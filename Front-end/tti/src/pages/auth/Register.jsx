@@ -61,6 +61,9 @@ export default function Register() {
           min-height: 100vh;
           width: 100vw;
           background: #f0f4f8;
+          display: flex;
+          align-items: flex-start;
+          justify-content: center;
           font-family: 'Barlow', sans-serif;
           padding: 60px;
           box-sizing: border-box;
@@ -73,7 +76,7 @@ export default function Register() {
           width: 100%;
           max-width: 680px;
           padding: 56px 64px 48px;
-          margin: 120px 60px 60px 60px;
+          margin: 60px auto;
         }
 
         .f-input {
