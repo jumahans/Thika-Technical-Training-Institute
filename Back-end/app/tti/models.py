@@ -33,17 +33,16 @@ class CustomUser(AbstractBaseUser, PermissionsMixin):
     address           = models.TextField(blank=True)
     next_of_kin_name  = models.CharField(max_length=200)
     next_of_kin_phone = models.CharField(max_length=20)
-    course            = models.CharField(max_length=200)
-    department        = models.CharField(max_length=200)
+    course           = models.ForeignKey('course', on_delete=models.PROTECT, null=True, blank=True)
     year_of_study     = models.PositiveSmallIntegerField(default=1)
-    admission_year    = models.PositiveSmallIntegerField()
+    admission_year = models.IntegerField(null=True, blank=True)
     is_active         = models.BooleanField(default=True)
     is_staff          = models.BooleanField(default=False)
     created_at        = models.DateTimeField(auto_now_add=True)
 
     objects = CustomUserManager()
 
-    USERNAME_FIELD  = 'admission_number'
+    USERNAME_FIELD = 'admission_number'
     REQUIRED_FIELDS = ['email', 'full_name']
     groups = models.ManyToManyField(
         'auth.Group',
@@ -95,37 +94,40 @@ class Event(models.Model):
         return self.title
 
 
-# ─── UNITS ───────────────────────────────────────────────────────────────────
+# ─── DEPARTMENTS ───────────────────────────────────────────────────────────────────
+class Department(models.Model):
+    name = models.CharField(max_length=100)
 
-class Unit(models.Model):
-    code          = models.CharField(max_length=20, unique=True)
-    name          = models.CharField(max_length=200)
-    course        = models.CharField(max_length=200)
-    year_of_study = models.PositiveSmallIntegerField()
-    semester      = models.ForeignKey(Semester, on_delete=models.PROTECT)
-    lecturer_name = models.CharField(max_length=200, blank=True)
+    def __str__(self):
+        return self.name
+# ─── COURCES ───────────────────────────────────────────────────────────────────
+class course(models.Model):
+    COURSE_LEVELS = (
+        ('certificate', 'Certificate'),
+        ('diploma', 'Diploma'),
+    )
+    code = models.CharField(max_length=20, unique=True)
+    name = models.CharField(max_length=200)
+    level = models.CharField(max_length=20, choices=COURSE_LEVELS)
+    department = models.ForeignKey(Department, on_delete=models.PROTECT, null=True, blank=True)
 
     def __str__(self):
         return f"{self.code} - {self.name}"
 
 
-# ─── TIMETABLE ───────────────────────────────────────────────────────────────
+# ─── UNITS ───────────────────────────────────────────────────────────────────
 
-class Timetable(models.Model):
-    DAY_CHOICES = [
-        ('Mon', 'Monday'), ('Tue', 'Tuesday'), ('Wed', 'Wednesday'),
-        ('Thu', 'Thursday'), ('Fri', 'Friday'),
-    ]
-
-    unit       = models.ForeignKey(Unit, on_delete=models.CASCADE)
-    day        = models.CharField(max_length=3, choices=DAY_CHOICES)
-    start_time = models.TimeField()
-    end_time   = models.TimeField()
-    venue      = models.CharField(max_length=100)
-    semester   = models.ForeignKey(Semester, on_delete=models.CASCADE)
+class Unit(models.Model):
+    code          = models.CharField(max_length=20, unique=True)
+    name          = models.CharField(max_length=200)
+    course        = models.ManyToManyField(course, blank=True, related_name='units', verbose_name='Courses this unit belongs to')
+    year_of_study = models.PositiveSmallIntegerField()
 
     def __str__(self):
-        return f"{self.unit.code} - {self.day} {self.start_time}"
+        return f"{self.code} - {self.name}"
+
+ 
+
 
 
 # ─── UNIT REGISTRATION ───────────────────────────────────────────────────────
@@ -187,13 +189,13 @@ class ExamCard(models.Model):
 # ─── FEES ─────────────────────────────────────────────────────────────────────
 
 class FeeStructure(models.Model):
-    course        = models.CharField(max_length=200)
+    course        = models.ForeignKey(course, on_delete=models.PROTECT)
+    semester      = models.ForeignKey(Semester, on_delete=models.PROTECT)
     academic_year = models.ForeignKey(AcademicYear, on_delete=models.PROTECT)
-    year_of_study = models.PositiveSmallIntegerField()
     total_fees    = models.DecimalField(max_digits=12, decimal_places=2)
 
     def __str__(self):
-        return f"{self.course} - Year {self.year_of_study} - {self.academic_year}"
+        return f"{self.course} - {self.semester} - {self.academic_year}"
 
 
 class FeePayment(models.Model):

@@ -6,19 +6,18 @@ from rest_framework.response import Response
 from rest_framework_simplejwt.tokens import RefreshToken
 from django.db.models import Sum
 from .models import (
-    CustomUser, AcademicYear, Semester, Event, Unit, Timetable,
+    CustomUser, AcademicYear, Semester, Event, Unit, course,
     UnitRegistration, AcademicResult, ExamCard, FeeStructure, FeePayment,
     ClearanceRecord, Hostel, Room, HostelBooking, DisciplinaryCase,
     StudentReporting, Attachment, StudentForm, LostCardReport
 )
 from .serializers import (
     RegisterSerializer, LoginSerializer, ProfileSerializer, ChangePasswordSerializer,
-    AcademicYearSerializer, SemesterSerializer, EventSerializer, UnitSerializer,
-    TimetableSerializer, UnitRegistrationSerializer, AcademicResultSerializer,
+    AcademicYearSerializer, SemesterSerializer, EventSerializer, UnitSerializer, UnitRegistrationSerializer, AcademicResultSerializer,
     ExamCardSerializer, FeeStructureSerializer, FeePaymentSerializer,
     ClearanceRecordSerializer, HostelSerializer, RoomSerializer, HostelBookingSerializer,
     DisciplinaryCaseSerializer, StudentReportingSerializer, AttachmentSerializer,
-    StudentFormSerializer, LostCardReportSerializer, DashboardSerializer
+    StudentFormSerializer, LostCardReportSerializer, DashboardSerializer, CourseSerializer
 )
 
 
@@ -95,7 +94,6 @@ class DashboardView(APIView):
             fee_structure = FeeStructure.objects.get(
                 course=student.course,
                 academic_year=current_year,
-                year_of_study=student.year_of_study
             )
             total_required = fee_structure.total_fees
         except FeeStructure.DoesNotExist:
@@ -165,28 +163,15 @@ class UnitListView(generics.ListAPIView):
 
     def get_queryset(self):
         user = self.request.user
-        return Unit.objects.filter(
-            course=user.course,
-            year_of_study=user.year_of_study
-        )
+        if not user.course:
+            return Unit.objects.none()
+        return Unit.objects.filter(course=user.course)
 
+class CourseListView(generics.ListAPIView):
+    queryset           = course.objects.all()
+    serializer_class   = CourseSerializer
+    permission_classes = []
 
-# ─── TIMETABLE ───────────────────────────────────────────────────────────────
-
-class TimetableView(generics.ListAPIView):
-    serializer_class   = TimetableSerializer
-    permission_classes = [permissions.IsAuthenticated]
-
-    def get_queryset(self):
-        user = self.request.user
-        try:
-            current_semester = Semester.objects.get(is_current=True)
-        except Semester.DoesNotExist:
-            return Timetable.objects.none()
-        return Timetable.objects.filter(
-            unit__course=user.course,
-            semester=current_semester
-        )
 
 
 # ─── UNIT REGISTRATION ───────────────────────────────────────────────────────
@@ -240,7 +225,7 @@ class FeeStructureView(generics.ListAPIView):
         user = self.request.user
         return FeeStructure.objects.filter(
             course=user.course,
-            year_of_study=user.year_of_study
+            academic_year = user.year_of_study
         )
 
 
@@ -258,11 +243,10 @@ class FeeSummaryView(APIView):
     def get(self, request):
         user = request.user
         try:
-            current_year  = AcademicYear.objects.get(is_current=True)
+            current_year  = AcademicYear.objects.filter(is_current=True).latest('id')
             fee_structure = FeeStructure.objects.get(
                 course=user.course,
                 academic_year=current_year,
-                year_of_study=user.year_of_study
             )
             total_required = fee_structure.total_fees
         except (AcademicYear.DoesNotExist, FeeStructure.DoesNotExist):

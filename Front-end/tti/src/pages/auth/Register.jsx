@@ -1,6 +1,7 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { authAPI, saveTokens } from "../../api/api";
+import { courselistAPI } from "../../api/api";
 
 const P     = "#0274BE";
 const PDARK = "#015fa0";
@@ -17,6 +18,8 @@ export default function Register() {
   const [loading, setLoading] = useState(false);
   const [showPass, setShowPass]   = useState(false);
   const [showPass2, setShowPass2] = useState(false);
+  const [courses, setCourses] = useState([]);
+  const [coursesLoading, setCoursesLoading] = useState(true);
 
   const [form, setForm] = useState({
     admission_number: "", full_name: "", email: "",
@@ -24,12 +27,29 @@ export default function Register() {
     national_id: "", address: "",
     next_of_kin_name: "", next_of_kin_phone: "",
     profile_photo: null,
-    course: "", department: "",
+    course: "",
     year_of_study: "", admission_year: "",
     password: "", password2: "",
   });
 
   const set = (k, v) => setForm(f => ({ ...f, [k]: v }));
+
+  useEffect(() => {
+    console.log("useEffect started");
+    const loadCourses = async () => {
+      console.log("Trying to call courselistAPI.getCourses()");
+      try {
+        const res = await courselistAPI.getCourses();
+        console.log("Courses response:", res.data);
+        setCourses(res.data || []);
+      } catch (err) {
+        console.error("Courses error:", err);
+      } finally {
+        setCoursesLoading(false);
+      }
+    };
+    loadCourses();
+  }, []);
 
   const handleSubmit = async () => {
     if (form.password !== form.password2) { setError("Passwords do not match."); return; }
@@ -272,11 +292,26 @@ export default function Register() {
             <div style={{ display: "flex", flexDirection: "column", gap: 22 }}>
               <div>
                 <label className="lbl">Course / Program</label>
-                <input className="f-input" type="text" placeholder="e.g. Electrical Engineering" value={form.course} onChange={e => set("course", e.target.value)} required />
-              </div>
-              <div>
-                <label className="lbl">Department</label>
-                <input className="f-input" type="text" placeholder="e.g. Electrical & Electronics" value={form.department} onChange={e => set("department", e.target.value)} required />
+                
+                {coursesLoading ? (
+                  <div style={{ color: "#64748b" }}>Loading courses...</div>
+                ) : courses.length === 0 ? (
+                  <div style={{ color: "#f59e0b" }}>No courses available</div>
+                ) : (
+                  <select 
+                    className="f-input" 
+                    value={form.course} 
+                    onChange={e => set("course", e.target.value)}
+                    required
+                  >
+                    <option value="">Select course</option>
+                    {courses.map(course => (
+                      <option key={course.id} value={course.id}>
+                        {course.code} - {course.name}
+                      </option>
+                    ))}
+                  </select>
+                )}
               </div>
               <div className="two-col">
                 <div>

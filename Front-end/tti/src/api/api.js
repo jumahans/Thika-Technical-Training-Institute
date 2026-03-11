@@ -258,6 +258,12 @@ export const studentFormsAPI = {
     }),
 };
 
+export const courselistAPI = {
+
+  getCourses: () =>
+    api.get("/courses/"),
+};
+
 // ─────────────────────────────────────────────────────────────────────────────
 // LOST CARD
 // ─────────────────────────────────────────────────────────────────────────────
@@ -297,6 +303,7 @@ export const clearTokens = () => {
   localStorage.removeItem("access_token");
   localStorage.removeItem("refresh_token");
 };
+
 
 export const isAuthenticated = () => !!localStorage.getItem("access_token");
 

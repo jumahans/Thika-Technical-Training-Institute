@@ -1,32 +1,96 @@
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin
 from .models import (
-    CustomUser, AcademicYear, Semester, Event, Unit, Timetable,
+    CustomUser, AcademicYear, Semester, Event, Unit,
     UnitRegistration, AcademicResult, ExamCard, FeeStructure, FeePayment,
     ClearanceRecord, Hostel, Room, HostelBooking, DisciplinaryCase,
-    StudentReporting, Attachment, StudentForm, LostCardReport
+    StudentReporting, Attachment, StudentForm, LostCardReport, course, Department
 )
 
 @admin.register(CustomUser)
 class CustomUserAdmin(UserAdmin):
-    model = CustomUser
-    list_display  = ['admission_number', 'full_name', 'email', 'course', 'department', 'year_of_study', 'is_active']
-    search_fields = ['admission_number', 'full_name', 'email', 'national_id']
-    ordering      = ['admission_number']
+    list_display = [
+        'admission_number',
+        'full_name',
+        'email',
+        'course',
+        'year_of_study',
+        'is_active',
+        'is_staff',
+    ]
+    list_filter = ['is_active', 'is_staff', 'year_of_study', 'course', 'gender']
+    search_fields = ['admission_number', 'full_name', 'email', 'national_id', 'phone_number']
+    ordering = ['admission_number']
+
+    # ─── Fields shown when editing an existing user ──────────────────────────
     fieldsets = (
-        (None,           {'fields': ('admission_number', 'password')}),
-        ('Personal Info',{'fields': ('full_name', 'email', 'phone_number', 'date_of_birth', 'gender', 'national_id', 'profile_photo', 'address')}),
-        ('Academic',     {'fields': ('course', 'department', 'year_of_study', 'admission_year')}),
-        ('Next of Kin',  {'fields': ('next_of_kin_name', 'next_of_kin_phone')}),
-        ('Permissions',  {'fields': ('is_active', 'is_staff', 'is_superuser', 'groups', 'user_permissions')}),
-    )
-    add_fieldsets = (
         (None, {
-            'classes': ('wide',),
-            'fields': ('admission_number', 'full_name', 'email', 'password1', 'password2'),
+            'fields': ('admission_number', 'password')
+        }),
+        ('Personal information', {
+            'fields': (
+                'full_name',
+                'email',
+                'phone_number',
+                'date_of_birth',
+                'gender',
+                'national_id',
+                'profile_photo',
+                'address',
+            )
+        }),
+        ('Academic information', {
+            'fields': (
+                'course',
+                'year_of_study',
+                'admission_year',
+            )
+        }),
+        ('Next of kin', {
+            'fields': (
+                'next_of_kin_name',
+                'next_of_kin_phone',
+            )
+        }),
+        ('Permissions', {
+            'fields': (
+                'is_active',
+                'is_staff',
+                'is_superuser',
+                'groups',
+                'user_permissions',
+            ),
         }),
     )
 
+    # ─── Fields shown when adding a NEW user ─────────────────────────────────
+    add_fieldsets = (
+        (None, {
+            'classes': ('wide',),
+            'fields': (
+                'admission_number',
+                'full_name',
+                'email',
+                'phone_number',
+                'date_of_birth',
+                'gender',
+                'national_id',
+                'address',
+                'next_of_kin_name',
+                'next_of_kin_phone',
+                'course',
+                'year_of_study',
+                'admission_year',
+                'password1',
+                'password2',
+                'is_active',
+                'is_staff',
+            ),
+        }),
+    )
+
+    # Optional: make some fields read-only after creation if you want
+    readonly_fields = ['created_at']
 @admin.register(AcademicYear)
 class AcademicYearAdmin(admin.ModelAdmin):
     list_display  = ['label', 'is_current']
@@ -42,15 +106,33 @@ class EventAdmin(admin.ModelAdmin):
     list_display  = ['title', 'date', 'location', 'organizer']
     search_fields = ['title', 'organizer']
 
+@admin.register(course)
+class courseAdmin(admin.ModelAdmin):
+    list_display  = ['code', 'name']
+    search_fields = ['code', 'name']
+
+
 @admin.register(Unit)
 class UnitAdmin(admin.ModelAdmin):
-    list_display  = ['code', 'name', 'course', 'year_of_study', 'semester', 'lecturer_name']
-    search_fields = ['code', 'name', 'course']
+    list_display = [
+        'code',
+        'name',
+        'get_courses_display',     
+    ]
+    
+    search_fields = ['code', 'name']           
+    
+    @admin.display(description='Courses')
+    def get_courses_display(self, obj):
+        count = obj.course.count()
+        return count if count > 0 else "—"
+        
 
-@admin.register(Timetable)
-class TimetableAdmin(admin.ModelAdmin):
-    list_display  = ['unit', 'day', 'start_time', 'end_time', 'venue', 'semester']
-    search_fields = ['unit__code', 'venue']
+
+@admin.register(Department)
+class DepartmentAdmin(admin.ModelAdmin):
+    list_display  = ['name']
+    search_fields = ['name']
 
 @admin.register(UnitRegistration)
 class UnitRegistrationAdmin(admin.ModelAdmin):
@@ -72,7 +154,7 @@ class ExamCardAdmin(admin.ModelAdmin):
 
 @admin.register(FeeStructure)
 class FeeStructureAdmin(admin.ModelAdmin):
-    list_display  = ['course', 'academic_year', 'year_of_study', 'total_fees']
+    list_display  = ['course', 'academic_year', 'semester', 'total_fees']
     search_fields = ['course']
 
 @admin.register(FeePayment)

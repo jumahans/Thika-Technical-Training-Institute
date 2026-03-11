@@ -1,6 +1,4 @@
-// src/App.jsx
-
-import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
+import { BrowserRouter, Routes, Route } from 'react-router-dom'
 
 // Landing
 import Landing from './pages/Landing'
@@ -9,6 +7,9 @@ import Landing from './pages/Landing'
 import Login          from './pages/auth/Login'
 import Register       from './pages/auth/Register'
 import ChangePassword from './pages/auth/ChangePassword'
+
+// Layout
+import Sidebar from './components/Sidebar'
 
 // Main Pages
 import Dashboard        from './pages/Dashboard'
@@ -23,10 +24,11 @@ import FeePayments      from './pages/FeePayments'
 import Clearance        from './pages/Clearance'
 import HostelBooking    from './pages/HostelBooking'
 import Disciplinary     from './pages/Disciplinary'
-import OnlineReporting        from './pages/OnlineReporting'
+import OnlineReporting  from './pages/OnlineReporting'
 import Attachments      from './pages/Attachments'
 import StudentForms     from './pages/StudentForms'
 import LostCard         from './pages/LostCard'
+import FeeSummary from './pages/FeeSummary'
 
 // Guard
 import PrivateRoute from './components/PrivateRoute'
@@ -36,32 +38,33 @@ function App() {
     <BrowserRouter>
       <Routes>
 
-        {/* Landing */}
+        {/* Public */}
         <Route path='/'         element={<Landing />} />
-
-        {/* Auth */}
         <Route path='/login'    element={<Login />} />
         <Route path='/register' element={<Register />} />
 
-        {/* Protected */}
+        {/* Protected — Sidebar is the layout shell, all pages render inside its <Outlet /> */}
         <Route element={<PrivateRoute />}>
-          <Route path='/dashboard'         element={<Dashboard />} />
-          <Route path='/profile'           element={<Profile />} />
-          <Route path='/change-password'   element={<ChangePassword />} />
-          <Route path='/events'            element={<Events />} />
-          <Route path='/units'             element={<Units />} />
-          <Route path='/unit-registration' element={<UnitRegistration />} />
-          <Route path='/results'           element={<Results />} />
-          <Route path='/exam-card'         element={<ExamCard />} />
-          <Route path='/fees/structure'    element={<FeeStructure />} />
-          <Route path='/fees/payments'     element={<FeePayments />} />
-          <Route path='/clearance'         element={<Clearance />} />
-          <Route path='/hostel'            element={<HostelBooking />} />
-          <Route path='/disciplinary'      element={<Disciplinary />} />
-          <Route path='/reporting'         element={<OnlineReporting />} />
-          <Route path='/attachments'       element={<Attachments />} />
-          <Route path='/forms'             element={<StudentForms />} />
-          <Route path='/lost-card'         element={<LostCard />} />
+          <Route element={<Sidebar />}>
+            <Route path='/dashboard'         element={<Dashboard />} />
+            <Route path='/profile'           element={<Profile />} />
+            <Route path='/change-password'   element={<ChangePassword />} />
+            <Route path='/events'            element={<Events />} />
+            <Route path='/units'             element={<Units />} />
+            <Route path='/unit-registration' element={<UnitRegistration />} />
+            <Route path='/results'           element={<Results />} />
+            <Route path='/exam-card'         element={<ExamCard />} />
+            <Route path='/fees/structure'    element={<FeeStructure />} />
+            <Route path='/fees/payments'     element={<FeePayments />} />
+            <Route path='/fees/summary'      element={<FeeSummary />} />
+            <Route path='/clearance'         element={<Clearance />} />
+            <Route path='/hostel'            element={<HostelBooking />} />
+            <Route path='/disciplinary'      element={<Disciplinary />} />
+            <Route path='/reporting'         element={<OnlineReporting />} />
+            <Route path='/attachments'       element={<Attachments />} />
+            <Route path='/forms'             element={<StudentForms />} />
+            <Route path='/lost-card'         element={<LostCard />} />
+          </Route>
         </Route>
 
       </Routes>

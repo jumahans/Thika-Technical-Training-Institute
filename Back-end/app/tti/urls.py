@@ -5,13 +5,13 @@ from rest_framework_simplejwt.views import TokenRefreshView
 from .views import (
     RegisterView, LoginView, LogoutView, ProfileView, ChangePasswordView,
     DashboardView, EventListView, EventDetailView, UnitListView,
-    TimetableView, UnitRegistrationView, UnitRegistrationDetailView,
+    UnitRegistrationView, UnitRegistrationDetailView,
     AcademicResultListView, ExamCardView, FeeStructureView,
     FeePaymentListView, FeeSummaryView, ClearanceRecordView,
     HostelListView, RoomListView, HostelBookingView, DisciplinaryCaseView,
     StudentReportingView, AttachmentView, AttachmentDetailView,
     StudentFormView, StudentFormDetailView, LostCardReportView,
-    AcademicYearListView, SemesterListView
+    AcademicYearListView, SemesterListView, CourseListView
 )
 
 urlpatterns = [
@@ -33,9 +33,7 @@ urlpatterns = [
 
     # ─── UNITS ───────────────────────────────────────────────────────────────
     path('units/',                 UnitListView.as_view(),       name='units'),
-
-    # ─── TIMETABLE ───────────────────────────────────────────────────────────
-    path('timetable/',             TimetableView.as_view(),      name='timetable'),
+    path('courses/',               CourseListView.as_view(),     name='courses'),
 
     # ─── UNIT REGISTRATION ───────────────────────────────────────────────────
     path('unit-registration/',           UnitRegistrationView.as_view(),       name='unit-registration'),

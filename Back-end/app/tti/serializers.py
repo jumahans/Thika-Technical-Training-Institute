@@ -3,7 +3,7 @@
 from rest_framework import serializers
 from django.contrib.auth import authenticate
 from .models import (
-    CustomUser, AcademicYear, Semester, Event, Unit, Timetable,
+    CustomUser, AcademicYear, Semester, Event, Unit, course,
     UnitRegistration, AcademicResult, ExamCard, FeeStructure, FeePayment,
     ClearanceRecord, Hostel, Room, HostelBooking, DisciplinaryCase,
     StudentReporting, Attachment, StudentForm, LostCardReport
@@ -22,7 +22,7 @@ class RegisterSerializer(serializers.ModelSerializer):
             'admission_number', 'full_name', 'email', 'phone_number',
             'date_of_birth', 'gender', 'national_id', 'profile_photo',
             'address', 'next_of_kin_name', 'next_of_kin_phone',
-            'course', 'department', 'year_of_study', 'admission_year',
+            'course', 'year_of_study', 'admission_year',
             'password', 'password2'
         ]
 
@@ -64,7 +64,7 @@ class ProfileSerializer(serializers.ModelSerializer):
             'id', 'admission_number', 'full_name', 'email', 'phone_number',
             'date_of_birth', 'gender', 'national_id', 'profile_photo',
             'address', 'next_of_kin_name', 'next_of_kin_phone',
-            'course', 'department', 'year_of_study', 'admission_year',
+            'course', 'year_of_study', 'admission_year',
             'created_at'
         ]
         read_only_fields = ['admission_number', 'created_at']
@@ -126,17 +126,14 @@ class UnitSerializer(serializers.ModelSerializer):
         model  = Unit
         fields = '__all__'
 
-
-# ─── TIMETABLE ───────────────────────────────────────────────────────────────
-
-class TimetableSerializer(serializers.ModelSerializer):
-    unit_code    = serializers.CharField(source='unit.code', read_only=True)
-    unit_name    = serializers.CharField(source='unit.name', read_only=True)
-    semester_name = serializers.CharField(source='semester.name', read_only=True)
+class CourseSerializer(serializers.ModelSerializer):
+    department_name = serializers.CharField(source='department.name', read_only=True)
 
     class Meta:
-        model  = Timetable
+        model  = course
         fields = '__all__'
+
+
 
 
 # ─── UNIT REGISTRATION ───────────────────────────────────────────────────────

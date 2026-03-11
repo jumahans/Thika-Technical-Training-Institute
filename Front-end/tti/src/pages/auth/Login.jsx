@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { authAPI, saveTokens } from "../../api/api";
+import logo from "../../assets/logo.png";
 
 const P     = "#0274BE";
 const PDARK = "#015fa0";
@@ -115,13 +116,16 @@ export default function Login() {
           <div style={{ textAlign: "center", marginBottom: 36 }}>
             <div style={{
               width: 68, height: 68,
-              background: P,
               borderRadius: "50%",
               display: "flex", alignItems: "center", justifyContent: "center",
               fontWeight: 900, color: "#fff", fontSize: 18,
               margin: "0 auto 14px",
               boxShadow: "0 6px 24px rgba(2,116,190,0.28)",
-            }}>TTI</div>
+            }}>
+              <img src={logo} alt="TTI Logo" style={{
+                width: "68px",
+              }} />
+            </div>
 
             <p style={{
               fontSize: 14, fontWeight: 700, color: DARK,

@@ -1,4 +1,12 @@
 import { useState, useEffect, useRef } from "react";
+import logo from "../assets/logo.png";
+import scouts from "../assets/scouts.jpg";
+import sports from "../assets/sports.jpeg";
+import image1 from "../assets/img1.jpeg";
+import image2 from "../assets/images2.jpeg";
+import image3 from "../assets/image3.jpeg";
+import image4 from "../assets/image4.jpeg";
+import career from "../assets/career.jpeg";
 
 const PRIMARY = "#0274BE";
 const RED = "#C0392B";
@@ -35,19 +43,19 @@ const mainLinks = [
 
 const heroSlides = [
   {
-    img: "https://images.unsplash.com/photo-1562774053-701939374585?w=1600&q=80",
+    img: image1,
     title: "Engineering Tomorrow's",
     highlight: "Kenya",
     sub: "Premier TVET Institution in the Mt. Kenya Region",
   },
   {
-    img: "https://images.unsplash.com/photo-1523050854058-8df90110c9f1?w=1600&q=80",
+    img: image3,
     title: "Skills. Knowledge.",
     highlight: "Purpose.",
     sub: "Transforming Lives Through Technical Education",
   },
   {
-    img: "https://images.unsplash.com/photo-1509062522246-3755977927d7?w=1600&q=80",
+    img: image4,
     title: "Build Your Future",
     highlight: "With Us",
     sub: "Over 50 Programs Across 10 Departments",
@@ -140,17 +148,17 @@ const values = [
 const studentLife = [
   {
     title: "Sports",
-    img: "https://images.unsplash.com/photo-1461896836934-ffe607ba8211?w=600&q=80",
+    img: sports,
     desc: "Compete, grow and build teamwork through our vibrant sports programs.",
   },
   {
     title: "Career Services",
-    img: "https://images.unsplash.com/photo-1521737711867-e3b97375f902?w=600&q=80",
+    img: career,
     desc: "Career guidance, job placement and industry connections for every graduate.",
   },
   {
     title: "Clubs & Societies",
-    img: "https://images.unsplash.com/photo-1529156069898-49953e39b3ac?w=600&q=80",
+    img: scouts,
     desc: "Explore your passions and make lifelong friends through our many clubs.",
   },
 ];
@@ -274,14 +282,18 @@ function MainNav() {
         <div style={{ display: "flex", alignItems: "center", gap: 12, flexShrink: 0 }}>
           <div style={{
             width: 44, height: 44,
-            background: PRIMARY,
+
             borderRadius: 6,
             display: "flex", alignItems: "center", justifyContent: "center",
             fontWeight: 900, color: WHITE, fontSize: 13,
             fontFamily: "'Barlow Condensed', sans-serif",
             letterSpacing: 0.5,
             flexShrink: 0,
-          }}>TTI</div>
+          }}>
+            <img src={logo} alt="TTI logo" style = {{
+              width: 44,
+            }} />
+          </div>
           <div>
             <div style={{
               color: scrolled ? WHITE : DARK,
@@ -1125,7 +1137,7 @@ function ServiceCharterSection() {
           }}>
             <iframe
               style={{ position: "absolute", top: 0, left: 0, width: "100%", height: "100%", border: "none" }}
-              src="https://www.youtube.com/embed/gS8nXoKnvKc"
+              src="https://youtu.be/3DlPQvYLjwI"
               title="Thika TTI"
               allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
               allowFullScreen
@@ -1344,13 +1356,16 @@ function Footer() {
               margin: "0 0 16px", paddingBottom: 12,
               borderBottom: `2px solid rgba(255,255,255,0.15)`,
             }}>Find Us</h4>
-            <iframe
-              title="Thika TTI Location"
-              src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3989.048!2d37.0833!3d-1.0333!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2zThika Technical Training Institute!5e0!3m2!1sen!2ske!4v1234567890"
-              width="100%" height="185"
-              style={{ border: "none", borderRadius: 6, opacity: 0.85 }}
-              allowFullScreen loading="lazy"
-            />
+            <iframe 
+              src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3989.1577933511653!2d37.07773657496532!3d-1.0425870989473822!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x182f4f8ce25a05df%3A0x30943508fed621a7!2sTHIKA%20TECHNICAL%20TRAINING%20INSTITUTE!5e0!3m2!1sen!2ske!4v1772484526882!5m2!1sen!2ske" 
+              width="600" 
+              height="450" 
+              style={{ border: 0 }}
+              allowFullScreen="" 
+              loading="lazy" 
+              referrerPolicy="no-referrer-when-downgrade"
+            >
+            </iframe>
           </div>
         </div>
 
