@@ -1,4 +1,4 @@
-import { BrowserRouter, Routes, Route } from 'react-router-dom'
+import { HashRouter, Routes, Route } from 'react-router-dom'
 
 // Landing
 import Landing from './pages/Landing'
@@ -35,7 +35,7 @@ import PrivateRoute from './components/PrivateRoute'
 
 function App() {
   return (
-    <BrowserRouter>
+    <HashRouter>
       <Routes>
 
         {/* Public */}
@@ -69,7 +69,7 @@ function App() {
         </Route>
 
       </Routes>
-    </BrowserRouter>
+    </HashRouter>
   )
 }
 
