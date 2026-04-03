@@ -11,9 +11,8 @@ const GREY4 = "#94a3b8";
 const DARK  = "#1e293b";
 
 const STATUS_META = {
-  approved: { color: "#15803d", bg: "#dcfce7", label: "Approved" },
-  pending:  { color: "#a16207", bg: "#fef9c3", label: "Pending"  },
-  rejected: { color: "#dc2626", bg: "#fee2e2", label: "Rejected" },
+  reported: { color: "#15803d", bg: "#dcfce7", label: "Reported" },
+  absent:   { color: "#dc2626", bg: "#fee2e2", label: "Absent"   },
 };
 
 export default function OnlineReporting() {
@@ -27,7 +26,6 @@ export default function OnlineReporting() {
 
   const [selectedSemester, setSelectedSemester] = useState("");
   const [reportDate,       setReportDate]       = useState("");
-  const [remarks,          setRemarks]          = useState("");
 
   useEffect(() => {
     (async () => {
@@ -53,13 +51,15 @@ export default function OnlineReporting() {
     setSubmitting(true);
     try {
       const res = await reportingAPI.createReporting({
-        semester:    parseInt(selectedSemester),
-        report_date: reportDate,
-        remarks:     remarks.trim(),
+        semester:       parseInt(selectedSemester),
+        reporting_date: reportDate,
+        status:         "reported",
       });
       setReports(prev => [res.data, ...prev]);
-      setSelectedSemester(""); setReportDate(""); setRemarks("");
-      setShowForm(false); setSuccess(true);
+      setSelectedSemester("");
+      setReportDate("");
+      setShowForm(false);
+      setSuccess(true);
       setTimeout(() => setSuccess(false), 4000);
     } catch (err) {
       const data = err.response?.data;
@@ -108,12 +108,14 @@ export default function OnlineReporting() {
       {/* BANNERS */}
       {success && (
         <div style={{ background: "#f0fdf4", border: "1px solid #bbf7d0", borderRadius: 6, padding: "12px 18px", marginBottom: 16, display: "flex", alignItems: "center", gap: 10 }}>
-          <span>✅</span><span style={{ fontSize: 13.5, color: "#15803d", fontWeight: 600 }}>Report submitted successfully! Pending approval.</span>
+          <span>✅</span>
+          <span style={{ fontSize: 13.5, color: "#15803d", fontWeight: 600 }}>Report submitted successfully!</span>
         </div>
       )}
       {error && (
         <div style={{ background: "#fef2f2", border: "1px solid #fecaca", borderRadius: 6, padding: "12px 18px", marginBottom: 16, display: "flex", alignItems: "center", gap: 10 }}>
-          <span>⚠️</span><span style={{ fontSize: 13.5, color: "#dc2626", fontWeight: 600 }}>{error}</span>
+          <span>⚠️</span>
+          <span style={{ fontSize: 13.5, color: "#dc2626", fontWeight: 600 }}>{error}</span>
         </div>
       )}
 
@@ -124,32 +126,41 @@ export default function OnlineReporting() {
             Submit Semester Report
           </h3>
 
-          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16, marginBottom: 16 }}>
+          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16, marginBottom: 20 }}>
             <div>
               <label style={{ fontSize: 11, fontWeight: 700, color: GREY4, letterSpacing: 1, textTransform: "uppercase", display: "block", marginBottom: 6 }}>Semester *</label>
-              <select value={selectedSemester} onChange={e => setSelectedSemester(e.target.value)}
-                style={{ width: "100%", padding: "9px 12px", border: `1px solid ${GREY3}`, borderRadius: 6, fontSize: 13.5, color: selectedSemester ? DARK : GREY4, outline: "none", background: WHITE, fontFamily: "inherit", cursor: "pointer" }}>
+              <select
+                value={selectedSemester}
+                onChange={e => setSelectedSemester(e.target.value)}
+                style={{ width: "100%", padding: "9px 12px", border: `1px solid ${GREY3}`, borderRadius: 6, fontSize: 13.5, color: selectedSemester ? DARK : GREY4, outline: "none", background: WHITE, fontFamily: "inherit", cursor: "pointer" }}
+              >
                 <option value="">Select semester…</option>
-                {semesters.map(s => <option key={s.id} value={s.id}>{s.name}{s.is_current ? " (Current)" : ""}</option>)}
+                {semesters.map(s => (
+                  <option key={s.id} value={s.id}>
+                    {s.name}{s.is_current ? " (Current)" : ""}
+                  </option>
+                ))}
               </select>
             </div>
             <div>
               <label style={{ fontSize: 11, fontWeight: 700, color: GREY4, letterSpacing: 1, textTransform: "uppercase", display: "block", marginBottom: 6 }}>Report Date *</label>
-              <input type="date" value={reportDate} onChange={e => setReportDate(e.target.value)}
-                style={{ width: "100%", padding: "9px 12px", border: `1px solid ${GREY3}`, borderRadius: 6, fontSize: 13.5, color: DARK, outline: "none", background: WHITE, fontFamily: "inherit" }} />
+              <input
+                type="date"
+                value={reportDate}
+                onChange={e => setReportDate(e.target.value)}
+                style={{ width: "100%", padding: "9px 12px", border: `1px solid ${GREY3}`, borderRadius: 6, fontSize: 13.5, color: DARK, outline: "none", background: WHITE, fontFamily: "inherit" }}
+              />
             </div>
           </div>
 
-          <div style={{ marginBottom: 20 }}>
-            <label style={{ fontSize: 11, fontWeight: 700, color: GREY4, letterSpacing: 1, textTransform: "uppercase", display: "block", marginBottom: 6 }}>Remarks (optional)</label>
-            <textarea value={remarks} onChange={e => setRemarks(e.target.value)} rows={3} placeholder="Any additional notes or remarks…"
-              style={{ width: "100%", padding: "9px 12px", border: `1px solid ${GREY3}`, borderRadius: 6, fontSize: 13.5, color: DARK, outline: "none", background: WHITE, fontFamily: "inherit", resize: "vertical" }} />
-          </div>
-
           <div style={{ display: "flex", gap: 10, justifyContent: "flex-end" }}>
-            <button onClick={() => { setShowForm(false); setError(null); }}
-              style={{ padding: "10px 22px", background: GREY2, border: `1px solid ${GREY3}`, borderRadius: 6, color: DARK, fontWeight: 600, fontSize: 13.5, cursor: "pointer", fontFamily: "inherit" }}>Cancel</button>
-            <button onClick={handleSubmit} disabled={submitting}
+            <button
+              onClick={() => { setShowForm(false); setError(null); }}
+              style={{ padding: "10px 22px", background: GREY2, border: `1px solid ${GREY3}`, borderRadius: 6, color: DARK, fontWeight: 600, fontSize: 13.5, cursor: "pointer", fontFamily: "inherit" }}
+            >Cancel</button>
+            <button
+              onClick={handleSubmit}
+              disabled={submitting}
               style={{ padding: "10px 28px", background: submitting ? GREY4 : P, border: "none", borderRadius: 6, color: WHITE, fontWeight: 700, fontSize: 13.5, cursor: submitting ? "not-allowed" : "pointer", fontFamily: "inherit" }}
               onMouseEnter={e => { if (!submitting) e.currentTarget.style.background = PDARK; }}
               onMouseLeave={e => { if (!submitting) e.currentTarget.style.background = submitting ? GREY4 : P; }}
@@ -170,35 +181,36 @@ export default function OnlineReporting() {
             <div style={{ fontSize: 48, marginBottom: 16 }}>📝</div>
             <p style={{ fontSize: 15, color: DARK, fontWeight: 700, marginBottom: 6 }}>No reports submitted yet</p>
             <p style={{ fontSize: 13, color: GREY4, marginBottom: 20 }}>Submit your semester attendance report using the button above.</p>
-            <button onClick={() => setShowForm(true)} style={{ background: P, color: WHITE, fontWeight: 700, fontSize: 13.5, padding: "10px 24px", borderRadius: 6, cursor: "pointer", border: "none", fontFamily: "inherit" }}>+ Report Attendance</button>
+            <button
+              onClick={() => setShowForm(true)}
+              style={{ background: P, color: WHITE, fontWeight: 700, fontSize: 13.5, padding: "10px 24px", borderRadius: 6, cursor: "pointer", border: "none", fontFamily: "inherit" }}
+            >+ Report Attendance</button>
           </div>
         ) : (
           <div style={{ overflowX: "auto" }}>
             <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 13.5 }}>
               <thead>
                 <tr style={{ background: GREY2, borderBottom: `2px solid ${GREY3}` }}>
-                  {["#", "Semester", "Report Date", "Submitted On", "Remarks", "Status"].map(h => (
+                  {["#", "Semester", "Report Date", "Status"].map(h => (
                     <th key={h} style={{ padding: "12px 18px", textAlign: "left", fontSize: 11, fontWeight: 700, color: GREY4, letterSpacing: 0.8, textTransform: "uppercase", whiteSpace: "nowrap" }}>{h}</th>
                   ))}
                 </tr>
               </thead>
               <tbody>
                 {reports.map((r, i) => {
-                  const meta = STATUS_META[r.status] || STATUS_META.pending;
+                  const meta = STATUS_META[r.status] || STATUS_META.reported;
                   return (
-                    <tr key={r.id || i} style={{ borderBottom: `1px solid ${GREY3}`, transition: "background 0.12s" }}
+                    <tr
+                      key={r.id || i}
+                      style={{ borderBottom: `1px solid ${GREY3}`, transition: "background 0.12s" }}
                       onMouseEnter={e => e.currentTarget.style.background = GREY1}
                       onMouseLeave={e => e.currentTarget.style.background = "transparent"}
                     >
                       <td style={{ padding: "13px 18px", color: GREY4, fontSize: 12, fontWeight: 600 }}>{String(i + 1).padStart(2, "0")}</td>
                       <td style={{ padding: "13px 18px", fontWeight: 600, color: DARK }}>{r.semester_name || r.semester || "—"}</td>
                       <td style={{ padding: "13px 18px", color: DARK, whiteSpace: "nowrap" }}>
-                        {r.report_date ? new Date(r.report_date).toLocaleDateString("en-KE", { day: "numeric", month: "short", year: "numeric" }) : "—"}
+                        {r.reporting_date ? new Date(r.reporting_date).toLocaleDateString("en-KE", { day: "numeric", month: "short", year: "numeric" }) : "—"}
                       </td>
-                      <td style={{ padding: "13px 18px", color: DARK, whiteSpace: "nowrap" }}>
-                        {r.submitted_at ? new Date(r.submitted_at).toLocaleDateString("en-KE", { day: "numeric", month: "short", year: "numeric" }) : "—"}
-                      </td>
-                      <td style={{ padding: "13px 18px", color: GREY4, maxWidth: 220 }}>{r.remarks || <span style={{ fontStyle: "italic" }}>—</span>}</td>
                       <td style={{ padding: "13px 18px" }}>
                         <span style={{ background: meta.bg, color: meta.color, fontSize: 12, fontWeight: 700, padding: "3px 10px", borderRadius: 99 }}>{meta.label}</span>
                       </td>

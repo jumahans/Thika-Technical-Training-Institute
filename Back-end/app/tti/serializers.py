@@ -150,7 +150,7 @@ class UnitRegistrationSerializer(serializers.ModelSerializer):
     class Meta:
         model  = UnitRegistration
         fields = [
-            'id', 'student', 'academic_year', 'academic_year_label',
+            'id', 'academic_year', 'academic_year_label',
             'semester', 'semester_name', 'units', 'unit_ids',
             'status', 'registered_at'
         ]

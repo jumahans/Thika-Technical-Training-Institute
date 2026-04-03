@@ -7,6 +7,7 @@ import image2 from "../assets/images2.jpeg";
 import image3 from "../assets/image3.jpeg";
 import image4 from "../assets/image4.jpeg";
 import career from "../assets/career.jpeg";
+import { Link } from "react-router-dom";
 
 const PRIMARY = "#0274BE";
 const RED = "#C0392B";
@@ -454,6 +455,7 @@ function TickerBanner() {
 function HeroCarousel() {
   const [current, setCurrent] = useState(0);
   const [animating, setAnimating] = useState(true);
+  const [formData, setFormData] = useState({ name: "", phone: "", course: "" });
 
   useEffect(() => {
     const timer = setInterval(() => {
@@ -498,65 +500,184 @@ function HeroCarousel() {
         boxSizing: "border-box",
       }}>
         <div style={{
-          maxWidth: 680,
-          opacity: animating ? 1 : 0,
-          transform: animating ? "translateY(0)" : "translateY(20px)",
-          transition: "all 0.6s ease",
+          display: "grid",
+          gridTemplateColumns: "1fr 380px",
+          gap: 60,
+          width: "100%",
+          alignItems: "center",
         }}>
-          {/* Kenya flag stripe */}
-          <div style={{ display: "flex", gap: 5, marginBottom: 24 }}>
-            {["#000", RED, "#27ae60"].map((c, i) => (
-              <div key={i} style={{ width: 36, height: 4, background: c, borderRadius: 2 }} />
-            ))}
-          </div>
-
+          {/* Left - Original Content */}
           <div style={{
-            color: "rgba(255,255,255,0.65)", fontSize: 11.5, letterSpacing: 4,
-            fontFamily: "'Barlow', sans-serif", fontWeight: 600,
-            textTransform: "uppercase", marginBottom: 14,
+            maxWidth: 680,
+            opacity: animating ? 1 : 0,
+            transform: animating ? "translateY(0)" : "translateY(20px)",
+            transition: "all 0.6s ease",
           }}>
-            Thika Technical Training Institute
+            {/* Kenya flag stripe */}
+            <div style={{ display: "flex", gap: 5, marginBottom: 24 }}>
+              {["#000", RED, "#27ae60"].map((c, i) => (
+                <div key={i} style={{ width: 36, height: 4, background: c, borderRadius: 2 }} />
+              ))}
+            </div>
+
+            <div style={{
+              color: "rgba(255,255,255,0.65)", fontSize: 11.5, letterSpacing: 4,
+              fontFamily: "'Barlow', sans-serif", fontWeight: 600,
+              textTransform: "uppercase", marginBottom: 14,
+            }}>
+              Thika Technical Training Institute
+            </div>
+
+            <h1 style={{
+              color: WHITE, margin: 0, lineHeight: 1.05,
+              fontFamily: "'Barlow Condensed', sans-serif",
+              fontWeight: 800, fontSize: "clamp(40px, 6.5vw, 76px)",
+              textTransform: "uppercase",
+            }}>
+              {slide.title}<br />
+              <span style={{ color: PRIMARY }}>
+                {slide.highlight}
+              </span>
+            </h1>
+
+            <p style={{
+              color: "rgba(255,255,255,0.75)", fontSize: 17,
+              fontFamily: "'Barlow', sans-serif", margin: "20px 0 38px",
+              fontWeight: 400, maxWidth: 500, lineHeight: 1.6,
+            }}>{slide.sub}</p>
+
+            <div style={{ display: "flex", gap: 14, flexWrap: "wrap" }}>
+              <Link to="/courses" style={{
+                background: "red", 
+                color: WHITE, 
+                padding: "13px 30px",
+                borderRadius: 4, 
+                fontWeight: 700, 
+                fontSize: 13,
+                fontFamily: "'Barlow Condensed', sans-serif", 
+                letterSpacing: 2,
+                textDecoration: "none", 
+                textTransform: "uppercase",
+                border: "2px solid rgba(255,255,255,0.4)", 
+                transition: "all 0.2s",
+              }}
+                onMouseEnter={e => { e.currentTarget.style.background = "red"; e.currentTarget.style.borderColor = WHITE; }}
+                onMouseLeave={e => { e.currentTarget.style.background = "transparent"; e.currentTarget.style.borderColor = "rgba(255,255,255,0.4)"; }}
+              >COURSES</Link>
+              <a href="#" style={{
+                background: "transparent", color: WHITE, padding: "13px 30px",
+                borderRadius: 4, fontWeight: 700, fontSize: 13,
+                fontFamily: "'Barlow Condensed', sans-serif", letterSpacing: 2,
+                textDecoration: "none", textTransform: "uppercase",
+                border: `2px solid rgba(255,255,255,0.4)`, transition: "all 0.2s",
+              }}
+                onMouseEnter={e => { e.currentTarget.style.background = "rgba(255,255,255,0.1)"; e.currentTarget.style.borderColor = WHITE; }}
+                onMouseLeave={e => { e.currentTarget.style.background = "transparent"; e.currentTarget.style.borderColor = "rgba(255,255,255,0.4)"; }}
+              >Request Information</a>
+            </div>
           </div>
 
-          <h1 style={{
-            color: WHITE, margin: 0, lineHeight: 1.05,
-            fontFamily: "'Barlow Condensed', sans-serif",
-            fontWeight: 800, fontSize: "clamp(40px, 6.5vw, 76px)",
-            textTransform: "uppercase",
+          {/* Right - Career Guide Card */}
+          <div style={{
+            background: WHITE,
+            padding: 35,
+            borderRadius: 8,
+            boxShadow: "0 20px 60px rgba(0,0,0,0.4)",
+            opacity: animating ? 1 : 0,
+            transform: animating ? "translateY(0)" : "translateY(20px)",
+            transition: "all 0.6s ease 0.2s",
           }}>
-            {slide.title}<br />
-            <span style={{ color: PRIMARY }}>
-              {slide.highlight}
-            </span>
-          </h1>
+            <h3 style={{
+              fontFamily: "'Barlow Condensed', sans-serif",
+              fontSize: 22,
+              color: DARK,
+              margin: "0 0 6px",
+              textTransform: "uppercase",
+              fontWeight: 800,
+            }}>Get Your Career Guide</h3>
+            <p style={{
+              color: "#666",
+              fontSize: 13,
+              margin: "0 0 20px",
+              lineHeight: 1.5,
+            }}>Download 2026 course catalog & fee structure instantly.</p>
 
-          <p style={{
-            color: "rgba(255,255,255,0.75)", fontSize: 17,
-            fontFamily: "'Barlow', sans-serif", margin: "20px 0 38px",
-            fontWeight: 400, maxWidth: 500, lineHeight: 1.6,
-          }}>{slide.sub}</p>
+            <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+              <input
+                type="text"
+                placeholder="Your Full Name"
+                value={formData.name}
+                onChange={e => setFormData({...formData, name: e.target.value})}
+                style={{
+                  padding: "14px 16px",
+                  border: "1px solid #ddd",
+                  borderRadius: 4,
+                  fontSize: 14,
+                  fontFamily: "'Barlow', sans-serif",
+                  outline: "none",
+                }}
+              />
+              <input
+                type="tel"
+                placeholder="Phone Number"
+                value={formData.phone}
+                onChange={e => setFormData({...formData, phone: e.target.value})}
+                style={{
+                  padding: "14px 16px",
+                  border: "1px solid #ddd",
+                  borderRadius: 4,
+                  fontSize: 14,
+                  fontFamily: "'Barlow', sans-serif",
+                  outline: "none",
+                }}
+              />
+              <select 
+                value={formData.course}
+                onChange={e => setFormData({...formData, course: e.target.value})}
+                style={{
+                  padding: "14px 16px",
+                  border: "1px solid #ddd",
+                  borderRadius: 4,
+                  fontSize: 14,
+                  fontFamily: "'Barlow', sans-serif",
+                  color: formData.course ? DARK : "#888",
+                  outline: "none",
+                  background: WHITE,
+                }}
+              >
+                <option value="">Select Course Interest</option>
+                {departments.map(d => (
+                  <option key={d.name} value={d.name}>{d.name}</option>
+                ))}
+              </select>
+              <button style={{
+                background: RED,
+                color: WHITE,
+                padding: "16px",
+                border: "none",
+                borderRadius: 4,
+                fontWeight: 800,
+                fontSize: 14,
+                textTransform: "uppercase",
+                letterSpacing: 1.5,
+                cursor: "pointer",
+                fontFamily: "'Barlow Condensed', sans-serif",
+                boxShadow: "0 4px 16px rgba(192,57,43,0.4)",
+                marginTop: 4,
+              }}>
+                Download Now →
+              </button>
+            </div>
 
-          <div style={{ display: "flex", gap: 14, flexWrap: "wrap" }}>
-            <a href="#" style={{
-              background: RED, color: WHITE, padding: "13px 30px",
-              borderRadius: 4, fontWeight: 800, fontSize: 13,
-              fontFamily: "'Barlow Condensed', sans-serif", letterSpacing: 2,
-              textDecoration: "none", textTransform: "uppercase",
-              transition: "all 0.2s", boxShadow: "0 4px 16px rgba(192,57,43,0.4)",
-            }}
-              onMouseEnter={e => e.currentTarget.style.background = "#a93226"}
-              onMouseLeave={e => e.currentTarget.style.background = RED}
-            >Our Courses</a>
-            <a href="#" style={{
-              background: "transparent", color: WHITE, padding: "13px 30px",
-              borderRadius: 4, fontWeight: 700, fontSize: 13,
-              fontFamily: "'Barlow Condensed', sans-serif", letterSpacing: 2,
-              textDecoration: "none", textTransform: "uppercase",
-              border: `2px solid rgba(255,255,255,0.4)`, transition: "all 0.2s",
-            }}
-              onMouseEnter={e => { e.currentTarget.style.background = "rgba(255,255,255,0.1)"; e.currentTarget.style.borderColor = WHITE; }}
-              onMouseLeave={e => { e.currentTarget.style.background = "transparent"; e.currentTarget.style.borderColor = "rgba(255,255,255,0.4)"; }}
-            >Request Information</a>
+            <p style={{
+              color: "#999",
+              fontSize: 11,
+              textAlign: "center",
+              marginTop: 14,
+              marginBottom: 0,
+            }}>
+              Trusted by 10,000+ students. Your info is secure.
+            </p>
           </div>
         </div>
       </div>

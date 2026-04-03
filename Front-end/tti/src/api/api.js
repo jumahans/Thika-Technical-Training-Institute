@@ -111,6 +111,7 @@ export const unitsAPI = {
 
   getUnits: () =>
     api.get("/units/"),
+    getAvailableUnits: () => api.get("/units/available/"), 
 };
 
 // ─────────────────────────────────────────────────────────────────────────────

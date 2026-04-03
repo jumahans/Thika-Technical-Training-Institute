@@ -165,7 +165,34 @@ class UnitListView(generics.ListAPIView):
         user = self.request.user
         if not user.course:
             return Unit.objects.none()
-        return Unit.objects.filter(course=user.course)
+
+        # Only return units the student has actually registered
+        registered = UnitRegistration.objects.filter(
+            student=user,
+            status='approved'
+        ).values_list('units', flat=True)
+
+        if not registered:
+            return Unit.objects.none()  # New student sees NOTHING until they register
+
+        return Unit.objects.filter(id__in=registered)
+
+class AvailableUnitsView(generics.ListAPIView):
+    serializer_class   = UnitSerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get_queryset(self):
+        user = self.request.user
+        if not user.course:
+            return Unit.objects.none()
+
+        already_registered = UnitRegistration.objects.filter(
+            student=user
+        ).values_list('units', flat=True)
+
+        return Unit.objects.filter(
+            course=user.course,        # filter by course only
+        ).exclude(id__in=already_registered).distinct()
 
 class CourseListView(generics.ListAPIView):
     queryset           = course.objects.all()

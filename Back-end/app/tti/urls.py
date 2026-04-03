@@ -11,7 +11,7 @@ from .views import (
     HostelListView, RoomListView, HostelBookingView, DisciplinaryCaseView,
     StudentReportingView, AttachmentView, AttachmentDetailView,
     StudentFormView, StudentFormDetailView, LostCardReportView,
-    AcademicYearListView, SemesterListView, CourseListView
+    AcademicYearListView, SemesterListView, CourseListView, AvailableUnitsView
 )
 
 urlpatterns = [
@@ -34,7 +34,7 @@ urlpatterns = [
     # ─── UNITS ───────────────────────────────────────────────────────────────
     path('units/',                 UnitListView.as_view(),       name='units'),
     path('courses/',               CourseListView.as_view(),     name='courses'),
-
+    path('units/available/', AvailableUnitsView.as_view(), name='available-units'),
     # ─── UNIT REGISTRATION ───────────────────────────────────────────────────
     path('unit-registration/',           UnitRegistrationView.as_view(),       name='unit-registration'),
     path('unit-registration/<int:pk>/',  UnitRegistrationDetailView.as_view(), name='unit-registration-detail'),

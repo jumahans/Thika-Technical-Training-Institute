@@ -49,7 +49,7 @@ export default function UnitRegistration() {
       try {
         const [regRes, unitRes, semRes, yearRes] = await Promise.all([
           unitRegistrationAPI.getRegistrations(),
-          unitsAPI.getUnits(),
+          unitsAPI.getAvailableUnits(),
           referenceAPI.getSemesters(),
           referenceAPI.getAcademicYears(),
         ]);

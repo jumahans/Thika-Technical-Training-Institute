@@ -29,7 +29,7 @@ import Attachments      from './pages/Attachments'
 import StudentForms     from './pages/StudentForms'
 import LostCard         from './pages/LostCard'
 import FeeSummary from './pages/FeeSummary'
-
+import CoursesPage from './pages/courses'
 // Guard
 import PrivateRoute from './components/PrivateRoute'
 
@@ -42,6 +42,7 @@ function App() {
         <Route path='/'         element={<Landing />} />
         <Route path='/login'    element={<Login />} />
         <Route path='/register' element={<Register />} />
+        <Route path='/courses'  element={<CoursesPage />} />
 
         {/* Protected — Sidebar is the layout shell, all pages render inside its <Outlet /> */}
         <Route element={<PrivateRoute />}>
