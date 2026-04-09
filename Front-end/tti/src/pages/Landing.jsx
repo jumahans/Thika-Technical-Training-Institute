@@ -761,24 +761,44 @@ function MainNav() {
             }}
           >
             {topLinks.map((l) => (
-              <a
-                key={l.label}
-                href={l.href}
-                style={{
-                  color: l.label === "Student Portal" ? WHITE : "rgba(255,255,255,0.6)",
-                  fontSize: 11,
-                  padding: "5px 10px",
-                  textDecoration: "none",
-                  fontFamily: "'Barlow', sans-serif",
-                  background:
-                    l.label === "Student Portal" ? PRIMARY : "rgba(255,255,255,0.06)",
-                  borderRadius: 4,
-                  fontWeight: l.label === "Student Portal" ? 700 : 400,
-                  whiteSpace: "nowrap",
-                }}
-              >
-                {l.label}
-              </a>
+              l.href.startsWith('/') ? (
+                <Link
+                  key={l.label}
+                  to={l.href}
+                  onClick={() => setMenuOpen(false)}
+                  style={{
+                    color: WHITE,
+                    fontSize: 11,
+                    padding: "5px 10px",
+                    textDecoration: "none",
+                    fontFamily: "'Barlow', sans-serif",
+                    background: PRIMARY,
+                    borderRadius: 4,
+                    fontWeight: 700,
+                    whiteSpace: "nowrap",
+                  }}
+                >
+                  {l.label}
+                </Link>
+              ) : (
+                <a
+                  key={l.label}
+                  href={l.href}
+                  style={{
+                    color: "rgba(255,255,255,0.6)",
+                    fontSize: 11,
+                    padding: "5px 10px",
+                    textDecoration: "none",
+                    fontFamily: "'Barlow', sans-serif",
+                    background: "rgba(255,255,255,0.06)",
+                    borderRadius: 4,
+                    fontWeight: 400,
+                    whiteSpace: "nowrap",
+                  }}
+                >
+                  {l.label}
+                </a>
+              )
             ))}
           </div>
 
@@ -2755,25 +2775,43 @@ function Footer() {
               Student Resources
             </h4>
             {studentResources.map((r, i) => (
-              <a
-                key={i}
-                href={r.href}
-                style={{
-                  display: "block",
-                  color: "rgba(255,255,255,0.45)",
-                  fontFamily: "'Barlow', sans-serif",
-                  fontSize: 12,
-                  textDecoration: "none",
-                  padding: "4px 0",
-                  transition: "color 0.15s",
-                }}
-                onMouseEnter={(e) => (e.currentTarget.style.color = WHITE)}
-                onMouseLeave={(e) =>
-                  (e.currentTarget.style.color = "rgba(255,255,255,0.45)")
-                }
-              >
-                › {r.label}
-              </a>
+              r.href.startsWith('/') ? (
+                <Link
+                  key={i}
+                  to={r.href}
+                  style={{
+                    display: "block",
+                    color: "rgba(255,255,255,0.45)",
+                    fontFamily: "'Barlow', sans-serif",
+                    fontSize: 12,
+                    textDecoration: "none",
+                    padding: "4px 0",
+                    transition: "color 0.15s",
+                  }}
+                  onMouseEnter={(e) => (e.currentTarget.style.color = WHITE)}
+                  onMouseLeave={(e) => (e.currentTarget.style.color = "rgba(255,255,255,0.45)")}
+                >
+                  › {r.label}
+                </Link>
+              ) : (
+                
+                  key={i}
+                  href={r.href}
+                  style={{
+                    display: "block",
+                    color: "rgba(255,255,255,0.45)",
+                    fontFamily: "'Barlow', sans-serif",
+                    fontSize: 12,
+                    textDecoration: "none",
+                    padding: "4px 0",
+                    transition: "color 0.15s",
+                  }}
+                  onMouseEnter={(e) => (e.currentTarget.style.color = WHITE)}
+                  onMouseLeave={(e) => (e.currentTarget.style.color = "rgba(255,255,255,0.45)")}
+                >
+                  › {r.label}
+                </a>
+              )
             ))}
           </div>
 
