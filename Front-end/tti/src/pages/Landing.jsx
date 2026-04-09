@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect } from "react";
 import logo from "../assets/logo.png";
 import scouts from "../assets/scouts.jpg";
 import sports from "../assets/sports.jpeg";
@@ -34,7 +34,8 @@ const mainLinks = [
   { label: "Admissions", href: "#" },
   { label: "Academic Departments", href: "#" },
   {
-    label: "Student Affairs", href: "#",
+    label: "Student Affairs",
+    href: "#",
     sub: ["Student Welfare", "Clubs & Societies", "Sports", "Chaplaincy"],
   },
   { label: "Research", href: "#" },
@@ -68,7 +69,8 @@ const news = [
     tag: "INTAKE",
     date: "Nov 2025",
     title: "The Dual Training Model (DTVET): A Strategic Framework for Technical Excellence",
-    excerpt: "The Dual Training Model bridges academia and industry, giving students real-world experience alongside classroom learning.",
+    excerpt:
+      "The Dual Training Model bridges academia and industry, giving students real-world experience alongside classroom learning.",
     img: "https://images.unsplash.com/photo-1581092918056-0c4c3acd3789?w=600&q=80",
     featured: true,
   },
@@ -83,14 +85,16 @@ const news = [
     tag: "CURRICULUM",
     date: "Aug 2025",
     title: "Information on Modularized Curriculum",
-    excerpt: "The new modularized curriculum ensures students gain competency-based skills relevant to the job market.",
+    excerpt:
+      "The new modularized curriculum ensures students gain competency-based skills relevant to the job market.",
     img: "https://images.unsplash.com/photo-1456513080510-7bf3a84b82f8?w=400&q=80",
   },
   {
     tag: "INTAKE",
     date: "Apr 2025",
     title: "May 2025 Intake Full Time and Short Courses",
-    excerpt: "Download the full list of available full-time and short courses for the May 2025 intake period.",
+    excerpt:
+      "Download the full list of available full-time and short courses for the May 2025 intake period.",
     img: "https://images.unsplash.com/photo-1503676260728-1c00da094a0b?w=400&q=80",
   },
 ];
@@ -172,17 +176,26 @@ const stats = [
 ];
 
 const footerDepts = [
-  "Agricultural Engineering", "Business & Management Studies",
-  "Mechanical Engineering", "Electrical & Electronics",
-  "Applied Sciences", "ICT Department",
-  "Building & Civil Engineering", "Health Sciences",
-  "Open Distance & Flexible Learning", "Liberal Studies",
+  "Agricultural Engineering",
+  "Business & Management Studies",
+  "Mechanical Engineering",
+  "Electrical & Electronics",
+  "Applied Sciences",
+  "ICT Department",
+  "Building & Civil Engineering",
+  "Health Sciences",
+  "Open Distance & Flexible Learning",
+  "Liberal Studies",
 ];
 
 const footerSupport = [
-  "Finance", "Procurement", "Catering",
-  "Internal Audit", "Industrial & Liaisons Office",
-  "Public Relations", "Monitoring & Evaluation",
+  "Finance",
+  "Procurement",
+  "Catering",
+  "Internal Audit",
+  "Industrial & Liaisons Office",
+  "Public Relations",
+  "Monitoring & Evaluation",
 ];
 
 const studentResources = [
@@ -196,68 +209,252 @@ const studentResources = [
   { label: "TVET CDACC", href: "https://www.tvetcdacc.go.ke" },
 ];
 
-// ─── HOOKS ────────────────────────────────────────────────────────────────────
+// ─── GLOBAL STYLES ────────────────────────────────────────────────────────────
 
-function useBreakpoint() {
-  const [width, setWidth] = useState(typeof window !== "undefined" ? window.innerWidth : 1280);
-  useEffect(() => {
-    const handler = () => setWidth(window.innerWidth);
-    window.addEventListener("resize", handler);
-    return () => window.removeEventListener("resize", handler);
-  }, []);
-  return {
-    isMobile: width < 640,
-    isTablet: width >= 640 && width < 960,
-    isDesktop: width >= 960,
-    width,
-  };
-}
+const globalStyles = `
+  @import url('https://fonts.googleapis.com/css2?family=Barlow:wght@400;600;700;800&family=Barlow+Condensed:wght@600;700;800;900&display=swap');
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; overflow-x: hidden; }
+  body { font-family: 'Barlow', sans-serif; overflow-x: hidden; background: #fff; }
+
+  @keyframes ticker {
+    0%   { transform: translateX(0); }
+    100% { transform: translateX(-33.33%); }
+  }
+  @keyframes marquee {
+    0%   { transform: translateX(0); }
+    100% { transform: translateX(-33.33%); }
+  }
+  @keyframes fadeSlideUp {
+    from { opacity: 0; transform: translateY(18px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  input::placeholder, textarea::placeholder { color: rgba(255,255,255,0.3); }
+
+  ::-webkit-scrollbar { width: 6px; }
+  ::-webkit-scrollbar-track { background: #0d1b2a; }
+  ::-webkit-scrollbar-thumb { background: #0274BE; border-radius: 3px; }
+
+  /* ── Responsive grid helpers ── */
+
+  /* TopBar links: hide on small screens */
+  .topbar-links { display: flex; flex-wrap: wrap; }
+  @media (max-width: 768px) {
+    .topbar-links { display: none !important; }
+    .topbar-contact { font-size: 10px !important; }
+  }
+
+  /* Main nav desktop links */
+  .desktop-nav { display: flex !important; }
+  @media (max-width: 1024px) {
+    .desktop-nav { display: none !important; }
+  }
+
+  /* Hamburger button */
+  .hamburger-btn { display: none; }
+  @media (max-width: 1024px) {
+    .hamburger-btn { display: flex !important; }
+  }
+
+  /* Mobile menu */
+  .mobile-menu-open { display: flex !important; }
+
+  /* Hero layout */
+  .hero-grid {
+    display: grid;
+    grid-template-columns: 1fr 380px;
+    gap: 60px;
+    width: 100%;
+    align-items: center;
+  }
+  @media (max-width: 960px) {
+    .hero-grid {
+      grid-template-columns: 1fr;
+      gap: 32px;
+    }
+    .hero-form-card { display: none !important; }
+    .hero-content { max-width: 100% !important; }
+  }
+
+  /* News section */
+  .news-outer-grid {
+    display: grid;
+    grid-template-columns: 1fr 320px;
+    gap: 32px;
+  }
+  @media (max-width: 960px) {
+    .news-outer-grid { grid-template-columns: 1fr; }
+  }
+
+  .featured-card-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+  }
+  @media (max-width: 640px) {
+    .featured-card-grid { grid-template-columns: 1fr; }
+    .featured-card-img { display: none; }
+  }
+
+  .secondary-cards-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 16px;
+  }
+  @media (max-width: 800px) {
+    .secondary-cards-grid { grid-template-columns: 1fr 1fr; }
+  }
+  @media (max-width: 520px) {
+    .secondary-cards-grid { grid-template-columns: 1fr; }
+  }
+
+  /* Courses / departments */
+  .courses-outer-grid {
+    display: grid;
+    grid-template-columns: 1fr 320px;
+    gap: 32px;
+  }
+  @media (max-width: 960px) {
+    .courses-outer-grid { grid-template-columns: 1fr; }
+  }
+
+  .dept-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+  }
+  @media (max-width: 480px) {
+    .dept-grid { grid-template-columns: 1fr; }
+  }
+
+  /* Mission */
+  .mission-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 20px;
+  }
+  @media (max-width: 900px) {
+    .mission-grid { grid-template-columns: 1fr; }
+  }
+
+  /* Student Life */
+  .life-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 20px;
+  }
+  @media (max-width: 800px) {
+    .life-grid { grid-template-columns: 1fr 1fr; }
+  }
+  @media (max-width: 520px) {
+    .life-grid { grid-template-columns: 1fr; }
+  }
+
+  /* Stats */
+  .stats-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    margin-top: 40px;
+    background: ${DARK};
+    border-radius: 8px;
+    overflow: hidden;
+  }
+  @media (max-width: 600px) {
+    .stats-grid { grid-template-columns: 1fr 1fr; }
+  }
+
+  /* Service charter */
+  .service-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 60px;
+    align-items: center;
+  }
+  @media (max-width: 860px) {
+    .service-grid { grid-template-columns: 1fr; gap: 32px; }
+    .service-video { padding-bottom: 56.25%; height: 0; }
+  }
+
+  /* Footer */
+  .footer-grid {
+    display: grid;
+    grid-template-columns: 2fr 1.5fr 1.5fr 1.5fr;
+    gap: 40px;
+    padding-bottom: 48px;
+  }
+  @media (max-width: 1024px) {
+    .footer-grid { grid-template-columns: 1fr 1fr; }
+  }
+  @media (max-width: 560px) {
+    .footer-grid { grid-template-columns: 1fr; }
+  }
+
+  /* Ticker / partners on small */
+  @media (max-width: 480px) {
+    .ticker-label { display: none; }
+  }
+`;
 
 // ─── COMPONENTS ──────────────────────────────────────────────────────────────
 
 function TopBar() {
-  const { isMobile } = useBreakpoint();
-  if (isMobile) return null; // hidden on mobile to avoid clutter
   return (
-    <div style={{
-      background: DARK,
-      padding: "7px 0",
-      borderBottom: `3px solid ${PRIMARY}`,
-      width: "100%",
-      overflow: "hidden",
-    }}>
-      <div style={{
-        maxWidth: 1280,
-        margin: "0 auto",
-        padding: "0 24px",
-        display: "flex",
-        justifyContent: "space-between",
-        alignItems: "center",
-        flexWrap: "wrap",
-        gap: 6,
-        boxSizing: "border-box",
-      }}>
-        <div style={{ display: "flex", gap: 0, flexWrap: "wrap", alignItems: "center" }}>
-          {topLinks.map((l, i) => (
-            <a key={l.label} href={l.href} style={{
-              color: l.label === "Student Portal" ? WHITE : "rgba(255,255,255,0.55)",
-              fontSize: 11,
-              padding: "4px 11px",
-              textDecoration: "none",
-              fontFamily: "'Barlow', sans-serif",
-              letterSpacing: "0.4px",
-              background: l.label === "Student Portal" ? PRIMARY : "transparent",
-              borderRadius: l.label === "Student Portal" ? 3 : 0,
-              fontWeight: l.label === "Student Portal" ? 700 : 400,
-              transition: "color 0.2s",
-              borderRight: i < topLinks.length - 1 && l.label !== "Student Portal" ? "1px solid rgba(255,255,255,0.1)" : "none",
-            }}
-              onMouseEnter={e => { if (l.label !== "Student Portal") e.target.style.color = WHITE; }}
-              onMouseLeave={e => { if (l.label !== "Student Portal") e.target.style.color = "rgba(255,255,255,0.55)"; }}
-            >{l.label}</a>
-          ))}
+    <div
+      style={{
+        background: DARK,
+        padding: "7px 0",
+        borderBottom: `3px solid ${PRIMARY}`,
+        width: "100%",
+        overflow: "hidden",
+      }}
+    >
+      <div
+        style={{
+          maxWidth: 1280,
+          margin: "0 auto",
+          padding: "0 16px",
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "center",
+          gap: 6,
+        }}
+      >
+        {/* Top links — hidden on mobile via CSS */}
+        <div className="topbar-links" style={{ gap: 0, alignItems: "center" }}>
+          {topLinks.map((l, i) =>
+            l.href.startsWith('/') ? (
+              <Link key={l.label} to={l.href} style={{
+                color: WHITE, fontSize: 11, padding: "4px 10px",
+                textDecoration: "none", fontFamily: "'Barlow', sans-serif",
+                background: PRIMARY, borderRadius: 3, fontWeight: 700,
+                letterSpacing: "0.4px", whiteSpace: "nowrap",
+              }}>
+                {l.label}
+              </Link>
+            ) : (
+              <a key={l.label} href={l.href} style={{
+                color: "rgba(255,255,255,0.55)", fontSize: 11,
+                padding: "4px 10px", textDecoration: "none",
+                fontFamily: "'Barlow', sans-serif", letterSpacing: "0.4px",
+                borderRight: i < topLinks.length - 1 ? "1px solid rgba(255,255,255,0.1)" : "none",
+                whiteSpace: "nowrap",
+              }}>
+                {l.label}
+              </a>
+            )
+          )}
         </div>
-        <div style={{ color: "rgba(255,255,255,0.55)", fontSize: 11, fontFamily: "'Barlow', sans-serif", whiteSpace: "nowrap" }}>
+
+        {/* Contact — always visible */}
+        <div
+          className="topbar-contact"
+          style={{
+            color: "rgba(255,255,255,0.55)",
+            fontSize: 11,
+            fontFamily: "'Barlow', sans-serif",
+            whiteSpace: "nowrap",
+          }}
+        >
           📞 020-2044965 &nbsp;|&nbsp; 0743 514 539 &nbsp;|&nbsp; info@thikatechnical.ac.ke
         </div>
       </div>
@@ -269,8 +466,7 @@ function MainNav() {
   const [scrolled, setScrolled] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
   const [activeDropdown, setActiveDropdown] = useState(null);
-  const { isMobile, isTablet } = useBreakpoint();
-  const isMobileOrTablet = isMobile || isTablet;
+  const [mobileExpanded, setMobileExpanded] = useState(null);
 
   useEffect(() => {
     const handler = () => setScrolled(window.scrollY > 60);
@@ -278,304 +474,471 @@ function MainNav() {
     return () => window.removeEventListener("scroll", handler);
   }, []);
 
-  // Close menu on route change / resize
+  // Close mobile menu on route change / outside click
   useEffect(() => {
-    if (!isMobileOrTablet) setMenuOpen(false);
-  }, [isMobileOrTablet]);
+    if (!menuOpen) setMobileExpanded(null);
+  }, [menuOpen]);
+
+  const navBg = scrolled ? "rgba(2,116,190,0.98)" : WHITE;
+  const textColor = scrolled ? WHITE : DARK;
 
   return (
-    <nav style={{
-      background: scrolled ? "rgba(2,116,190,0.98)" : WHITE,
-      backdropFilter: scrolled ? "blur(12px)" : "none",
-      position: "sticky",
-      top: 0,
-      zIndex: 1000,
-      boxShadow: scrolled ? "0 4px 24px rgba(0,0,0,0.15)" : "0 1px 0 rgba(0,0,0,0.08)",
-      transition: "all 0.3s ease",
-      width: "100%",
-      boxSizing: "border-box",
-    }}>
-      <div style={{
-        maxWidth: 1280,
-        margin: "0 auto",
-        padding: "0 20px",
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "space-between",
-        height: 64,
-        boxSizing: "border-box",
-      }}>
-        {/* Logo */}
-        <div style={{ display: "flex", alignItems: "center", gap: 10, flexShrink: 0 }}>
-          <div style={{
-            width: 40, height: 40,
-            borderRadius: 6,
-            display: "flex", alignItems: "center", justifyContent: "center",
-            flexShrink: 0,
-          }}>
-            <img src={logo} alt="TTI logo" style={{ width: 40 }} />
-          </div>
-          <div>
-            <div style={{
-              color: scrolled ? WHITE : DARK,
-              fontWeight: 800, fontSize: isMobile ? 12 : 14,
-              fontFamily: "'Barlow Condensed', sans-serif",
-              letterSpacing: 1.5, lineHeight: 1.1,
-              transition: "color 0.3s",
-            }}>
-              THIKA TECHNICAL
+    <>
+      <nav
+        style={{
+          background: navBg,
+          backdropFilter: scrolled ? "blur(12px)" : "none",
+          position: "sticky",
+          top: 0,
+          zIndex: 1000,
+          boxShadow: scrolled
+            ? "0 4px 24px rgba(0,0,0,0.15)"
+            : "0 1px 0 rgba(0,0,0,0.08)",
+          transition: "all 0.3s ease",
+          width: "100%",
+        }}
+      >
+        <div
+          style={{
+            maxWidth: 1280,
+            margin: "0 auto",
+            padding: "0 16px",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "space-between",
+            height: 68,
+          }}
+        >
+          {/* Logo */}
+          <div style={{ display: "flex", alignItems: "center", gap: 10, flexShrink: 0 }}>
+            <div
+              style={{
+                width: 44,
+                height: 44,
+                borderRadius: 6,
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                flexShrink: 0,
+              }}
+            >
+              <img src={logo} alt="TTI logo" style={{ width: 44 }} />
             </div>
-            <div style={{
-              color: scrolled ? "rgba(255,255,255,0.7)" : PRIMARY,
-              fontSize: 9,
-              fontFamily: "'Barlow', sans-serif",
-              letterSpacing: 2,
-              transition: "color 0.3s",
-            }}>
-              TRAINING INSTITUTE
+            <div>
+              <div
+                style={{
+                  color: scrolled ? WHITE : DARK,
+                  fontWeight: 800,
+                  fontSize: 13,
+                  fontFamily: "'Barlow Condensed', sans-serif",
+                  letterSpacing: 1.5,
+                  lineHeight: 1.1,
+                  transition: "color 0.3s",
+                }}
+              >
+                THIKA TECHNICAL
+              </div>
+              <div
+                style={{
+                  color: scrolled ? "rgba(255,255,255,0.7)" : PRIMARY,
+                  fontSize: 9,
+                  fontFamily: "'Barlow', sans-serif",
+                  letterSpacing: 2.5,
+                  transition: "color 0.3s",
+                }}
+              >
+                TRAINING INSTITUTE
+              </div>
             </div>
           </div>
-        </div>
 
-        {/* Desktop Links */}
-        {!isMobileOrTablet && (
-          <div style={{ display: "flex", gap: 0, alignItems: "center" }}>
+          {/* Desktop nav links */}
+          <div className="desktop-nav" style={{ gap: 0, alignItems: "center" }}>
             {mainLinks.map((l) => (
-              <div key={l.label} style={{ position: "relative" }}
+              <div
+                key={l.label}
+                style={{ position: "relative" }}
                 onMouseEnter={() => l.sub && setActiveDropdown(l.label)}
                 onMouseLeave={() => setActiveDropdown(null)}
               >
-                <a href={l.href} style={{
-                  color: scrolled ? WHITE : DARK,
-                  fontSize: 12.5,
-                  padding: "8px 11px",
-                  textDecoration: "none",
-                  fontFamily: "'Barlow', sans-serif",
-                  fontWeight: 600,
-                  letterSpacing: 0.3,
-                  display: "block",
-                  borderRadius: 4,
-                  transition: "all 0.2s",
-                  background: "transparent",
-                  whiteSpace: "nowrap",
-                  opacity: 0.85,
-                }}
-                  onMouseEnter={e => {
+                <a
+                  href={l.href}
+                  style={{
+                    color: textColor,
+                    fontSize: 12.5,
+                    padding: "8px 12px",
+                    textDecoration: "none",
+                    fontFamily: "'Barlow', sans-serif",
+                    fontWeight: 600,
+                    letterSpacing: 0.3,
+                    display: "block",
+                    borderRadius: 4,
+                    transition: "all 0.2s",
+                    background: "transparent",
+                    whiteSpace: "nowrap",
+                    opacity: 0.85,
+                  }}
+                  onMouseEnter={(e) => {
                     e.currentTarget.style.opacity = "1";
-                    e.currentTarget.style.background = scrolled ? "rgba(255,255,255,0.15)" : "rgba(2,116,190,0.07)";
+                    e.currentTarget.style.background = scrolled
+                      ? "rgba(255,255,255,0.15)"
+                      : "rgba(2,116,190,0.07)";
                     e.currentTarget.style.color = scrolled ? WHITE : PRIMARY;
                   }}
-                  onMouseLeave={e => {
+                  onMouseLeave={(e) => {
                     e.currentTarget.style.opacity = "0.85";
                     e.currentTarget.style.background = "transparent";
-                    e.currentTarget.style.color = scrolled ? WHITE : DARK;
+                    e.currentTarget.style.color = textColor;
                   }}
                 >
-                  {l.label}{l.sub ? " ▾" : ""}
+                  {l.label}
+                  {l.sub ? " ▾" : ""}
                 </a>
                 {l.sub && activeDropdown === l.label && (
-                  <div style={{
-                    position: "absolute", top: "100%", left: 0,
-                    background: WHITE,
-                    borderRadius: 6,
-                    minWidth: 190,
-                    boxShadow: "0 12px 40px rgba(0,0,0,0.12)",
-                    border: `1px solid rgba(0,0,0,0.07)`,
-                    overflow: "hidden",
-                    borderTop: `3px solid ${PRIMARY}`,
-                  }}>
-                    {l.sub.map(s => (
-                      <a key={s} href="#" style={{
-                        display: "block", padding: "11px 18px",
-                        color: "#444", fontSize: 12.5,
-                        fontFamily: "'Barlow', sans-serif",
-                        textDecoration: "none", transition: "all 0.15s",
-                        borderBottom: "1px solid rgba(0,0,0,0.05)",
-                      }}
-                        onMouseEnter={e => { e.currentTarget.style.background = LIGHT_BG; e.currentTarget.style.color = PRIMARY; e.currentTarget.style.paddingLeft = "22px"; }}
-                        onMouseLeave={e => { e.currentTarget.style.background = "transparent"; e.currentTarget.style.color = "#444"; e.currentTarget.style.paddingLeft = "18px"; }}
-                      >{s}</a>
+                  <div
+                    style={{
+                      position: "absolute",
+                      top: "100%",
+                      left: 0,
+                      background: WHITE,
+                      borderRadius: 6,
+                      minWidth: 190,
+                      boxShadow: "0 12px 40px rgba(0,0,0,0.12)",
+                      border: `1px solid rgba(0,0,0,0.07)`,
+                      overflow: "hidden",
+                      borderTop: `3px solid ${PRIMARY}`,
+                      zIndex: 200,
+                    }}
+                  >
+                    {l.sub.map((s) => (
+                      <a
+                        key={s}
+                        href="#"
+                        style={{
+                          display: "block",
+                          padding: "11px 18px",
+                          color: "#444",
+                          fontSize: 12.5,
+                          fontFamily: "'Barlow', sans-serif",
+                          textDecoration: "none",
+                          transition: "all 0.15s",
+                          borderBottom: "1px solid rgba(0,0,0,0.05)",
+                        }}
+                        onMouseEnter={(e) => {
+                          e.currentTarget.style.background = LIGHT_BG;
+                          e.currentTarget.style.color = PRIMARY;
+                          e.currentTarget.style.paddingLeft = "22px";
+                        }}
+                        onMouseLeave={(e) => {
+                          e.currentTarget.style.background = "transparent";
+                          e.currentTarget.style.color = "#444";
+                          e.currentTarget.style.paddingLeft = "18px";
+                        }}
+                      >
+                        {s}
+                      </a>
                     ))}
                   </div>
                 )}
               </div>
             ))}
           </div>
-        )}
 
-        <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-          {/* Apply Now CTA */}
-          {!isMobile && (
-            <a href="#" style={{
-              background: RED,
-              color: WHITE,
-              padding: "9px 18px",
-              borderRadius: 4,
-              fontWeight: 800,
-              fontSize: 12,
-              fontFamily: "'Barlow Condensed', sans-serif",
-              letterSpacing: 1.5,
-              textDecoration: "none",
-              textTransform: "uppercase",
-              transition: "all 0.2s",
-              flexShrink: 0,
-              boxShadow: "0 2px 10px rgba(192,57,43,0.3)",
-            }}
-              onMouseEnter={e => { e.currentTarget.style.background = "#a93226"; }}
-              onMouseLeave={e => { e.currentTarget.style.background = RED; }}
-            >Apply Now</a>
-          )}
-
-          {/* Hamburger */}
-          {isMobileOrTablet && (
-            <button onClick={() => setMenuOpen(o => !o)} style={{
-              background: "transparent",
-              border: `2px solid ${scrolled ? "rgba(255,255,255,0.4)" : "rgba(0,0,0,0.15)"}`,
-              borderRadius: 6,
-              padding: "7px 10px",
-              cursor: "pointer",
-              display: "flex",
-              flexDirection: "column",
-              gap: 4,
-              alignItems: "center",
-              justifyContent: "center",
-            }}>
-              {[0, 1, 2].map(i => (
-                <span key={i} style={{
-                  display: "block",
-                  width: 20,
-                  height: 2,
-                  background: scrolled ? WHITE : DARK,
-                  borderRadius: 2,
-                  transition: "all 0.3s",
-                  transformOrigin: "center",
-                  transform: menuOpen
-                    ? i === 0 ? "rotate(45deg) translate(4px, 4px)"
-                    : i === 1 ? "scaleX(0)"
-                    : "rotate(-45deg) translate(4px, -4px)"
-                    : "none",
-                }} />
-              ))}
-            </button>
-          )}
-        </div>
-      </div>
-
-      {/* Mobile Menu */}
-      {isMobileOrTablet && menuOpen && (
-        <div style={{
-          background: WHITE,
-          borderTop: `3px solid ${PRIMARY}`,
-          boxShadow: "0 12px 40px rgba(0,0,0,0.15)",
-          maxHeight: "80vh",
-          overflowY: "auto",
-        }}>
-          {mainLinks.map((l) => (
-            <div key={l.label}>
-              <a href={l.href} style={{
-                display: "block",
-                padding: "14px 20px",
-                color: DARK,
-                fontFamily: "'Barlow', sans-serif",
-                fontWeight: 600,
-                fontSize: 14,
-                textDecoration: "none",
-                borderBottom: "1px solid rgba(0,0,0,0.06)",
-                transition: "background 0.15s",
-              }}
-                onMouseEnter={e => { e.currentTarget.style.background = LIGHT_BG; e.currentTarget.style.color = PRIMARY; }}
-                onMouseLeave={e => { e.currentTarget.style.background = "transparent"; e.currentTarget.style.color = DARK; }}
-              >
-                {l.label}
-              </a>
-              {l.sub && l.sub.map(s => (
-                <a key={s} href="#" style={{
-                  display: "block",
-                  padding: "10px 20px 10px 36px",
-                  color: "#666",
-                  fontFamily: "'Barlow', sans-serif",
-                  fontSize: 13,
-                  textDecoration: "none",
-                  borderBottom: "1px solid rgba(0,0,0,0.04)",
-                  background: "rgba(2,116,190,0.03)",
-                }}>› {s}</a>
-              ))}
-            </div>
-          ))}
-          {isMobile && (
-            <div style={{ padding: 16 }}>
-              <a href="#" style={{
-                display: "block",
+          {/* Right side: Apply Now + Hamburger */}
+          <div style={{ display: "flex", alignItems: "center", gap: 10, flexShrink: 0 }}>
+            <a
+              href="#"
+              style={{
                 background: RED,
                 color: WHITE,
-                padding: "12px",
+                padding: "9px 18px",
                 borderRadius: 4,
                 fontWeight: 800,
-                fontSize: 13,
+                fontSize: 12,
                 fontFamily: "'Barlow Condensed', sans-serif",
                 letterSpacing: 1.5,
                 textDecoration: "none",
                 textTransform: "uppercase",
-                textAlign: "center",
-              }}>Apply Now</a>
-            </div>
-          )}
-          <div style={{
-            padding: "12px 20px",
-            background: LIGHT_BG,
-            borderTop: "1px solid rgba(0,0,0,0.06)",
-            color: "#666",
-            fontSize: 12,
-            fontFamily: "'Barlow', sans-serif",
-          }}>
-            📞 020-2044965 | 0743 514 539
+                transition: "all 0.2s",
+                flexShrink: 0,
+                boxShadow: "0 2px 10px rgba(192,57,43,0.3)",
+                whiteSpace: "nowrap",
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.background = "#a93226";
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.background = RED;
+              }}
+            >
+              Apply Now
+            </a>
+
+            {/* Hamburger — shown on mobile/tablet via CSS */}
+            <button
+              className="hamburger-btn"
+              onClick={() => setMenuOpen((o) => !o)}
+              style={{
+                background: "transparent",
+                border: `2px solid ${scrolled ? "rgba(255,255,255,0.5)" : "rgba(0,0,0,0.2)"}`,
+                borderRadius: 6,
+                width: 40,
+                height: 40,
+                cursor: "pointer",
+                alignItems: "center",
+                justifyContent: "center",
+                flexDirection: "column",
+                gap: 5,
+                padding: 0,
+                flexShrink: 0,
+              }}
+              aria-label="Toggle navigation"
+            >
+              {[0, 1, 2].map((i) => (
+                <span
+                  key={i}
+                  style={{
+                    display: "block",
+                    width: 20,
+                    height: 2,
+                    background: scrolled ? WHITE : DARK,
+                    borderRadius: 2,
+                    transition: "all 0.3s",
+                    transform:
+                      menuOpen && i === 0
+                        ? "rotate(45deg) translate(5px, 5px)"
+                        : menuOpen && i === 1
+                        ? "scaleX(0)"
+                        : menuOpen && i === 2
+                        ? "rotate(-45deg) translate(5px, -5px)"
+                        : "none",
+                  }}
+                />
+              ))}
+            </button>
           </div>
         </div>
+      </nav>
+
+      {/* ── Mobile menu drawer ── */}
+      {menuOpen && (
+        <div
+          style={{
+            position: "fixed",
+            top: 68,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            background: "rgba(0,0,0,0.5)",
+            zIndex: 999,
+          }}
+          onClick={() => setMenuOpen(false)}
+        />
       )}
-    </nav>
+      <div
+        style={{
+          position: "fixed",
+          top: 68,
+          left: 0,
+          right: 0,
+          background: DARK,
+          zIndex: 1000,
+          maxHeight: menuOpen ? "100vh" : 0,
+          overflow: "hidden",
+          transition: "max-height 0.35s ease",
+          boxShadow: "0 8px 32px rgba(0,0,0,0.4)",
+        }}
+      >
+        <div style={{ padding: "12px 0 24px" }}>
+          {/* All top links in mobile menu */}
+          <div
+            style={{
+              padding: "10px 20px 14px",
+              borderBottom: "1px solid rgba(255,255,255,0.08)",
+              display: "flex",
+              flexWrap: "wrap",
+              gap: 6,
+            }}
+          >
+            {topLinks.map((l) => (
+              <a
+                key={l.label}
+                href={l.href}
+                style={{
+                  color: l.label === "Student Portal" ? WHITE : "rgba(255,255,255,0.6)",
+                  fontSize: 11,
+                  padding: "5px 10px",
+                  textDecoration: "none",
+                  fontFamily: "'Barlow', sans-serif",
+                  background:
+                    l.label === "Student Portal" ? PRIMARY : "rgba(255,255,255,0.06)",
+                  borderRadius: 4,
+                  fontWeight: l.label === "Student Portal" ? 700 : 400,
+                  whiteSpace: "nowrap",
+                }}
+              >
+                {l.label}
+              </a>
+            ))}
+          </div>
+
+          {/* Main nav links */}
+          {mainLinks.map((l) => (
+            <div key={l.label}>
+              <div
+                onClick={() =>
+                  l.sub
+                    ? setMobileExpanded(mobileExpanded === l.label ? null : l.label)
+                    : setMenuOpen(false)
+                }
+                style={{
+                  display: "flex",
+                  justifyContent: "space-between",
+                  alignItems: "center",
+                  padding: "14px 20px",
+                  cursor: "pointer",
+                  borderBottom: "1px solid rgba(255,255,255,0.06)",
+                }}
+              >
+                <a
+                  href={l.sub ? undefined : l.href}
+                  style={{
+                    color: WHITE,
+                    fontFamily: "'Barlow', sans-serif",
+                    fontWeight: 600,
+                    fontSize: 15,
+                    textDecoration: "none",
+                    flex: 1,
+                  }}
+                  onClick={(e) => l.sub && e.preventDefault()}
+                >
+                  {l.label}
+                </a>
+                {l.sub && (
+                  <span
+                    style={{
+                      color: "rgba(255,255,255,0.5)",
+                      fontSize: 12,
+                      transition: "transform 0.2s",
+                      transform:
+                        mobileExpanded === l.label ? "rotate(180deg)" : "none",
+                    }}
+                  >
+                    ▾
+                  </span>
+                )}
+              </div>
+              {l.sub && mobileExpanded === l.label && (
+                <div style={{ background: "rgba(255,255,255,0.03)" }}>
+                  {l.sub.map((s) => (
+                    <a
+                      key={s}
+                      href="#"
+                      onClick={() => setMenuOpen(false)}
+                      style={{
+                        display: "block",
+                        padding: "11px 32px",
+                        color: "rgba(255,255,255,0.65)",
+                        fontFamily: "'Barlow', sans-serif",
+                        fontSize: 13.5,
+                        textDecoration: "none",
+                        borderBottom: "1px solid rgba(255,255,255,0.04)",
+                        transition: "color 0.15s",
+                      }}
+                    >
+                      › {s}
+                    </a>
+                  ))}
+                </div>
+              )}
+            </div>
+          ))}
+        </div>
+      </div>
+    </>
   );
 }
 
 function TickerBanner() {
   return (
-    <div style={{
-      background: PRIMARY,
-      padding: "9px 0",
-      overflow: "hidden",
-      width: "100%",
-      boxSizing: "border-box",
-    }}>
-      <div style={{
-        display: "flex",
-        alignItems: "center",
-        animation: "ticker 18s linear infinite",
-        whiteSpace: "nowrap",
-        gap: 0,
-      }}>
+    <div
+      style={{
+        background: PRIMARY,
+        padding: "9px 0",
+        overflow: "hidden",
+        width: "100%",
+      }}
+    >
+      <div
+        style={{
+          display: "flex",
+          alignItems: "center",
+          animation: "ticker 18s linear infinite",
+          whiteSpace: "nowrap",
+          gap: 0,
+        }}
+      >
         {[...Array(3)].map((_, i) => (
           <span key={i} style={{ display: "flex", alignItems: "center", gap: 0 }}>
-            <span style={{
-              background: RED,
-              color: WHITE,
-              padding: "2px 14px",
-              fontSize: 10.5,
-              fontWeight: 800,
-              fontFamily: "'Barlow Condensed', sans-serif",
-              letterSpacing: 2.5,
-              marginRight: 28,
-            }}>INTAKE ALERT</span>
-            <span style={{ color: WHITE, fontSize: 13, fontFamily: "'Barlow', sans-serif", fontWeight: 600 }}>
+            <span
+              className="ticker-label"
+              style={{
+                background: RED,
+                color: WHITE,
+                padding: "2px 14px",
+                fontSize: 10.5,
+                fontWeight: 800,
+                fontFamily: "'Barlow Condensed', sans-serif",
+                letterSpacing: 2.5,
+                marginRight: 28,
+              }}
+            >
+              INTAKE ALERT
+            </span>
+            <span
+              style={{
+                color: WHITE,
+                fontSize: 13,
+                fontFamily: "'Barlow', sans-serif",
+                fontWeight: 600,
+              }}
+            >
               🎓 May 2026 Intake Ongoing
             </span>
-            <span style={{ color: "rgba(255,255,255,0.4)", fontSize: 20, margin: "0 28px" }}>|</span>
-            <span style={{ color: "rgba(255,255,255,0.85)", fontSize: 13, fontFamily: "'Barlow', sans-serif" }}>
+            <span
+              style={{ color: "rgba(255,255,255,0.4)", fontSize: 20, margin: "0 28px" }}
+            >
+              |
+            </span>
+            <span
+              style={{
+                color: "rgba(255,255,255,0.85)",
+                fontSize: 13,
+                fontFamily: "'Barlow', sans-serif",
+              }}
+            >
               Click here to apply for your admission letter
             </span>
-            <span style={{ color: "rgba(255,255,255,0.4)", fontSize: 20, margin: "0 28px" }}>|</span>
-            <span style={{ color: WHITE, fontSize: 13, fontFamily: "'Barlow', sans-serif", fontWeight: 600 }}>
+            <span
+              style={{ color: "rgba(255,255,255,0.4)", fontSize: 20, margin: "0 28px" }}
+            >
+              |
+            </span>
+            <span
+              style={{
+                color: WHITE,
+                fontSize: 13,
+                fontFamily: "'Barlow', sans-serif",
+                fontWeight: 600,
+              }}
+            >
               📞 Hotline: 020-2044965 | 0743 514 539
             </span>
-            <span style={{ color: "rgba(255,255,255,0.4)", fontSize: 20, margin: "0 28px" }}>|</span>
+            <span
+              style={{ color: "rgba(255,255,255,0.4)", fontSize: 20, margin: "0 28px" }}
+            >
+              |
+            </span>
           </span>
         ))}
       </div>
@@ -587,14 +950,12 @@ function HeroCarousel() {
   const [current, setCurrent] = useState(0);
   const [animating, setAnimating] = useState(true);
   const [formData, setFormData] = useState({ name: "", phone: "", course: "" });
-  const [showForm, setShowForm] = useState(false);
-  const { isMobile, isTablet, isDesktop } = useBreakpoint();
 
   useEffect(() => {
     const timer = setInterval(() => {
       setAnimating(false);
       setTimeout(() => {
-        setCurrent(c => (c + 1) % heroSlides.length);
+        setCurrent((c) => (c + 1) % heroSlides.length);
         setAnimating(true);
       }, 300);
     }, 5000);
@@ -604,242 +965,379 @@ function HeroCarousel() {
   const slide = heroSlides[current];
 
   return (
-    <div style={{ position: "relative", height: isMobile ? "100svh" : "88vh", minHeight: isMobile ? 500 : 520, overflow: "hidden", width: "100%" }}>
-      {/* Background */}
-      <div style={{
-        position: "absolute", inset: 0,
-        backgroundImage: `url(${slide.img})`,
-        backgroundSize: "cover", backgroundPosition: "center",
-        transition: "opacity 0.5s ease",
-        opacity: animating ? 1 : 0,
-      }} />
+    <div
+      style={{
+        position: "relative",
+        height: "88vh",
+        minHeight: 480,
+        overflow: "hidden",
+        width: "100%",
+      }}
+    >
+      {/* Background image */}
+      <div
+        style={{
+          position: "absolute",
+          inset: 0,
+          backgroundImage: `url(${slide.img})`,
+          backgroundSize: "cover",
+          backgroundPosition: "center",
+          transition: "opacity 0.5s ease",
+          opacity: animating ? 1 : 0,
+        }}
+      />
       {/* Overlay */}
-      <div style={{
-        position: "absolute", inset: 0,
-        background: isMobile
-          ? "linear-gradient(to bottom, rgba(13,27,42,0.88) 0%, rgba(13,27,42,0.82) 100%)"
-          : "linear-gradient(110deg, rgba(13,27,42,0.93) 0%, rgba(13,27,42,0.75) 55%, rgba(2,116,190,0.25) 100%)",
-      }} />
+      <div
+        style={{
+          position: "absolute",
+          inset: 0,
+          background:
+            "linear-gradient(110deg, rgba(13,27,42,0.93) 0%, rgba(13,27,42,0.75) 55%, rgba(2,116,190,0.25) 100%)",
+        }}
+      />
       {/* Blue accent line left */}
-      <div style={{
-        position: "absolute", left: 0, top: 0, bottom: 0,
-        width: 5, background: `linear-gradient(to bottom, ${PRIMARY}, ${RED})`,
-        zIndex: 3,
-      }} />
+      <div
+        style={{
+          position: "absolute",
+          left: 0,
+          top: 0,
+          bottom: 0,
+          width: 5,
+          background: `linear-gradient(to bottom, ${PRIMARY}, ${RED})`,
+          zIndex: 3,
+        }}
+      />
 
       {/* Content */}
-      <div style={{
-        position: "relative", zIndex: 2,
-        maxWidth: 1280, margin: "0 auto",
-        padding: isMobile ? "0 20px" : "0 48px",
-        height: "100%", display: "flex", alignItems: "center",
-        boxSizing: "border-box",
-      }}>
-        {isDesktop ? (
-          /* Desktop: two-column */
-          <div style={{
-            display: "grid",
-            gridTemplateColumns: "1fr 380px",
-            gap: 60,
-            width: "100%",
-            alignItems: "center",
-          }}>
-            <HeroText slide={slide} animating={animating} isMobile={false} />
-            <HeroForm formData={formData} setFormData={setFormData} />
-          </div>
-        ) : (
-          /* Mobile/Tablet: stacked, form behind CTA button */
-          <div style={{ width: "100%", maxWidth: isTablet ? 600 : "100%" }}>
-            <HeroText slide={slide} animating={animating} isMobile={isMobile} />
-            {isMobile && (
-              <button
-                onClick={() => setShowForm(o => !o)}
+      <div
+        style={{
+          position: "relative",
+          zIndex: 2,
+          maxWidth: 1280,
+          margin: "0 auto",
+          padding: "0 24px",
+          height: "100%",
+          display: "flex",
+          alignItems: "center",
+        }}
+      >
+        <div className="hero-grid">
+          {/* Left */}
+          <div
+            className="hero-content"
+            style={{
+              maxWidth: 680,
+              opacity: animating ? 1 : 0,
+              transform: animating ? "translateY(0)" : "translateY(20px)",
+              transition: "all 0.6s ease",
+            }}
+          >
+            {/* Kenya flag stripe */}
+            <div style={{ display: "flex", gap: 5, marginBottom: 24 }}>
+              {["#000", RED, "#27ae60"].map((c, idx) => (
+                <div
+                  key={idx}
+                  style={{ width: 36, height: 4, background: c, borderRadius: 2 }}
+                />
+              ))}
+            </div>
+
+            <div
+              style={{
+                color: "rgba(255,255,255,0.65)",
+                fontSize: 11.5,
+                letterSpacing: 4,
+                fontFamily: "'Barlow', sans-serif",
+                fontWeight: 600,
+                textTransform: "uppercase",
+                marginBottom: 14,
+              }}
+            >
+              Thika Technical Training Institute
+            </div>
+
+            <h1
+              style={{
+                color: WHITE,
+                margin: 0,
+                lineHeight: 1.05,
+                fontFamily: "'Barlow Condensed', sans-serif",
+                fontWeight: 800,
+                fontSize: "clamp(36px, 6.5vw, 76px)",
+                textTransform: "uppercase",
+              }}
+            >
+              {slide.title}
+              <br />
+              <span style={{ color: PRIMARY }}>{slide.highlight}</span>
+            </h1>
+
+            <p
+              style={{
+                color: "rgba(255,255,255,0.75)",
+                fontSize: "clamp(14px, 2vw, 17px)",
+                fontFamily: "'Barlow', sans-serif",
+                margin: "20px 0 38px",
+                fontWeight: 400,
+                maxWidth: 500,
+                lineHeight: 1.6,
+              }}
+            >
+              {slide.sub}
+            </p>
+
+            <div style={{ display: "flex", gap: 14, flexWrap: "wrap" }}>
+              <Link
+                to="/courses"
                 style={{
-                  marginTop: 12,
-                  background: "rgba(255,255,255,0.12)",
-                  border: "1px solid rgba(255,255,255,0.3)",
+                  background: "red",
                   color: WHITE,
-                  padding: "10px 20px",
+                  padding: "13px 28px",
                   borderRadius: 4,
-                  fontSize: 12,
-                  fontFamily: "'Barlow Condensed', sans-serif",
                   fontWeight: 700,
-                  letterSpacing: 1.5,
+                  fontSize: 13,
+                  fontFamily: "'Barlow Condensed', sans-serif",
+                  letterSpacing: 2,
+                  textDecoration: "none",
                   textTransform: "uppercase",
-                  cursor: "pointer",
-                  width: "100%",
+                  border: "2px solid rgba(255,255,255,0.4)",
+                  transition: "all 0.2s",
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.borderColor = WHITE;
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.borderColor = "rgba(255,255,255,0.4)";
                 }}
               >
-                {showForm ? "Hide Form ▲" : "Get Career Guide ▼"}
-              </button>
-            )}
-            {(!isMobile || showForm) && (
-              <div style={{ marginTop: 16 }}>
-                <HeroForm formData={formData} setFormData={setFormData} compact={isMobile} />
-              </div>
-            )}
+                COURSES
+              </Link>
+              <a
+                href="#"
+                style={{
+                  background: "transparent",
+                  color: WHITE,
+                  padding: "13px 28px",
+                  borderRadius: 4,
+                  fontWeight: 700,
+                  fontSize: 13,
+                  fontFamily: "'Barlow Condensed', sans-serif",
+                  letterSpacing: 2,
+                  textDecoration: "none",
+                  textTransform: "uppercase",
+                  border: "2px solid rgba(255,255,255,0.4)",
+                  transition: "all 0.2s",
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.background = "rgba(255,255,255,0.1)";
+                  e.currentTarget.style.borderColor = WHITE;
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.background = "transparent";
+                  e.currentTarget.style.borderColor = "rgba(255,255,255,0.4)";
+                }}
+              >
+                Request Information
+              </a>
+            </div>
           </div>
-        )}
+
+          {/* Right — Career Guide Card (hidden on mobile via CSS) */}
+          <div
+            className="hero-form-card"
+            style={{
+              background: WHITE,
+              padding: 32,
+              borderRadius: 8,
+              boxShadow: "0 20px 60px rgba(0,0,0,0.4)",
+              opacity: animating ? 1 : 0,
+              transform: animating ? "translateY(0)" : "translateY(20px)",
+              transition: "all 0.6s ease 0.2s",
+            }}
+          >
+            <h3
+              style={{
+                fontFamily: "'Barlow Condensed', sans-serif",
+                fontSize: 22,
+                color: DARK,
+                margin: "0 0 6px",
+                textTransform: "uppercase",
+                fontWeight: 800,
+              }}
+            >
+              Get Your Career Guide
+            </h3>
+            <p
+              style={{
+                color: "#666",
+                fontSize: 13,
+                margin: "0 0 20px",
+                lineHeight: 1.5,
+              }}
+            >
+              Download 2026 course catalog & fee structure instantly.
+            </p>
+
+            <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+              <input
+                type="text"
+                placeholder="Your Full Name"
+                value={formData.name}
+                onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                style={{
+                  padding: "14px 16px",
+                  border: "1px solid #ddd",
+                  borderRadius: 4,
+                  fontSize: 14,
+                  fontFamily: "'Barlow', sans-serif",
+                  outline: "none",
+                  color: DARK,
+                }}
+              />
+              <input
+                type="tel"
+                placeholder="Phone Number"
+                value={formData.phone}
+                onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
+                style={{
+                  padding: "14px 16px",
+                  border: "1px solid #ddd",
+                  borderRadius: 4,
+                  fontSize: 14,
+                  fontFamily: "'Barlow', sans-serif",
+                  outline: "none",
+                  color: DARK,
+                }}
+              />
+              <select
+                value={formData.course}
+                onChange={(e) => setFormData({ ...formData, course: e.target.value })}
+                style={{
+                  padding: "14px 16px",
+                  border: "1px solid #ddd",
+                  borderRadius: 4,
+                  fontSize: 14,
+                  fontFamily: "'Barlow', sans-serif",
+                  color: formData.course ? DARK : "#888",
+                  outline: "none",
+                  background: WHITE,
+                }}
+              >
+                <option value="">Select Course Interest</option>
+                {departments.map((d) => (
+                  <option key={d.name} value={d.name}>
+                    {d.name}
+                  </option>
+                ))}
+              </select>
+              <button
+                style={{
+                  background: RED,
+                  color: WHITE,
+                  padding: "16px",
+                  border: "none",
+                  borderRadius: 4,
+                  fontWeight: 800,
+                  fontSize: 14,
+                  textTransform: "uppercase",
+                  letterSpacing: 1.5,
+                  cursor: "pointer",
+                  fontFamily: "'Barlow Condensed', sans-serif",
+                  boxShadow: "0 4px 16px rgba(192,57,43,0.4)",
+                  marginTop: 4,
+                }}
+              >
+                Download Now →
+              </button>
+            </div>
+
+            <p
+              style={{
+                color: "#999",
+                fontSize: 11,
+                textAlign: "center",
+                marginTop: 14,
+                marginBottom: 0,
+              }}
+            >
+              Trusted by 10,000+ students. Your info is secure.
+            </p>
+          </div>
+        </div>
       </div>
 
       {/* Slide indicators */}
-      <div style={{
-        position: "absolute", bottom: 24, left: "50%", transform: "translateX(-50%)",
-        display: "flex", gap: 8, zIndex: 3,
-      }}>
+      <div
+        style={{
+          position: "absolute",
+          bottom: 24,
+          left: "50%",
+          transform: "translateX(-50%)",
+          display: "flex",
+          gap: 8,
+          zIndex: 3,
+        }}
+      >
         {heroSlides.map((_, i) => (
-          <button key={i} onClick={() => setCurrent(i)} style={{
-            width: i === current ? 28 : 8, height: 8,
-            borderRadius: 4, border: "none", cursor: "pointer",
-            background: i === current ? WHITE : "rgba(255,255,255,0.35)",
-            transition: "all 0.3s ease", padding: 0,
-          }} />
+          <button
+            key={i}
+            onClick={() => setCurrent(i)}
+            style={{
+              width: i === current ? 28 : 8,
+              height: 8,
+              borderRadius: 4,
+              border: "none",
+              cursor: "pointer",
+              background: i === current ? WHITE : "rgba(255,255,255,0.35)",
+              transition: "all 0.3s ease",
+              padding: 0,
+            }}
+          />
         ))}
       </div>
     </div>
   );
 }
 
-function HeroText({ slide, animating, isMobile }) {
-  return (
-    <div style={{
-      maxWidth: 680,
-      opacity: animating ? 1 : 0,
-      transform: animating ? "translateY(0)" : "translateY(20px)",
-      transition: "all 0.6s ease",
-    }}>
-      {/* Kenya flag stripe */}
-      <div style={{ display: "flex", gap: 5, marginBottom: 18 }}>
-        {["#000", RED, "#27ae60"].map((c, i) => (
-          <div key={i} style={{ width: 36, height: 4, background: c, borderRadius: 2 }} />
-        ))}
-      </div>
-
-      <div style={{
-        color: "rgba(255,255,255,0.65)", fontSize: 10, letterSpacing: 4,
-        fontFamily: "'Barlow', sans-serif", fontWeight: 600,
-        textTransform: "uppercase", marginBottom: 12,
-      }}>
-        Thika Technical Training Institute
-      </div>
-
-      <h1 style={{
-        color: WHITE, margin: 0, lineHeight: 1.05,
-        fontFamily: "'Barlow Condensed', sans-serif",
-        fontWeight: 800, fontSize: isMobile ? "clamp(32px, 10vw, 50px)" : "clamp(38px, 5.5vw, 70px)",
-        textTransform: "uppercase",
-      }}>
-        {slide.title}<br />
-        <span style={{ color: PRIMARY }}>{slide.highlight}</span>
-      </h1>
-
-      <p style={{
-        color: "rgba(255,255,255,0.75)", fontSize: isMobile ? 14 : 16,
-        fontFamily: "'Barlow', sans-serif", margin: "16px 0 28px",
-        fontWeight: 400, maxWidth: 500, lineHeight: 1.6,
-      }}>{slide.sub}</p>
-
-      <div style={{ display: "flex", gap: 12, flexWrap: "wrap" }}>
-        <Link to="/courses" style={{
-          background: RED,
-          color: WHITE,
-          padding: isMobile ? "11px 22px" : "13px 30px",
-          borderRadius: 4, fontWeight: 700, fontSize: isMobile ? 12 : 13,
-          fontFamily: "'Barlow Condensed', sans-serif", letterSpacing: 2,
-          textDecoration: "none", textTransform: "uppercase",
-          border: "2px solid rgba(255,255,255,0.4)", transition: "all 0.2s",
-        }}>COURSES</Link>
-        <a href="#" style={{
-          background: "transparent", color: WHITE,
-          padding: isMobile ? "11px 22px" : "13px 30px",
-          borderRadius: 4, fontWeight: 700, fontSize: isMobile ? 12 : 13,
-          fontFamily: "'Barlow Condensed', sans-serif", letterSpacing: 2,
-          textDecoration: "none", textTransform: "uppercase",
-          border: "2px solid rgba(255,255,255,0.4)", transition: "all 0.2s",
-        }}>Request Info</a>
-      </div>
-    </div>
-  );
-}
-
-function HeroForm({ formData, setFormData, compact = false }) {
-  return (
-    <div style={{
-      background: WHITE,
-      padding: compact ? 20 : 32,
-      borderRadius: 8,
-      boxShadow: "0 20px 60px rgba(0,0,0,0.4)",
-    }}>
-      <h3 style={{
-        fontFamily: "'Barlow Condensed', sans-serif",
-        fontSize: compact ? 18 : 22,
-        color: DARK, margin: "0 0 4px",
-        textTransform: "uppercase", fontWeight: 800,
-      }}>Get Your Career Guide</h3>
-      <p style={{
-        color: "#666", fontSize: 12, margin: "0 0 16px", lineHeight: 1.5,
-      }}>Download 2026 course catalog &amp; fee structure instantly.</p>
-
-      <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
-        <input
-          type="text" placeholder="Your Full Name"
-          value={formData.name}
-          onChange={e => setFormData({ ...formData, name: e.target.value })}
-          style={{
-            padding: "12px 14px", border: "1px solid #ddd", borderRadius: 4,
-            fontSize: 13, fontFamily: "'Barlow', sans-serif", outline: "none", width: "100%", boxSizing: "border-box",
-          }}
-        />
-        <input
-          type="tel" placeholder="Phone Number"
-          value={formData.phone}
-          onChange={e => setFormData({ ...formData, phone: e.target.value })}
-          style={{
-            padding: "12px 14px", border: "1px solid #ddd", borderRadius: 4,
-            fontSize: 13, fontFamily: "'Barlow', sans-serif", outline: "none", width: "100%", boxSizing: "border-box",
-          }}
-        />
-        <select
-          value={formData.course}
-          onChange={e => setFormData({ ...formData, course: e.target.value })}
-          style={{
-            padding: "12px 14px", border: "1px solid #ddd", borderRadius: 4,
-            fontSize: 13, fontFamily: "'Barlow', sans-serif",
-            color: formData.course ? DARK : "#888", outline: "none",
-            background: WHITE, width: "100%", boxSizing: "border-box",
-          }}
-        >
-          <option value="">Select Course Interest</option>
-          {departments.map(d => (
-            <option key={d.name} value={d.name}>{d.name}</option>
-          ))}
-        </select>
-        <button style={{
-          background: RED, color: WHITE, padding: "14px",
-          border: "none", borderRadius: 4, fontWeight: 800, fontSize: 13,
-          textTransform: "uppercase", letterSpacing: 1.5, cursor: "pointer",
-          fontFamily: "'Barlow Condensed', sans-serif",
-          boxShadow: "0 4px 16px rgba(192,57,43,0.4)", marginTop: 2,
-          width: "100%",
-        }}>
-          Download Now →
-        </button>
-      </div>
-      <p style={{ color: "#999", fontSize: 11, textAlign: "center", marginTop: 10, marginBottom: 0 }}>
-        Trusted by 10,000+ students. Your info is secure.
-      </p>
-    </div>
-  );
-}
-
+// ─── Section header helper ────────────────────────────────────────────────────
 function SectionHeader({ eyebrow, title }) {
   return (
-    <div style={{ marginBottom: 36 }}>
+    <div style={{ marginBottom: 40 }}>
       <div style={{ display: "flex", alignItems: "center", gap: 14, marginBottom: 10 }}>
-        <div style={{ width: 4, height: 32, background: `linear-gradient(to bottom, ${PRIMARY}, ${RED})`, borderRadius: 2, flexShrink: 0 }} />
+        <div
+          style={{
+            width: 4,
+            height: 32,
+            background: `linear-gradient(to bottom, ${PRIMARY}, ${RED})`,
+            borderRadius: 2,
+            flexShrink: 0,
+          }}
+        />
         <div>
-          <div style={{ color: PRIMARY, fontSize: 11, letterSpacing: 4, fontFamily: "'Barlow', sans-serif", fontWeight: 700, textTransform: "uppercase" }}>{eyebrow}</div>
-          <div style={{ fontFamily: "'Barlow Condensed', sans-serif", fontSize: "clamp(22px, 4vw, 30px)", fontWeight: 800, color: DARK, letterSpacing: 1, lineHeight: 1 }}>{title}</div>
+          <div
+            style={{
+              color: PRIMARY,
+              fontSize: 11,
+              letterSpacing: 4,
+              fontFamily: "'Barlow', sans-serif",
+              fontWeight: 700,
+              textTransform: "uppercase",
+            }}
+          >
+            {eyebrow}
+          </div>
+          <div
+            style={{
+              fontFamily: "'Barlow Condensed', sans-serif",
+              fontSize: "clamp(22px, 3vw, 30px)",
+              fontWeight: 800,
+              color: DARK,
+              letterSpacing: 1,
+              lineHeight: 1,
+            }}
+          >
+            {title}
+          </div>
         </div>
       </div>
       <div style={{ height: 1, background: "rgba(0,0,0,0.08)", marginTop: 4 }} />
@@ -850,199 +1348,402 @@ function SectionHeader({ eyebrow, title }) {
 function NewsSection() {
   const featured = news[0];
   const secondary = news.slice(1);
-  const { isMobile, isTablet } = useBreakpoint();
 
   return (
-    <section style={{ background: LIGHT_BG, padding: "60px 0", width: "100%", boxSizing: "border-box" }}>
-      <div style={{ maxWidth: 1280, margin: "0 auto", padding: "0 20px", boxSizing: "border-box" }}>
+    <section
+      style={{ background: LIGHT_BG, padding: "70px 0", width: "100%" }}
+    >
+      <div
+        style={{ maxWidth: 1280, margin: "0 auto", padding: "0 16px" }}
+      >
         <SectionHeader eyebrow="Latest" title="NEWS & UPDATES" />
 
-        <div style={{
-          display: "grid",
-          gridTemplateColumns: isMobile || isTablet ? "1fr" : "1fr 320px",
-          gap: 28,
-          boxSizing: "border-box",
-        }}>
+        <div className="news-outer-grid">
           {/* Left — News */}
           <div>
-            {/* Featured story */}
-            <div style={{
-              background: WHITE, borderRadius: 8, overflow: "hidden",
-              boxShadow: "0 2px 16px rgba(0,0,0,0.07)", marginBottom: 20,
-              display: "grid",
-              gridTemplateColumns: isMobile ? "1fr" : "1fr 1fr",
-              borderTop: `4px solid ${PRIMARY}`,
-            }}>
-              <div style={{ padding: isMobile ? 20 : 28, order: isMobile ? 2 : 1 }}>
-                <div style={{
-                  background: PRIMARY, color: WHITE, display: "inline-block",
-                  padding: "3px 10px", fontSize: 10, fontWeight: 800,
-                  fontFamily: "'Barlow', sans-serif", letterSpacing: 2, marginBottom: 12,
-                  borderRadius: 2,
-                }}>{featured.tag}</div>
-                <h2 style={{
-                  fontFamily: "'Barlow Condensed', sans-serif",
-                  fontSize: isMobile ? 18 : 22, fontWeight: 800, color: DARK,
-                  lineHeight: 1.25, margin: "0 0 12px", letterSpacing: 0.5,
-                }}>{featured.title}</h2>
-                <div style={{ width: 36, height: 3, background: RED, marginBottom: 12, borderRadius: 2 }} />
-                <p style={{
-                  fontFamily: "'Barlow', sans-serif", fontSize: 13, color: "#555",
-                  lineHeight: 1.7, margin: "0 0 14px",
-                }}>{featured.excerpt}</p>
-                <a href="#" style={{
-                  color: RED, fontSize: 12, fontWeight: 700,
-                  fontFamily: "'Barlow', sans-serif", textDecoration: "none",
-                  letterSpacing: 1, textTransform: "uppercase",
-                  borderBottom: `2px solid ${RED}`, paddingBottom: 2,
-                }}>Continue Reading →</a>
+            {/* Featured */}
+            <div
+              style={{
+                background: WHITE,
+                borderRadius: 8,
+                overflow: "hidden",
+                boxShadow: "0 2px 16px rgba(0,0,0,0.07)",
+                marginBottom: 24,
+                borderTop: `4px solid ${PRIMARY}`,
+              }}
+            >
+              <div className="featured-card-grid">
+                <div style={{ padding: "24px 24px 24px" }}>
+                  <div
+                    style={{
+                      background: PRIMARY,
+                      color: WHITE,
+                      display: "inline-block",
+                      padding: "3px 10px",
+                      fontSize: 10,
+                      fontWeight: 800,
+                      fontFamily: "'Barlow', sans-serif",
+                      letterSpacing: 2,
+                      marginBottom: 14,
+                      borderRadius: 2,
+                    }}
+                  >
+                    {featured.tag}
+                  </div>
+                  <h2
+                    style={{
+                      fontFamily: "'Barlow Condensed', sans-serif",
+                      fontSize: "clamp(18px, 2.5vw, 22px)",
+                      fontWeight: 800,
+                      color: DARK,
+                      lineHeight: 1.25,
+                      margin: "0 0 14px",
+                      letterSpacing: 0.5,
+                    }}
+                  >
+                    {featured.title}
+                  </h2>
+                  <div
+                    style={{
+                      width: 36,
+                      height: 3,
+                      background: RED,
+                      marginBottom: 14,
+                      borderRadius: 2,
+                    }}
+                  />
+                  <p
+                    style={{
+                      fontFamily: "'Barlow', sans-serif",
+                      fontSize: 13.5,
+                      color: "#555",
+                      lineHeight: 1.7,
+                      margin: "0 0 18px",
+                    }}
+                  >
+                    {featured.excerpt}
+                  </p>
+                  <a
+                    href="#"
+                    style={{
+                      color: RED,
+                      fontSize: 12,
+                      fontWeight: 700,
+                      fontFamily: "'Barlow', sans-serif",
+                      textDecoration: "none",
+                      letterSpacing: 1,
+                      textTransform: "uppercase",
+                      borderBottom: `2px solid ${RED}`,
+                      paddingBottom: 2,
+                    }}
+                  >
+                    Continue Reading →
+                  </a>
+                </div>
+                <img
+                  src={featured.img}
+                  alt={featured.title}
+                  className="featured-card-img"
+                  style={{
+                    width: "100%",
+                    height: "100%",
+                    objectFit: "cover",
+                    minHeight: 220,
+                    display: "block",
+                  }}
+                />
               </div>
-              <img src={featured.img} alt={featured.title} style={{
-                width: "100%", height: isMobile ? 200 : "100%",
-                objectFit: "cover", minHeight: isMobile ? 0 : 220,
-                order: isMobile ? 1 : 2,
-              }} />
             </div>
 
-            {/* Secondary cards */}
-            <div style={{
-              display: "grid",
-              gridTemplateColumns: isMobile ? "1fr" : "repeat(3, 1fr)",
-              gap: 14,
-            }}>
+            {/* Secondary */}
+            <div className="secondary-cards-grid">
               {secondary.map((item, i) => (
-                <div key={i} style={{
-                  background: WHITE, borderRadius: 8, overflow: "hidden",
-                  boxShadow: "0 2px 12px rgba(0,0,0,0.06)",
-                  borderTop: `3px solid rgba(2,116,190,0.3)`,
-                  transition: "transform 0.2s, box-shadow 0.2s",
-                }}
-                  onMouseEnter={e => { e.currentTarget.style.transform = "translateY(-3px)"; e.currentTarget.style.boxShadow = "0 8px 24px rgba(0,0,0,0.1)"; }}
-                  onMouseLeave={e => { e.currentTarget.style.transform = "translateY(0)"; e.currentTarget.style.boxShadow = "0 2px 12px rgba(0,0,0,0.06)"; }}
+                <div
+                  key={i}
+                  style={{
+                    background: WHITE,
+                    borderRadius: 8,
+                    overflow: "hidden",
+                    boxShadow: "0 2px 12px rgba(0,0,0,0.06)",
+                    borderTop: `3px solid rgba(2,116,190,0.3)`,
+                    transition: "transform 0.2s, box-shadow 0.2s",
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.transform = "translateY(-3px)";
+                    e.currentTarget.style.boxShadow = "0 8px 24px rgba(0,0,0,0.1)";
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.transform = "translateY(0)";
+                    e.currentTarget.style.boxShadow = "0 2px 12px rgba(0,0,0,0.06)";
+                  }}
                 >
-                  <img src={item.img} alt={item.title} style={{ width: "100%", height: 110, objectFit: "cover" }} />
+                  <img
+                    src={item.img}
+                    alt={item.title}
+                    style={{ width: "100%", height: 110, objectFit: "cover" }}
+                  />
                   <div style={{ padding: "14px 16px" }}>
-                    <div style={{
-                      background: DARK, color: WHITE, display: "inline-block",
-                      padding: "2px 8px", fontSize: 9, fontWeight: 800,
-                      fontFamily: "'Barlow', sans-serif", letterSpacing: 2, marginBottom: 8, borderRadius: 2,
-                    }}>{item.tag}</div>
-                    <h4 style={{
-                      fontFamily: "'Barlow Condensed', sans-serif",
-                      fontSize: 14.5, fontWeight: 700, color: DARK,
-                      lineHeight: 1.3, margin: "0 0 8px",
-                    }}>{item.title}</h4>
-                    <p style={{
-                      fontFamily: "'Barlow', sans-serif", fontSize: 12, color: "#666",
-                      lineHeight: 1.6, margin: "0 0 10px",
-                    }}>{item.excerpt.substring(0, 80)}...</p>
-                    <a href="#" style={{
-                      color: PRIMARY, fontSize: 11, fontWeight: 700,
-                      fontFamily: "'Barlow', sans-serif", textDecoration: "none",
-                    }}>Read More →</a>
+                    <div
+                      style={{
+                        background: DARK,
+                        color: WHITE,
+                        display: "inline-block",
+                        padding: "2px 8px",
+                        fontSize: 9,
+                        fontWeight: 800,
+                        fontFamily: "'Barlow', sans-serif",
+                        letterSpacing: 2,
+                        marginBottom: 8,
+                        borderRadius: 2,
+                      }}
+                    >
+                      {item.tag}
+                    </div>
+                    <h4
+                      style={{
+                        fontFamily: "'Barlow Condensed', sans-serif",
+                        fontSize: 14.5,
+                        fontWeight: 700,
+                        color: DARK,
+                        lineHeight: 1.3,
+                        margin: "0 0 8px",
+                      }}
+                    >
+                      {item.title}
+                    </h4>
+                    <p
+                      style={{
+                        fontFamily: "'Barlow', sans-serif",
+                        fontSize: 12,
+                        color: "#666",
+                        lineHeight: 1.6,
+                        margin: "0 0 10px",
+                      }}
+                    >
+                      {item.excerpt.substring(0, 80)}...
+                    </p>
+                    <a
+                      href="#"
+                      style={{
+                        color: PRIMARY,
+                        fontSize: 11,
+                        fontWeight: 700,
+                        fontFamily: "'Barlow', sans-serif",
+                        textDecoration: "none",
+                      }}
+                    >
+                      Read More →
+                    </a>
                   </div>
                 </div>
               ))}
             </div>
 
-            <div style={{ textAlign: "center", paddingTop: 20 }}>
-              <a href="#" style={{
-                color: PRIMARY, fontSize: 12, fontWeight: 700,
-                fontFamily: "'Barlow Condensed', sans-serif", textDecoration: "none",
-                letterSpacing: 2, textTransform: "uppercase",
-                border: `2px solid ${PRIMARY}`, padding: "9px 26px",
-                borderRadius: 4, transition: "all 0.2s", display: "inline-block",
-              }}
-                onMouseEnter={e => { e.currentTarget.style.background = PRIMARY; e.currentTarget.style.color = WHITE; }}
-                onMouseLeave={e => { e.currentTarget.style.background = "transparent"; e.currentTarget.style.color = PRIMARY; }}
-              >View All News</a>
+            <div style={{ textAlign: "center", paddingTop: 24 }}>
+              <a
+                href="#"
+                style={{
+                  color: PRIMARY,
+                  fontSize: 12,
+                  fontWeight: 700,
+                  fontFamily: "'Barlow Condensed', sans-serif",
+                  textDecoration: "none",
+                  letterSpacing: 2,
+                  textTransform: "uppercase",
+                  border: `2px solid ${PRIMARY}`,
+                  padding: "9px 26px",
+                  borderRadius: 4,
+                  transition: "all 0.2s",
+                  display: "inline-block",
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.background = PRIMARY;
+                  e.currentTarget.style.color = WHITE;
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.background = "transparent";
+                  e.currentTarget.style.color = PRIMARY;
+                }}
+              >
+                View All News
+              </a>
             </div>
           </div>
 
-          {/* Right — Noticeboard (always shown, stacks below on mobile) */}
+          {/* Right — Sidebar widgets */}
           <div style={{ display: "flex", flexDirection: "column", gap: 20 }}>
             {/* Notice Board */}
-            <div style={{
-              background: WHITE, borderRadius: 8,
-              boxShadow: "0 2px 12px rgba(0,0,0,0.07)",
-              overflow: "hidden", border: "1px solid rgba(0,0,0,0.06)",
-            }}>
-              <div style={{
-                background: DARK, padding: "13px 18px",
-                display: "flex", alignItems: "center", gap: 10,
-              }}>
+            <div
+              style={{
+                background: WHITE,
+                borderRadius: 8,
+                boxShadow: "0 2px 12px rgba(0,0,0,0.07)",
+                overflow: "hidden",
+                border: "1px solid rgba(0,0,0,0.06)",
+              }}
+            >
+              <div
+                style={{
+                  background: DARK,
+                  padding: "13px 18px",
+                  display: "flex",
+                  alignItems: "center",
+                  gap: 10,
+                }}
+              >
                 <span style={{ fontSize: 16 }}>📌</span>
-                <h3 style={{
-                  color: WHITE, margin: 0, fontFamily: "'Barlow Condensed', sans-serif",
-                  fontSize: 15, letterSpacing: 2.5, textTransform: "uppercase",
-                }}>Notice Board</h3>
+                <h3
+                  style={{
+                    color: WHITE,
+                    margin: 0,
+                    fontFamily: "'Barlow Condensed', sans-serif",
+                    fontSize: 15,
+                    letterSpacing: 2.5,
+                    textTransform: "uppercase",
+                  }}
+                >
+                  Notice Board
+                </h3>
               </div>
               <div style={{ padding: "4px 0" }}>
                 {notices.map((n, i) => (
-                  <div key={i} style={{
-                    padding: "11px 18px",
-                    borderBottom: i < notices.length - 1 ? "1px solid rgba(0,0,0,0.06)" : "none",
-                    display: "flex", gap: 12, alignItems: "flex-start",
-                  }}>
-                    <div style={{
-                      width: 6, height: 6, borderRadius: "50%",
-                      background: PRIMARY, flexShrink: 0, marginTop: 5,
-                    }} />
-                    <a href="#" style={{
-                      fontFamily: "'Barlow', sans-serif", fontSize: 13, color: "#333",
-                      textDecoration: "none", lineHeight: 1.45,
-                    }}>{n}</a>
+                  <div
+                    key={i}
+                    style={{
+                      padding: "11px 18px",
+                      borderBottom:
+                        i < notices.length - 1 ? "1px solid rgba(0,0,0,0.06)" : "none",
+                      display: "flex",
+                      gap: 12,
+                      alignItems: "flex-start",
+                      transition: "background 0.15s",
+                    }}
+                    onMouseEnter={(e) => (e.currentTarget.style.background = LIGHT_BG)}
+                    onMouseLeave={(e) =>
+                      (e.currentTarget.style.background = "transparent")
+                    }
+                  >
+                    <div
+                      style={{
+                        width: 6,
+                        height: 6,
+                        borderRadius: "50%",
+                        background: PRIMARY,
+                        flexShrink: 0,
+                        marginTop: 5,
+                      }}
+                    />
+                    <a
+                      href="#"
+                      style={{
+                        fontFamily: "'Barlow', sans-serif",
+                        fontSize: 13,
+                        color: "#333",
+                        textDecoration: "none",
+                        lineHeight: 1.45,
+                      }}
+                      onMouseEnter={(e) => (e.currentTarget.style.color = PRIMARY)}
+                      onMouseLeave={(e) => (e.currentTarget.style.color = "#333")}
+                    >
+                      {n}
+                    </a>
                   </div>
                 ))}
               </div>
             </div>
 
             {/* Calendar */}
-            <div style={{
-              background: WHITE, borderRadius: 8,
-              boxShadow: "0 2px 12px rgba(0,0,0,0.07)",
-              overflow: "hidden", border: "1px solid rgba(0,0,0,0.06)",
-            }}>
-              <div style={{
-                background: PRIMARY, padding: "13px 18px",
-                display: "flex", alignItems: "center", gap: 10,
-              }}>
+            <div
+              style={{
+                background: WHITE,
+                borderRadius: 8,
+                boxShadow: "0 2px 12px rgba(0,0,0,0.07)",
+                overflow: "hidden",
+                border: "1px solid rgba(0,0,0,0.06)",
+              }}
+            >
+              <div
+                style={{
+                  background: PRIMARY,
+                  padding: "13px 18px",
+                  display: "flex",
+                  alignItems: "center",
+                  gap: 10,
+                }}
+              >
                 <span style={{ fontSize: 16 }}>📅</span>
-                <h3 style={{
-                  color: WHITE, margin: 0, fontFamily: "'Barlow Condensed', sans-serif",
-                  fontSize: 15, letterSpacing: 2.5, textTransform: "uppercase",
-                }}>Notices & Events</h3>
+                <h3
+                  style={{
+                    color: WHITE,
+                    margin: 0,
+                    fontFamily: "'Barlow Condensed', sans-serif",
+                    fontSize: 15,
+                    letterSpacing: 2.5,
+                    textTransform: "uppercase",
+                  }}
+                >
+                  Notices & Events
+                </h3>
               </div>
-              <div style={{
-                background: `rgba(2,116,190,0.06)`, padding: "10px 14px",
-                color: PRIMARY, fontFamily: "'Barlow Condensed', sans-serif",
-                fontSize: 13, letterSpacing: 2, fontWeight: 700, textAlign: "center",
-              }}>
-                {new Date().toLocaleDateString("en-KE", { month: "long", year: "numeric" }).toUpperCase()}
+              <div
+                style={{
+                  background: `rgba(2,116,190,0.06)`,
+                  padding: "10px 14px",
+                  color: PRIMARY,
+                  fontFamily: "'Barlow Condensed', sans-serif",
+                  fontSize: 13,
+                  letterSpacing: 2,
+                  fontWeight: 700,
+                  textAlign: "center",
+                }}
+              >
+                {new Date()
+                  .toLocaleDateString("en-KE", { month: "long", year: "numeric" })
+                  .toUpperCase()}
               </div>
               <div style={{ padding: "8px 12px 14px" }}>
-                {["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"].map(d => (
-                  <span key={d} style={{
-                    display: "inline-block", width: "14.28%", textAlign: "center",
-                    fontSize: 10, fontWeight: 700, color: "#aaa",
-                    fontFamily: "'Barlow', sans-serif",
-                  }}>{d}</span>
+                {["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"].map((d) => (
+                  <span
+                    key={d}
+                    style={{
+                      display: "inline-block",
+                      width: "14.28%",
+                      textAlign: "center",
+                      fontSize: 10,
+                      fontWeight: 700,
+                      color: "#aaa",
+                      fontFamily: "'Barlow', sans-serif",
+                    }}
+                  >
+                    {d}
+                  </span>
                 ))}
                 <div style={{ height: 6 }} />
                 {Array.from({ length: 35 }, (_, i) => {
-                  const day = i - new Date(new Date().getFullYear(), new Date().getMonth(), 1).getDay() + 1;
-                  const isToday = day === new Date().getDate();
-                  const valid = day > 0 && day <= 31;
+                  const now = new Date();
+                  const firstDay = new Date(now.getFullYear(), now.getMonth(), 1).getDay();
+                  const day = i - firstDay + 1;
+                  const daysInMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0).getDate();
+                  const isToday = day === now.getDate();
+                  const valid = day > 0 && day <= daysInMonth;
                   return (
-                    <span key={i} style={{
-                      display: "inline-block", width: "14.28%", textAlign: "center",
-                      padding: "4px 0", fontSize: 11,
-                      fontFamily: "'Barlow', sans-serif",
-                      color: !valid ? "transparent" : isToday ? WHITE : "#444",
-                      background: isToday ? RED : "transparent",
-                      borderRadius: isToday ? "50%" : 0,
-                      fontWeight: isToday ? 700 : 400,
-                    }}>{valid ? day : ""}</span>
+                    <span
+                      key={i}
+                      style={{
+                        display: "inline-block",
+                        width: "14.28%",
+                        textAlign: "center",
+                        padding: "4px 0",
+                        fontSize: 11,
+                        fontFamily: "'Barlow', sans-serif",
+                        color: !valid ? "transparent" : isToday ? WHITE : "#444",
+                        background: isToday ? RED : "transparent",
+                        borderRadius: isToday ? "50%" : 0,
+                        fontWeight: isToday ? 700 : 400,
+                      }}
+                    >
+                      {valid ? day : ""}
+                    </span>
                   );
                 })}
               </div>
@@ -1055,60 +1756,103 @@ function NewsSection() {
 }
 
 function CoursesSection() {
-  const { isMobile, isTablet } = useBreakpoint();
   return (
-    <section style={{ background: WHITE, padding: "60px 0", width: "100%", boxSizing: "border-box" }}>
-      <div style={{ maxWidth: 1280, margin: "0 auto", padding: "0 20px", boxSizing: "border-box" }}>
+    <section style={{ background: WHITE, padding: "70px 0", width: "100%" }}>
+      <div style={{ maxWidth: 1280, margin: "0 auto", padding: "0 16px" }}>
         <SectionHeader eyebrow="Join Us" title="BECOME A PART OF THIKA TTI" />
 
-        <div style={{
-          display: "grid",
-          gridTemplateColumns: isMobile || isTablet ? "1fr" : "1fr 320px",
-          gap: 28,
-          boxSizing: "border-box",
-        }}>
-          {/* Departments grid */}
+        <div className="courses-outer-grid">
+          {/* Departments */}
           <div>
-            <div style={{
-              display: "flex", alignItems: "center", gap: 10,
-              background: DARK, padding: "11px 18px", marginBottom: 2, borderRadius: "6px 6px 0 0",
-            }}>
+            <div
+              style={{
+                display: "flex",
+                alignItems: "center",
+                gap: 10,
+                background: DARK,
+                padding: "11px 18px",
+                marginBottom: 2,
+                borderRadius: "6px 6px 0 0",
+              }}
+            >
               <span style={{ fontSize: 16 }}>🎓</span>
-              <h3 style={{
-                color: WHITE, margin: 0, fontFamily: "'Barlow Condensed', sans-serif",
-                fontSize: 14, letterSpacing: 2.5, textTransform: "uppercase",
-              }}>Academic Departments</h3>
-            </div>
-            <div style={{
-              display: "grid",
-              gridTemplateColumns: isMobile ? "1fr" : "1fr 1fr",
-              border: "1px solid rgba(0,0,0,0.08)",
-              borderRadius: "0 0 6px 6px",
-              overflow: "hidden",
-            }}>
-              {departments.map((d, i) => (
-                <a key={i} href="#" style={{
-                  display: "flex", alignItems: "center", gap: 13,
-                  padding: "13px 18px", textDecoration: "none",
-                  borderBottom: "1px solid rgba(0,0,0,0.06)",
-                  borderRight: !isMobile && i % 2 === 0 ? "1px solid rgba(0,0,0,0.06)" : "none",
-                  transition: "all 0.15s",
-                  background: WHITE,
+              <h3
+                style={{
+                  color: WHITE,
+                  margin: 0,
+                  fontFamily: "'Barlow Condensed', sans-serif",
+                  fontSize: 14,
+                  letterSpacing: 2.5,
+                  textTransform: "uppercase",
                 }}
-                  onMouseEnter={e => { e.currentTarget.style.background = `rgba(2,116,190,0.05)`; e.currentTarget.querySelector(".dept-name").style.color = PRIMARY; }}
-                  onMouseLeave={e => { e.currentTarget.style.background = WHITE; e.currentTarget.querySelector(".dept-name").style.color = "#333"; }}
+              >
+                Academic Departments
+              </h3>
+            </div>
+            <div
+              className="dept-grid"
+              style={{
+                border: "1px solid rgba(0,0,0,0.08)",
+                borderRadius: "0 0 6px 6px",
+                overflow: "hidden",
+              }}
+            >
+              {departments.map((d, i) => (
+                <a
+                  key={i}
+                  href="#"
+                  style={{
+                    display: "flex",
+                    alignItems: "center",
+                    gap: 13,
+                    padding: "13px 18px",
+                    textDecoration: "none",
+                    borderBottom:
+                      i < departments.length - 2
+                        ? "1px solid rgba(0,0,0,0.06)"
+                        : "none",
+                    borderRight:
+                      i % 2 === 0 ? "1px solid rgba(0,0,0,0.06)" : "none",
+                    transition: "all 0.15s",
+                    background: WHITE,
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.background = `rgba(2,116,190,0.05)`;
+                    e.currentTarget.querySelector(".dept-name").style.color = PRIMARY;
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.background = WHITE;
+                    e.currentTarget.querySelector(".dept-name").style.color = "#333";
+                  }}
                 >
-                  <span style={{
-                    fontSize: 20, width: 36, height: 36,
-                    background: `rgba(2,116,190,0.08)`,
-                    borderRadius: 6, display: "flex", alignItems: "center", justifyContent: "center",
-                    flexShrink: 0,
-                  }}>{d.icon}</span>
-                  <span className="dept-name" style={{
-                    fontFamily: "'Barlow', sans-serif", fontSize: 12.5,
-                    color: "#333", lineHeight: 1.3, fontWeight: 600,
-                    transition: "color 0.15s",
-                  }}>{d.name}</span>
+                  <span
+                    style={{
+                      fontSize: 20,
+                      width: 36,
+                      height: 36,
+                      background: `rgba(2,116,190,0.08)`,
+                      borderRadius: 6,
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      flexShrink: 0,
+                    }}
+                  >
+                    {d.icon}
+                  </span>
+                  <span
+                    className="dept-name"
+                    style={{
+                      fontFamily: "'Barlow', sans-serif",
+                      fontSize: 12.5,
+                      color: "#333",
+                      lineHeight: 1.3,
+                      fontWeight: 600,
+                      transition: "color 0.15s",
+                    }}
+                  >
+                    {d.name}
+                  </span>
                 </a>
               ))}
             </div>
@@ -1116,53 +1860,119 @@ function CoursesSection() {
 
           {/* Tweets */}
           <div>
-            <div style={{
-              display: "flex", alignItems: "center", gap: 10,
-              background: "#1da1f2", padding: "11px 18px", marginBottom: 2, borderRadius: "6px 6px 0 0",
-            }}>
+            <div
+              style={{
+                display: "flex",
+                alignItems: "center",
+                gap: 10,
+                background: "#1da1f2",
+                padding: "11px 18px",
+                marginBottom: 2,
+                borderRadius: "6px 6px 0 0",
+              }}
+            >
               <span style={{ fontSize: 16 }}>🐦</span>
-              <h3 style={{
-                color: WHITE, margin: 0, fontFamily: "'Barlow Condensed', sans-serif",
-                fontSize: 14, letterSpacing: 2.5, textTransform: "uppercase",
-              }}>Latest Tweets</h3>
+              <h3
+                style={{
+                  color: WHITE,
+                  margin: 0,
+                  fontFamily: "'Barlow Condensed', sans-serif",
+                  fontSize: 14,
+                  letterSpacing: 2.5,
+                  textTransform: "uppercase",
+                }}
+              >
+                Latest Tweets
+              </h3>
             </div>
-            <div style={{
-              border: "1px solid rgba(0,0,0,0.08)",
-              borderRadius: "0 0 6px 6px",
-              overflow: "hidden", background: WHITE,
-            }}>
+            <div
+              style={{
+                border: "1px solid rgba(0,0,0,0.08)",
+                borderRadius: "0 0 6px 6px",
+                overflow: "hidden",
+                background: WHITE,
+              }}
+            >
               {tweets.map((t, i) => (
-                <div key={i} style={{
-                  padding: "15px 18px",
-                  borderBottom: i < tweets.length - 1 ? "1px solid rgba(0,0,0,0.06)" : "none",
-                }}>
+                <div
+                  key={i}
+                  style={{
+                    padding: "15px 18px",
+                    borderBottom:
+                      i < tweets.length - 1 ? "1px solid rgba(0,0,0,0.06)" : "none",
+                  }}
+                >
                   <div style={{ display: "flex", gap: 11, alignItems: "flex-start" }}>
-                    <div style={{
-                      width: 34, height: 34, borderRadius: "50%",
-                      background: PRIMARY, color: WHITE,
-                      display: "flex", alignItems: "center", justifyContent: "center",
-                      fontSize: 13, fontWeight: 700, flexShrink: 0,
-                    }}>T</div>
+                    <div
+                      style={{
+                        width: 34,
+                        height: 34,
+                        borderRadius: "50%",
+                        background: PRIMARY,
+                        color: WHITE,
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "center",
+                        fontSize: 13,
+                        fontWeight: 700,
+                        flexShrink: 0,
+                      }}
+                    >
+                      T
+                    </div>
                     <div>
-                      <div style={{
-                        fontFamily: "'Barlow', sans-serif", fontWeight: 700,
-                        fontSize: 11.5, color: DARK, marginBottom: 4,
-                      }}>Thika Technical
-                        <span style={{ color: "#aaa", fontWeight: 400, marginLeft: 6 }}>· {t.date}</span>
+                      <div
+                        style={{
+                          fontFamily: "'Barlow', sans-serif",
+                          fontWeight: 700,
+                          fontSize: 11.5,
+                          color: DARK,
+                          marginBottom: 4,
+                        }}
+                      >
+                        Thika Technical Training Institute
+                        <span
+                          style={{ color: "#aaa", fontWeight: 400, marginLeft: 6 }}
+                        >
+                          · {t.date}
+                        </span>
                       </div>
-                      <p style={{
-                        fontFamily: "'Barlow', sans-serif", fontSize: 12.5,
-                        color: "#555", lineHeight: 1.55, margin: 0,
-                      }}>{t.text}</p>
+                      <p
+                        style={{
+                          fontFamily: "'Barlow', sans-serif",
+                          fontSize: 12.5,
+                          color: "#555",
+                          lineHeight: 1.55,
+                          margin: 0,
+                        }}
+                      >
+                        {t.text}
+                      </p>
                     </div>
                   </div>
                 </div>
               ))}
-              <div style={{ padding: "12px 18px", background: `rgba(2,116,190,0.04)` }}>
-                <a href="https://twitter.com/Thika_Technical" target="_blank" rel="noreferrer" style={{
-                  color: "#1da1f2", fontSize: 12, fontWeight: 700,
-                  fontFamily: "'Barlow', sans-serif", textDecoration: "none",
-                }}>Follow @Thika_Technical →</a>
+              <div
+                style={{
+                  padding: "12px 18px",
+                  background: `rgba(2,116,190,0.04)`,
+                }}
+              >
+                <a
+                  href="https://twitter.com/Thika_Technical"
+                  target="_blank"
+                  rel="noreferrer"
+                  style={{
+                    color: "#1da1f2",
+                    fontSize: 12,
+                    fontWeight: 700,
+                    fontFamily: "'Barlow', sans-serif",
+                    textDecoration: "none",
+                    letterSpacing: 0.5,
+                  }}
+                >
+                  Follow @Thika_Technical →
+                </a>
               </div>
             </div>
           </div>
@@ -1173,79 +1983,140 @@ function CoursesSection() {
 }
 
 function MissionSection() {
-  const { isMobile, isTablet } = useBreakpoint();
   return (
-    <section style={{ background: DARK, padding: "70px 0", width: "100%", boxSizing: "border-box" }}>
-      <div style={{ maxWidth: 1280, margin: "0 auto", padding: "0 20px", boxSizing: "border-box" }}>
-        <div style={{ textAlign: "center", marginBottom: 44 }}>
-          <div style={{ color: PRIMARY, fontSize: 11, letterSpacing: 4, fontFamily: "'Barlow', sans-serif", fontWeight: 700, marginBottom: 10, textTransform: "uppercase" }}>
+    <section style={{ background: DARK, padding: "80px 0", width: "100%" }}>
+      <div style={{ maxWidth: 1280, margin: "0 auto", padding: "0 16px" }}>
+        <div style={{ textAlign: "center", marginBottom: 52 }}>
+          <div
+            style={{
+              color: PRIMARY,
+              fontSize: 11,
+              letterSpacing: 4,
+              fontFamily: "'Barlow', sans-serif",
+              fontWeight: 700,
+              marginBottom: 10,
+              textTransform: "uppercase",
+            }}
+          >
             Who We Are
           </div>
-          <h2 style={{
-            color: WHITE, fontFamily: "'Barlow Condensed', sans-serif",
-            fontSize: "clamp(26px, 5vw, 44px)", margin: "0 0 16px", fontWeight: 800,
-            letterSpacing: 1.5, textTransform: "uppercase",
-          }}>Our Foundation</h2>
-          <div style={{ width: 48, height: 3, background: RED, margin: "0 auto", borderRadius: 2 }} />
+          <h2
+            style={{
+              color: WHITE,
+              fontFamily: "'Barlow Condensed', sans-serif",
+              fontSize: "clamp(28px, 4vw, 44px)",
+              margin: "0 0 16px",
+              fontWeight: 800,
+              letterSpacing: 1.5,
+              textTransform: "uppercase",
+            }}
+          >
+            Our Foundation
+          </h2>
+          <div
+            style={{
+              width: 48,
+              height: 3,
+              background: RED,
+              margin: "0 auto",
+              borderRadius: 2,
+            }}
+          />
         </div>
 
-        <div style={{
-          display: "grid",
-          gridTemplateColumns: isMobile ? "1fr" : isTablet ? "1fr 1fr" : "repeat(3, 1fr)",
-          gap: 18,
-        }}>
+        <div className="mission-grid">
           {[
             {
-              icon: "🎯", title: "Our Mission",
+              icon: "🎯",
+              title: "Our Mission",
               text: "To provide Training, Research and Outreach Programmes that impart skills and utilize applied knowledge to spur economic growth and solve problems in society.",
             },
             {
-              icon: "🔭", title: "Our Vision",
+              icon: "🔭",
+              title: "Our Vision",
               text: "To be the centre of excellence in Technical, Industrial, Vocational and Entrepreneurship Training in Kenya and the region.",
               highlight: true,
             },
             {
-              icon: "⭐", title: "Our Core Values",
-              list: values.map(v => v.title),
+              icon: "⭐",
+              title: "Our Core Values",
+              list: values.map((v) => v.title),
             },
           ].map((item, i) => (
-            <div key={i} style={{
-              background: item.highlight ? PRIMARY : "rgba(255,255,255,0.04)",
-              padding: "32px 28px", borderRadius: 8,
-              borderTop: `4px solid ${item.highlight ? WHITE : PRIMARY}`,
-              transition: "transform 0.2s, box-shadow 0.2s",
-              // On tablet, last card spans full width
-              gridColumn: isTablet && i === 2 ? "1 / -1" : "auto",
-            }}
-              onMouseEnter={e => { e.currentTarget.style.transform = "translateY(-4px)"; e.currentTarget.style.boxShadow = "0 16px 40px rgba(0,0,0,0.25)"; }}
-              onMouseLeave={e => { e.currentTarget.style.transform = "translateY(0)"; e.currentTarget.style.boxShadow = "none"; }}
+            <div
+              key={i}
+              style={{
+                background: item.highlight ? PRIMARY : "rgba(255,255,255,0.04)",
+                padding: "36px 28px",
+                borderRadius: 8,
+                borderTop: `4px solid ${item.highlight ? WHITE : PRIMARY}`,
+                transition: "transform 0.2s, box-shadow 0.2s",
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.transform = "translateY(-4px)";
+                e.currentTarget.style.boxShadow = "0 16px 40px rgba(0,0,0,0.25)";
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.transform = "translateY(0)";
+                e.currentTarget.style.boxShadow = "none";
+              }}
             >
-              <div style={{ fontSize: 28, marginBottom: 16 }}>{item.icon}</div>
-              <h3 style={{
-                color: WHITE, fontFamily: "'Barlow Condensed', sans-serif",
-                fontSize: 19, fontWeight: 800, letterSpacing: 2,
-                textTransform: "uppercase", margin: "0 0 14px",
-              }}>{item.title}</h3>
-              <div style={{ width: 28, height: 2, background: item.highlight ? WHITE : RED, marginBottom: 14, borderRadius: 2 }} />
+              <div style={{ fontSize: 30, marginBottom: 18 }}>{item.icon}</div>
+              <h3
+                style={{
+                  color: WHITE,
+                  fontFamily: "'Barlow Condensed', sans-serif",
+                  fontSize: 21,
+                  fontWeight: 800,
+                  letterSpacing: 2,
+                  textTransform: "uppercase",
+                  margin: "0 0 16px",
+                }}
+              >
+                {item.title}
+              </h3>
+              <div
+                style={{
+                  width: 28,
+                  height: 2,
+                  background: item.highlight ? WHITE : RED,
+                  marginBottom: 16,
+                  borderRadius: 2,
+                }}
+              />
               {item.text && (
-                <p style={{
-                  color: item.highlight ? "rgba(255,255,255,0.9)" : "rgba(255,255,255,0.65)",
-                  fontFamily: "'Barlow', sans-serif", fontSize: 14, lineHeight: 1.75, margin: 0,
-                }}>{item.text}</p>
+                <p
+                  style={{
+                    color: item.highlight
+                      ? "rgba(255,255,255,0.9)"
+                      : "rgba(255,255,255,0.65)",
+                    fontFamily: "'Barlow', sans-serif",
+                    fontSize: 14,
+                    lineHeight: 1.75,
+                    margin: 0,
+                  }}
+                >
+                  {item.text}
+                </p>
               )}
               {item.list && (
-                <ul style={{
-                  margin: 0, padding: 0, listStyle: "none",
-                  display: isTablet && i === 2 ? "grid" : "block",
-                  gridTemplateColumns: isTablet && i === 2 ? "1fr 1fr 1fr" : "auto",
-                  gap: isTablet && i === 2 ? "0 24px" : 0,
-                }}>
+                <ul style={{ margin: 0, padding: 0, listStyle: "none" }}>
                   {item.list.map((v, j) => (
-                    <li key={j} style={{
-                      color: "rgba(255,255,255,0.65)", fontFamily: "'Barlow', sans-serif",
-                      fontSize: 13.5, padding: "5px 0", display: "flex", gap: 10,
-                      borderBottom: j < item.list.length - 1 ? "1px solid rgba(255,255,255,0.07)" : "none",
-                    }}>
+                    <li
+                      key={j}
+                      style={{
+                        color: "rgba(255,255,255,0.65)",
+                        fontFamily: "'Barlow', sans-serif",
+                        fontSize: 13.5,
+                        padding: "5px 0",
+                        display: "flex",
+                        gap: 10,
+                        borderBottom:
+                          j < item.list.length - 1
+                            ? "1px solid rgba(255,255,255,0.07)"
+                            : "none",
+                      }}
+                    >
                       <span style={{ color: PRIMARY, fontWeight: 700 }}>▸</span> {v}
                     </li>
                   ))}
@@ -1260,82 +2131,129 @@ function MissionSection() {
 }
 
 function StudentLifeSection() {
-  const { isMobile, isTablet } = useBreakpoint();
   return (
-    <section style={{ background: LIGHT_BG, padding: "70px 0", width: "100%", boxSizing: "border-box" }}>
-      <div style={{ maxWidth: 1280, margin: "0 auto", padding: "0 20px", boxSizing: "border-box" }}>
+    <section style={{ background: LIGHT_BG, padding: "80px 0", width: "100%" }}>
+      <div style={{ maxWidth: 1280, margin: "0 auto", padding: "0 16px" }}>
         <SectionHeader eyebrow="Experience" title="STUDENT LIFE @ THIKA TTI" />
 
-        <div style={{
-          display: "grid",
-          gridTemplateColumns: isMobile ? "1fr" : isTablet ? "1fr 1fr" : "repeat(3, 1fr)",
-          gap: 18,
-        }}>
+        <div className="life-grid">
           {studentLife.map((item, i) => (
-            <div key={i} style={{
-              position: "relative", overflow: "hidden", cursor: "pointer",
-              height: isMobile ? 240 : 280, borderRadius: 8,
-              boxShadow: "0 4px 20px rgba(0,0,0,0.12)",
-              // On tablet, last card spans full width
-              gridColumn: isTablet && i === 2 ? "1 / -1" : "auto",
-            }}
-              onMouseEnter={e => {
-                e.currentTarget.querySelector(".overlay").style.background = `rgba(2,116,190,0.88)`;
+            <div
+              key={i}
+              style={{
+                position: "relative",
+                overflow: "hidden",
+                cursor: "pointer",
+                height: 300,
+                borderRadius: 8,
+                boxShadow: "0 4px 20px rgba(0,0,0,0.12)",
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.querySelector(".overlay").style.background =
+                  `rgba(2,116,190,0.88)`;
                 e.currentTarget.querySelector("img").style.transform = "scale(1.07)";
               }}
-              onMouseLeave={e => {
-                e.currentTarget.querySelector(".overlay").style.background = "rgba(13,27,42,0.55)";
+              onMouseLeave={(e) => {
+                e.currentTarget.querySelector(".overlay").style.background =
+                  "rgba(13,27,42,0.55)";
                 e.currentTarget.querySelector("img").style.transform = "scale(1)";
               }}
             >
-              <img src={item.img} alt={item.title} style={{
-                width: "100%", height: "100%", objectFit: "cover",
-                transition: "transform 0.5s ease",
-              }} />
-              <div className="overlay" style={{
-                position: "absolute", inset: 0,
-                background: "rgba(13,27,42,0.55)",
-                transition: "background 0.3s ease",
-                display: "flex", flexDirection: "column",
-                justifyContent: "flex-end", padding: 22,
-              }}>
-                <div style={{ width: 28, height: 3, background: RED, marginBottom: 10, borderRadius: 2 }} />
-                <h3 style={{
-                  color: WHITE, margin: "0 0 8px",
-                  fontFamily: "'Barlow Condensed', sans-serif",
-                  fontSize: 22, fontWeight: 800, letterSpacing: 1.5,
-                  textTransform: "uppercase",
-                }}>{item.title}</h3>
-                <p style={{
-                  color: "rgba(255,255,255,0.85)", margin: 0,
-                  fontFamily: "'Barlow', sans-serif", fontSize: 13, lineHeight: 1.55,
-                }}>{item.desc}</p>
+              <img
+                src={item.img}
+                alt={item.title}
+                style={{
+                  width: "100%",
+                  height: "100%",
+                  objectFit: "cover",
+                  transition: "transform 0.5s ease",
+                }}
+              />
+              <div
+                className="overlay"
+                style={{
+                  position: "absolute",
+                  inset: 0,
+                  background: "rgba(13,27,42,0.55)",
+                  transition: "background 0.3s ease",
+                  display: "flex",
+                  flexDirection: "column",
+                  justifyContent: "flex-end",
+                  padding: 24,
+                }}
+              >
+                <div
+                  style={{
+                    width: 28,
+                    height: 3,
+                    background: RED,
+                    marginBottom: 10,
+                    borderRadius: 2,
+                  }}
+                />
+                <h3
+                  style={{
+                    color: WHITE,
+                    margin: "0 0 8px",
+                    fontFamily: "'Barlow Condensed', sans-serif",
+                    fontSize: 24,
+                    fontWeight: 800,
+                    letterSpacing: 1.5,
+                    textTransform: "uppercase",
+                  }}
+                >
+                  {item.title}
+                </h3>
+                <p
+                  style={{
+                    color: "rgba(255,255,255,0.85)",
+                    margin: 0,
+                    fontFamily: "'Barlow', sans-serif",
+                    fontSize: 13,
+                    lineHeight: 1.55,
+                  }}
+                >
+                  {item.desc}
+                </p>
               </div>
             </div>
           ))}
         </div>
 
         {/* Stats */}
-        <div style={{
-          display: "grid",
-          gridTemplateColumns: isMobile ? "1fr 1fr" : "repeat(4, 1fr)",
-          gap: 0, marginTop: 36,
-          background: DARK, borderRadius: 8, overflow: "hidden",
-        }}>
+        <div className="stats-grid">
           {stats.map((s, i) => (
-            <div key={i} style={{
-              padding: isMobile ? "24px 16px" : "32px 24px", textAlign: "center",
-              borderRight: (isMobile ? i % 2 === 0 : i < 3) ? "1px solid rgba(255,255,255,0.08)" : "none",
-              borderBottom: isMobile && i < 2 ? "1px solid rgba(255,255,255,0.08)" : "none",
-            }}>
-              <div style={{
-                color: RED, fontFamily: "'Barlow Condensed', sans-serif",
-                fontSize: isMobile ? 34 : 42, fontWeight: 900, lineHeight: 1,
-              }}>{s.value}</div>
-              <div style={{
-                color: "rgba(255,255,255,0.55)", fontFamily: "'Barlow', sans-serif",
-                fontSize: isMobile ? 10 : 12, letterSpacing: 2, textTransform: "uppercase", marginTop: 8,
-              }}>{s.label}</div>
+            <div
+              key={i}
+              style={{
+                padding: "32px 16px",
+                textAlign: "center",
+                borderRight: i < 3 ? "1px solid rgba(255,255,255,0.08)" : "none",
+              }}
+            >
+              <div
+                style={{
+                  color: RED,
+                  fontFamily: "'Barlow Condensed', sans-serif",
+                  fontSize: "clamp(32px, 5vw, 42px)",
+                  fontWeight: 900,
+                  lineHeight: 1,
+                }}
+              >
+                {s.value}
+              </div>
+              <div
+                style={{
+                  color: "rgba(255,255,255,0.55)",
+                  fontFamily: "'Barlow', sans-serif",
+                  fontSize: 12,
+                  letterSpacing: 2.5,
+                  textTransform: "uppercase",
+                  marginTop: 8,
+                }}
+              >
+                {s.label}
+              </div>
             </div>
           ))}
         </div>
@@ -1345,49 +2263,107 @@ function StudentLifeSection() {
 }
 
 function ServiceCharterSection() {
-  const { isMobile, isTablet } = useBreakpoint();
   return (
-    <section style={{ background: WHITE, padding: "70px 0", width: "100%", boxSizing: "border-box" }}>
-      <div style={{ maxWidth: 1280, margin: "0 auto", padding: "0 20px", boxSizing: "border-box" }}>
-        <div style={{
-          display: "grid",
-          gridTemplateColumns: isMobile || isTablet ? "1fr" : "1fr 1fr",
-          gap: 48, alignItems: "center",
-        }}>
+    <section style={{ background: WHITE, padding: "80px 0", width: "100%" }}>
+      <div style={{ maxWidth: 1280, margin: "0 auto", padding: "0 16px" }}>
+        <div className="service-grid">
           <div>
-            <div style={{ color: PRIMARY, fontSize: 11, letterSpacing: 4, fontFamily: "'Barlow', sans-serif", fontWeight: 700, marginBottom: 10, textTransform: "uppercase" }}>
+            <div
+              style={{
+                color: PRIMARY,
+                fontSize: 11,
+                letterSpacing: 4,
+                fontFamily: "'Barlow', sans-serif",
+                fontWeight: 700,
+                marginBottom: 10,
+                textTransform: "uppercase",
+              }}
+            >
               Our Commitment
             </div>
-            <h2 style={{
-              fontFamily: "'Barlow Condensed', sans-serif",
-              fontSize: "clamp(24px, 4vw, 40px)", margin: "0 0 18px",
-              fontWeight: 800, color: DARK, lineHeight: 1.15,
-              letterSpacing: 0.5, textTransform: "uppercase",
-            }}>Thika Technical<br />Service Charter</h2>
-            <div style={{ width: 44, height: 3, background: RED, marginBottom: 20, borderRadius: 2 }} />
-            <p style={{
-              fontFamily: "'Barlow', sans-serif", fontSize: 15, color: "#666",
-              lineHeight: 1.8, margin: "0 0 28px",
-            }}>
-              A student of Thika Technical is exposed to quality service. As you walk about in the corridors of the Institute, be sure you will encounter skilled and competent staff to attend to your needs.
+            <h2
+              style={{
+                fontFamily: "'Barlow Condensed', sans-serif",
+                fontSize: "clamp(26px, 3.5vw, 40px)",
+                margin: "0 0 18px",
+                fontWeight: 800,
+                color: DARK,
+                lineHeight: 1.15,
+                letterSpacing: 0.5,
+                textTransform: "uppercase",
+              }}
+            >
+              Thika Technical
+              <br />
+              Service Charter
+            </h2>
+            <div
+              style={{
+                width: 44,
+                height: 3,
+                background: RED,
+                marginBottom: 20,
+                borderRadius: 2,
+              }}
+            />
+            <p
+              style={{
+                fontFamily: "'Barlow', sans-serif",
+                fontSize: 15,
+                color: "#666",
+                lineHeight: 1.8,
+                margin: "0 0 28px",
+              }}
+            >
+              A student of Thika Technical is exposed to quality service. As you walk about
+              in the corridors of the Institute, be sure you will encounter skilled and
+              competent staff to attend to your needs.
             </p>
-            <a href="#" style={{
-              display: "inline-block", background: RED, color: WHITE,
-              padding: "12px 28px", textDecoration: "none",
-              fontFamily: "'Barlow Condensed', sans-serif", fontWeight: 800,
-              fontSize: 13.5, letterSpacing: 2, textTransform: "uppercase",
-              borderRadius: 4, boxShadow: "0 3px 12px rgba(192,57,43,0.3)",
-            }}>Read More</a>
+            <a
+              href="#"
+              style={{
+                display: "inline-block",
+                background: RED,
+                color: WHITE,
+                padding: "12px 28px",
+                textDecoration: "none",
+                fontFamily: "'Barlow Condensed', sans-serif",
+                fontWeight: 800,
+                fontSize: 13.5,
+                letterSpacing: 2,
+                textTransform: "uppercase",
+                transition: "background 0.2s",
+                borderRadius: 4,
+                boxShadow: "0 3px 12px rgba(192,57,43,0.3)",
+              }}
+              onMouseEnter={(e) => (e.currentTarget.style.background = "#a93226")}
+              onMouseLeave={(e) => (e.currentTarget.style.background = RED)}
+            >
+              Read More
+            </a>
           </div>
 
           {/* YouTube embed */}
-          <div style={{
-            position: "relative", paddingBottom: "56.25%", height: 0,
-            overflow: "hidden", borderRadius: 8,
-            boxShadow: "0 12px 50px rgba(0,0,0,0.15)",
-          }}>
+          <div
+            className="service-video"
+            style={{
+              position: "relative",
+              paddingBottom: "56.25%",
+              height: 0,
+              overflow: "hidden",
+              borderRadius: 8,
+              boxShadow: "0 12px 50px rgba(0,0,0,0.15)",
+            }}
+          >
             <iframe
-              style={{ position: "absolute", top: 0, left: 0, width: "100%", height: "100%", border: "none" }}
+              style={{
+                position: "absolute",
+                top: 0,
+                left: 0,
+                width: "100%",
+                height: "100%",
+                border: "none",
+              }}
               src="https://www.youtube.com/embed/3DlPQvYLjwI"
               title="Thika TTI"
               allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
@@ -1402,26 +2378,64 @@ function ServiceCharterSection() {
 
 function PartnersSection() {
   return (
-    <section style={{ background: LIGHT_BG, padding: "48px 0", overflow: "hidden", width: "100%", boxSizing: "border-box" }}>
-      <div style={{ maxWidth: 1280, margin: "0 auto", padding: "0 20px", marginBottom: 28, textAlign: "center", boxSizing: "border-box" }}>
-        <div style={{ color: "#aaa", fontSize: 11, letterSpacing: 4, fontFamily: "'Barlow', sans-serif", fontWeight: 700, textTransform: "uppercase" }}>
+    <section
+      style={{
+        background: LIGHT_BG,
+        padding: "48px 0",
+        overflow: "hidden",
+        width: "100%",
+      }}
+    >
+      <div
+        style={{
+          maxWidth: 1280,
+          margin: "0 auto",
+          padding: "0 16px",
+          marginBottom: 28,
+          textAlign: "center",
+        }}
+      >
+        <div
+          style={{
+            color: "#aaa",
+            fontSize: 11,
+            letterSpacing: 4,
+            fontFamily: "'Barlow', sans-serif",
+            fontWeight: 700,
+            textTransform: "uppercase",
+          }}
+        >
           Our Partners & Affiliates
         </div>
       </div>
-      <div style={{
-        display: "flex", gap: 16, animation: "marquee 18s linear infinite",
-        whiteSpace: "nowrap",
-      }}>
+      <div
+        style={{
+          display: "flex",
+          gap: 20,
+          animation: "marquee 18s linear infinite",
+          whiteSpace: "nowrap",
+        }}
+      >
         {[...partners, ...partners, ...partners].map((p, i) => (
-          <div key={i} style={{
-            background: WHITE, border: `1px solid rgba(0,0,0,0.08)`,
-            padding: "12px 28px", borderRadius: 6,
-            fontFamily: "'Barlow Condensed', sans-serif",
-            fontWeight: 800, fontSize: 15, color: DARK,
-            letterSpacing: 2.5, flexShrink: 0,
-            boxShadow: "0 1px 6px rgba(0,0,0,0.06)",
-            borderTop: `3px solid ${PRIMARY}`,
-          }}>{p}</div>
+          <div
+            key={i}
+            style={{
+              background: WHITE,
+              border: `1px solid rgba(0,0,0,0.08)`,
+              padding: "12px 32px",
+              borderRadius: 6,
+              fontFamily: "'Barlow Condensed', sans-serif",
+              fontWeight: 800,
+              fontSize: 16,
+              color: DARK,
+              letterSpacing: 2.5,
+              flexShrink: 0,
+              boxShadow: "0 1px 6px rgba(0,0,0,0.06)",
+              borderTop: `3px solid ${PRIMARY}`,
+            }}
+          >
+            {p}
+          </div>
         ))}
       </div>
     </section>
@@ -1433,67 +2447,133 @@ function IssuesSection() {
   const [sent, setSent] = useState(false);
 
   return (
-    <section style={{ background: DARK, padding: "70px 0", width: "100%", boxSizing: "border-box" }}>
-      <div style={{ maxWidth: 660, margin: "0 auto", padding: "0 20px", textAlign: "center", boxSizing: "border-box" }}>
-        <div style={{ color: PRIMARY, fontSize: 11, letterSpacing: 4, fontFamily: "'Barlow', sans-serif", fontWeight: 700, marginBottom: 12, textTransform: "uppercase" }}>
+    <section style={{ background: DARK, padding: "80px 0", width: "100%" }}>
+      <div
+        style={{
+          maxWidth: 660,
+          margin: "0 auto",
+          padding: "0 16px",
+          textAlign: "center",
+        }}
+      >
+        <div
+          style={{
+            color: PRIMARY,
+            fontSize: 11,
+            letterSpacing: 4,
+            fontFamily: "'Barlow', sans-serif",
+            fontWeight: 700,
+            marginBottom: 12,
+            textTransform: "uppercase",
+          }}
+        >
           Support
         </div>
-        <h2 style={{
-          color: WHITE, fontFamily: "'Barlow Condensed', sans-serif",
-          fontSize: "clamp(22px, 5vw, 38px)", margin: "0 0 10px", fontWeight: 800,
-          textTransform: "uppercase", letterSpacing: 1,
-        }}>Having Any Issues?</h2>
-        <div style={{ width: 40, height: 3, background: RED, margin: "0 auto 16px", borderRadius: 2 }} />
-        <p style={{
-          color: "rgba(255,255,255,0.55)", fontFamily: "'Barlow', sans-serif",
-          fontSize: 15, marginBottom: 32, lineHeight: 1.6,
-        }}>Please complete the form below for any complaints or inquiries.</p>
+        <h2
+          style={{
+            color: WHITE,
+            fontFamily: "'Barlow Condensed', sans-serif",
+            fontSize: "clamp(24px, 4vw, 38px)",
+            margin: "0 0 10px",
+            fontWeight: 800,
+            textTransform: "uppercase",
+            letterSpacing: 1,
+          }}
+        >
+          Having Any Issues?
+        </h2>
+        <div
+          style={{
+            width: 40,
+            height: 3,
+            background: RED,
+            margin: "0 auto 16px",
+            borderRadius: 2,
+          }}
+        />
+        <p
+          style={{
+            color: "rgba(255,255,255,0.55)",
+            fontFamily: "'Barlow', sans-serif",
+            fontSize: 15,
+            marginBottom: 36,
+            lineHeight: 1.6,
+          }}
+        >
+          Please complete the form below for any complaints or inquiries.
+        </p>
 
         {sent ? (
-          <div style={{
-            background: "rgba(2,116,190,0.15)", border: `1px solid ${PRIMARY}`,
-            padding: 32, borderRadius: 6, color: WHITE,
-            fontFamily: "'Barlow', sans-serif", fontSize: 16,
-          }}>
+          <div
+            style={{
+              background: "rgba(2,116,190,0.15)",
+              border: `1px solid ${PRIMARY}`,
+              padding: 32,
+              borderRadius: 6,
+              color: WHITE,
+              fontFamily: "'Barlow', sans-serif",
+              fontSize: 16,
+            }}
+          >
             ✅ Message sent successfully. We will get back to you soon.
           </div>
         ) : (
           <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
             <input
-              type="email" placeholder="Your Email Address"
+              type="email"
+              placeholder="Your Email Address"
               value={form.email}
-              onChange={e => setForm({ ...form, email: e.target.value })}
+              onChange={(e) => setForm({ ...form, email: e.target.value })}
               style={{
                 padding: "14px 18px",
                 background: "rgba(255,255,255,0.06)",
                 border: "1px solid rgba(255,255,255,0.12)",
                 color: WHITE,
-                fontFamily: "'Barlow', sans-serif", fontSize: 14, borderRadius: 4,
-                outline: "none", width: "100%", boxSizing: "border-box",
+                fontFamily: "'Barlow', sans-serif",
+                fontSize: 14,
+                borderRadius: 4,
+                outline: "none",
               }}
             />
             <textarea
               placeholder="Your Message or Complaint"
               rows={5}
               value={form.message}
-              onChange={e => setForm({ ...form, message: e.target.value })}
+              onChange={(e) => setForm({ ...form, message: e.target.value })}
               style={{
                 padding: "14px 18px",
                 background: "rgba(255,255,255,0.06)",
                 border: "1px solid rgba(255,255,255,0.12)",
                 color: WHITE,
-                fontFamily: "'Barlow', sans-serif", fontSize: 14, borderRadius: 4,
-                outline: "none", resize: "vertical", width: "100%", boxSizing: "border-box",
+                fontFamily: "'Barlow', sans-serif",
+                fontSize: 14,
+                borderRadius: 4,
+                outline: "none",
+                resize: "vertical",
               }}
             />
-            <button onClick={() => setSent(true)} style={{
-              background: RED, color: WHITE, border: "none",
-              padding: "14px 32px", fontFamily: "'Barlow Condensed', sans-serif",
-              fontWeight: 800, fontSize: 14.5, letterSpacing: 2,
-              textTransform: "uppercase", cursor: "pointer",
-              borderRadius: 4, boxShadow: "0 3px 12px rgba(192,57,43,0.35)",
-              width: "100%",
-            }}>Submit Message</button>
+            <button
+              onClick={() => setSent(true)}
+              style={{
+                background: RED,
+                color: WHITE,
+                border: "none",
+                padding: "14px 32px",
+                fontFamily: "'Barlow Condensed', sans-serif",
+                fontWeight: 800,
+                fontSize: 14.5,
+                letterSpacing: 2,
+                textTransform: "uppercase",
+                cursor: "pointer",
+                transition: "background 0.2s",
+                borderRadius: 4,
+                boxShadow: "0 3px 12px rgba(192,57,43,0.35)",
+              }}
+              onMouseEnter={(e) => (e.currentTarget.style.background = "#a93226")}
+              onMouseLeave={(e) => (e.currentTarget.style.background = RED)}
+            >
+              Submit Message
+            </button>
           </div>
         )}
       </div>
@@ -1502,41 +2582,78 @@ function IssuesSection() {
 }
 
 function Footer() {
-  const { isMobile, isTablet } = useBreakpoint();
   return (
-    <footer style={{ background: "#060f18", width: "100%", boxSizing: "border-box" }}>
-      <div style={{ maxWidth: 1280, margin: "0 auto", padding: "52px 20px 0", boxSizing: "border-box" }}>
-        <div style={{
-          display: "grid",
-          gridTemplateColumns: isMobile ? "1fr" : isTablet ? "1fr 1fr" : "2fr 1.5fr 1.5fr 1.5fr",
-          gap: 36,
-          paddingBottom: 48,
-        }}>
+    <footer style={{ background: "#060f18", width: "100%" }}>
+      <div style={{ maxWidth: 1280, margin: "0 auto", padding: "60px 16px 0" }}>
+        <div className="footer-grid">
           {/* Brand */}
           <div>
-            <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 18 }}>
-              <div style={{
-                width: 44, height: 44, background: PRIMARY, borderRadius: 8,
-                display: "flex", alignItems: "center", justifyContent: "center",
-                fontWeight: 900, color: WHITE, fontSize: 13,
-                fontFamily: "'Barlow Condensed', sans-serif", letterSpacing: 0.5,
-              }}>TTI</div>
+            <div
+              style={{
+                display: "flex",
+                alignItems: "center",
+                gap: 12,
+                marginBottom: 20,
+              }}
+            >
+              <div
+                style={{
+                  width: 46,
+                  height: 46,
+                  background: PRIMARY,
+                  borderRadius: 8,
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  fontWeight: 900,
+                  color: WHITE,
+                  fontSize: 13,
+                  fontFamily: "'Barlow Condensed', sans-serif",
+                  letterSpacing: 0.5,
+                  flexShrink: 0,
+                }}
+              >
+                TTI
+              </div>
               <div>
-                <div style={{ color: WHITE, fontWeight: 800, fontSize: 14, fontFamily: "'Barlow Condensed', sans-serif", letterSpacing: 1.5 }}>
+                <div
+                  style={{
+                    color: WHITE,
+                    fontWeight: 800,
+                    fontSize: 14,
+                    fontFamily: "'Barlow Condensed', sans-serif",
+                    letterSpacing: 1.5,
+                  }}
+                >
                   THIKA TECHNICAL
                 </div>
-                <div style={{ color: PRIMARY, fontSize: 9.5, fontFamily: "'Barlow', sans-serif", letterSpacing: 2.5 }}>
+                <div
+                  style={{
+                    color: PRIMARY,
+                    fontSize: 9.5,
+                    fontFamily: "'Barlow', sans-serif",
+                    letterSpacing: 2.5,
+                  }}
+                >
                   TRAINING INSTITUTE
                 </div>
               </div>
             </div>
-            <p style={{
-              color: "rgba(255,255,255,0.45)", fontFamily: "'Barlow', sans-serif",
-              fontSize: 13, lineHeight: 1.8, marginBottom: 18,
-            }}>
-              P.O BOX 91 – 01000, Thika<br />
-              📧 info@thikatechnical.ac.ke<br />
-              📞 020-2044965<br />
+            <p
+              style={{
+                color: "rgba(255,255,255,0.45)",
+                fontFamily: "'Barlow', sans-serif",
+                fontSize: 13,
+                lineHeight: 1.8,
+                marginBottom: 20,
+              }}
+            >
+              P.O BOX 91 – 01000, Thika
+              <br />
+              📧 info@thikatechnical.ac.ke
+              <br />
+              📞 020-2044965
+              <br />
               📱 0743 514 539 / 0740 150 798
             </p>
             <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
@@ -1546,93 +2663,180 @@ function Footer() {
                 { icon: "▶", href: "https://www.youtube.com/@thikatechnicaltraininginst4254" },
                 { icon: "📷", href: "https://www.instagram.com/thika_tti/" },
               ].map((s, i) => (
-                <a key={i} href={s.href} target="_blank" rel="noreferrer" style={{
-                  width: 34, height: 34, background: "rgba(255,255,255,0.06)",
-                  borderRadius: 6, display: "flex", alignItems: "center",
-                  justifyContent: "center", color: "rgba(255,255,255,0.55)",
-                  textDecoration: "none", fontSize: 13, transition: "all 0.2s",
-                  border: "1px solid rgba(255,255,255,0.08)",
-                }}
-                  onMouseEnter={e => { e.currentTarget.style.background = PRIMARY; e.currentTarget.style.color = WHITE; e.currentTarget.style.borderColor = PRIMARY; }}
-                  onMouseLeave={e => { e.currentTarget.style.background = "rgba(255,255,255,0.06)"; e.currentTarget.style.color = "rgba(255,255,255,0.55)"; e.currentTarget.style.borderColor = "rgba(255,255,255,0.08)"; }}
-                >{s.icon}</a>
+                <a
+                  key={i}
+                  href={s.href}
+                  target="_blank"
+                  rel="noreferrer"
+                  style={{
+                    width: 34,
+                    height: 34,
+                    background: "rgba(255,255,255,0.06)",
+                    borderRadius: 6,
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    color: "rgba(255,255,255,0.55)",
+                    textDecoration: "none",
+                    fontSize: 13,
+                    transition: "all 0.2s",
+                    border: "1px solid rgba(255,255,255,0.08)",
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.background = PRIMARY;
+                    e.currentTarget.style.color = WHITE;
+                    e.currentTarget.style.borderColor = PRIMARY;
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.background = "rgba(255,255,255,0.06)";
+                    e.currentTarget.style.color = "rgba(255,255,255,0.55)";
+                    e.currentTarget.style.borderColor = "rgba(255,255,255,0.08)";
+                  }}
+                >
+                  {s.icon}
+                </a>
               ))}
             </div>
           </div>
 
           {/* Academic Departments */}
           <div>
-            <h4 style={{
-              color: WHITE, fontFamily: "'Barlow Condensed', sans-serif",
-              fontSize: 13, letterSpacing: 2.5, textTransform: "uppercase",
-              margin: "0 0 16px", paddingBottom: 12,
-              borderBottom: `2px solid ${PRIMARY}`,
-            }}>Academic Departments</h4>
-            {footerDepts.map((d, i) => (
-              <a key={i} href="#" style={{
-                display: "block", color: "rgba(255,255,255,0.45)",
-                fontFamily: "'Barlow', sans-serif", fontSize: 12,
-                textDecoration: "none", padding: "4px 0", transition: "color 0.15s",
+            <h4
+              style={{
+                color: WHITE,
+                fontFamily: "'Barlow Condensed', sans-serif",
+                fontSize: 13,
+                letterSpacing: 2.5,
+                textTransform: "uppercase",
+                margin: "0 0 16px",
+                paddingBottom: 12,
+                borderBottom: `2px solid ${PRIMARY}`,
               }}
-                onMouseEnter={e => e.currentTarget.style.color = WHITE}
-                onMouseLeave={e => e.currentTarget.style.color = "rgba(255,255,255,0.45)"}
-              >› {d}</a>
+            >
+              Academic Departments
+            </h4>
+            {footerDepts.map((d, i) => (
+              <a
+                key={i}
+                href="#"
+                style={{
+                  display: "block",
+                  color: "rgba(255,255,255,0.45)",
+                  fontFamily: "'Barlow', sans-serif",
+                  fontSize: 12,
+                  textDecoration: "none",
+                  padding: "4px 0",
+                  transition: "color 0.15s",
+                }}
+                onMouseEnter={(e) => (e.currentTarget.style.color = WHITE)}
+                onMouseLeave={(e) =>
+                  (e.currentTarget.style.color = "rgba(255,255,255,0.45)")
+                }
+              >
+                › {d}
+              </a>
             ))}
           </div>
 
           {/* Student Resources */}
           <div>
-            <h4 style={{
-              color: WHITE, fontFamily: "'Barlow Condensed', sans-serif",
-              fontSize: 13, letterSpacing: 2.5, textTransform: "uppercase",
-              margin: "0 0 16px", paddingBottom: 12,
-              borderBottom: `2px solid ${RED}`,
-            }}>Student Resources</h4>
-            {studentResources.map((r, i) => (
-              <a key={i} href={r.href} style={{
-                display: "block", color: "rgba(255,255,255,0.45)",
-                fontFamily: "'Barlow', sans-serif", fontSize: 12,
-                textDecoration: "none", padding: "4px 0", transition: "color 0.15s",
+            <h4
+              style={{
+                color: WHITE,
+                fontFamily: "'Barlow Condensed', sans-serif",
+                fontSize: 13,
+                letterSpacing: 2.5,
+                textTransform: "uppercase",
+                margin: "0 0 16px",
+                paddingBottom: 12,
+                borderBottom: `2px solid ${RED}`,
               }}
-                onMouseEnter={e => e.currentTarget.style.color = WHITE}
-                onMouseLeave={e => e.currentTarget.style.color = "rgba(255,255,255,0.45)"}
-              >› {r.label}</a>
+            >
+              Student Resources
+            </h4>
+            {studentResources.map((r, i) => (
+              <a
+                key={i}
+                href={r.href}
+                style={{
+                  display: "block",
+                  color: "rgba(255,255,255,0.45)",
+                  fontFamily: "'Barlow', sans-serif",
+                  fontSize: 12,
+                  textDecoration: "none",
+                  padding: "4px 0",
+                  transition: "color 0.15s",
+                }}
+                onMouseEnter={(e) => (e.currentTarget.style.color = WHITE)}
+                onMouseLeave={(e) =>
+                  (e.currentTarget.style.color = "rgba(255,255,255,0.45)")
+                }
+              >
+                › {r.label}
+              </a>
             ))}
           </div>
 
           {/* Map */}
           <div>
-            <h4 style={{
-              color: WHITE, fontFamily: "'Barlow Condensed', sans-serif",
-              fontSize: 13, letterSpacing: 2.5, textTransform: "uppercase",
-              margin: "0 0 16px", paddingBottom: 12,
-              borderBottom: `2px solid rgba(255,255,255,0.15)`,
-            }}>Find Us</h4>
-            <div style={{
-              position: "relative", paddingBottom: "70%", height: 0,
-              overflow: "hidden", borderRadius: 6,
-            }}>
+            <h4
+              style={{
+                color: WHITE,
+                fontFamily: "'Barlow Condensed', sans-serif",
+                fontSize: 13,
+                letterSpacing: 2.5,
+                textTransform: "uppercase",
+                margin: "0 0 16px",
+                paddingBottom: 12,
+                borderBottom: `2px solid rgba(255,255,255,0.15)`,
+              }}
+            >
+              Find Us
+            </h4>
+            <div
+              style={{
+                position: "relative",
+                paddingBottom: "70%",
+                height: 0,
+                overflow: "hidden",
+                borderRadius: 6,
+              }}
+            >
               <iframe
                 src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3989.1577933511653!2d37.07773657496532!3d-1.0425870989473822!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x182f4f8ce25a05df%3A0x30943508fed621a7!2sTHIKA%20TECHNICAL%20TRAINING%20INSTITUTE!5e0!3m2!1sen!2ske!4v1772484526882!5m2!1sen!2ske"
-                style={{ position: "absolute", top: 0, left: 0, width: "100%", height: "100%", border: 0 }}
+                style={{
+                  position: "absolute",
+                  top: 0,
+                  left: 0,
+                  width: "100%",
+                  height: "100%",
+                  border: 0,
+                }}
                 allowFullScreen=""
                 loading="lazy"
                 referrerPolicy="no-referrer-when-downgrade"
-                title="Thika TTI Map"
+                title="Thika TTI Location"
               />
             </div>
           </div>
         </div>
 
         {/* Bottom bar */}
-        <div style={{
-          borderTop: "1px solid rgba(255,255,255,0.07)",
-          padding: "16px 0", textAlign: "center",
-        }}>
-          <p style={{
-            color: "rgba(255,255,255,0.25)", fontFamily: "'Barlow', sans-serif",
-            fontSize: 12, margin: 0,
-          }}>
+        <div
+          style={{
+            borderTop: "1px solid rgba(255,255,255,0.07)",
+            padding: "16px 0",
+            textAlign: "center",
+          }}
+        >
+          <p
+            style={{
+              color: "rgba(255,255,255,0.25)",
+              fontFamily: "'Barlow', sans-serif",
+              fontSize: 12,
+              margin: 0,
+            }}
+          >
             © {new Date().getFullYear()} Thika Technical Training Institute. All Rights Reserved.
           </p>
         </div>
@@ -1640,36 +2844,6 @@ function Footer() {
     </footer>
   );
 }
-
-// ─── STYLES ──────────────────────────────────────────────────────────────────
-
-const globalStyles = `
-  @import url('https://fonts.googleapis.com/css2?family=Barlow:wght@400;600;700;800&family=Barlow+Condensed:wght@600;700;800;900&display=swap');
-
-  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-  html { scroll-behavior: smooth; overflow-x: hidden; }
-  body { font-family: 'Barlow', sans-serif; overflow-x: hidden; }
-
-  @keyframes ticker {
-    0% { transform: translateX(0); }
-    100% { transform: translateX(-33.33%); }
-  }
-
-  @keyframes marquee {
-    0% { transform: translateX(0); }
-    100% { transform: translateX(-33.33%); }
-  }
-
-  input::placeholder, textarea::placeholder {
-    color: rgba(255,255,255,0.3);
-  }
-
-  ::-webkit-scrollbar { width: 6px; }
-  ::-webkit-scrollbar-track { background: #0d1b2a; }
-  ::-webkit-scrollbar-thumb { background: #0274BE; border-radius: 3px; }
-
-  img { max-width: 100%; }
-`;
 
 // ─── MAIN ────────────────────────────────────────────────────────────────────
 
