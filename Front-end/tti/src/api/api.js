@@ -2,7 +2,7 @@
 
 import axios from "axios";
 
-const BASE_URL = "http://localhost:8000/";
+const BASE_URL = "https://thika-technical-training-institute.onrender.com/"
 
 // ── AXIOS INSTANCE ────────────────────────────────────────────────────────────
 const api = axios.create({

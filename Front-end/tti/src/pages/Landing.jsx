@@ -196,9 +196,28 @@ const studentResources = [
   { label: "TVET CDACC", href: "https://www.tvetcdacc.go.ke" },
 ];
 
+// ─── HOOKS ────────────────────────────────────────────────────────────────────
+
+function useBreakpoint() {
+  const [width, setWidth] = useState(typeof window !== "undefined" ? window.innerWidth : 1280);
+  useEffect(() => {
+    const handler = () => setWidth(window.innerWidth);
+    window.addEventListener("resize", handler);
+    return () => window.removeEventListener("resize", handler);
+  }, []);
+  return {
+    isMobile: width < 640,
+    isTablet: width >= 640 && width < 960,
+    isDesktop: width >= 960,
+    width,
+  };
+}
+
 // ─── COMPONENTS ──────────────────────────────────────────────────────────────
 
 function TopBar() {
+  const { isMobile } = useBreakpoint();
+  if (isMobile) return null; // hidden on mobile to avoid clutter
   return (
     <div style={{
       background: DARK,
@@ -233,8 +252,8 @@ function TopBar() {
               transition: "color 0.2s",
               borderRight: i < topLinks.length - 1 && l.label !== "Student Portal" ? "1px solid rgba(255,255,255,0.1)" : "none",
             }}
-              onMouseEnter={e => { if (l.label !== "Student Portal") e.target.style.color = WHITE }}
-              onMouseLeave={e => { if (l.label !== "Student Portal") e.target.style.color = "rgba(255,255,255,0.55)" }}
+              onMouseEnter={e => { if (l.label !== "Student Portal") e.target.style.color = WHITE; }}
+              onMouseLeave={e => { if (l.label !== "Student Portal") e.target.style.color = "rgba(255,255,255,0.55)"; }}
             >{l.label}</a>
           ))}
         </div>
@@ -250,12 +269,19 @@ function MainNav() {
   const [scrolled, setScrolled] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
   const [activeDropdown, setActiveDropdown] = useState(null);
+  const { isMobile, isTablet } = useBreakpoint();
+  const isMobileOrTablet = isMobile || isTablet;
 
   useEffect(() => {
     const handler = () => setScrolled(window.scrollY > 60);
     window.addEventListener("scroll", handler);
     return () => window.removeEventListener("scroll", handler);
   }, []);
+
+  // Close menu on route change / resize
+  useEffect(() => {
+    if (!isMobileOrTablet) setMenuOpen(false);
+  }, [isMobileOrTablet]);
 
   return (
     <nav style={{
@@ -272,33 +298,27 @@ function MainNav() {
       <div style={{
         maxWidth: 1280,
         margin: "0 auto",
-        padding: "0 24px",
+        padding: "0 20px",
         display: "flex",
         alignItems: "center",
         justifyContent: "space-between",
-        height: 68,
+        height: 64,
         boxSizing: "border-box",
       }}>
         {/* Logo */}
-        <div style={{ display: "flex", alignItems: "center", gap: 12, flexShrink: 0 }}>
+        <div style={{ display: "flex", alignItems: "center", gap: 10, flexShrink: 0 }}>
           <div style={{
-            width: 44, height: 44,
-
+            width: 40, height: 40,
             borderRadius: 6,
             display: "flex", alignItems: "center", justifyContent: "center",
-            fontWeight: 900, color: WHITE, fontSize: 13,
-            fontFamily: "'Barlow Condensed', sans-serif",
-            letterSpacing: 0.5,
             flexShrink: 0,
           }}>
-            <img src={logo} alt="TTI logo" style = {{
-              width: 44,
-            }} />
+            <img src={logo} alt="TTI logo" style={{ width: 40 }} />
           </div>
           <div>
             <div style={{
               color: scrolled ? WHITE : DARK,
-              fontWeight: 800, fontSize: 14,
+              fontWeight: 800, fontSize: isMobile ? 12 : 14,
               fontFamily: "'Barlow Condensed', sans-serif",
               letterSpacing: 1.5, lineHeight: 1.1,
               transition: "color 0.3s",
@@ -307,9 +327,9 @@ function MainNav() {
             </div>
             <div style={{
               color: scrolled ? "rgba(255,255,255,0.7)" : PRIMARY,
-              fontSize: 9.5,
+              fontSize: 9,
               fontFamily: "'Barlow', sans-serif",
-              letterSpacing: 2.5,
+              letterSpacing: 2,
               transition: "color 0.3s",
             }}>
               TRAINING INSTITUTE
@@ -318,89 +338,200 @@ function MainNav() {
         </div>
 
         {/* Desktop Links */}
-        <div style={{ display: "flex", gap: 0, alignItems: "center" }} className="desktop-nav">
+        {!isMobileOrTablet && (
+          <div style={{ display: "flex", gap: 0, alignItems: "center" }}>
+            {mainLinks.map((l) => (
+              <div key={l.label} style={{ position: "relative" }}
+                onMouseEnter={() => l.sub && setActiveDropdown(l.label)}
+                onMouseLeave={() => setActiveDropdown(null)}
+              >
+                <a href={l.href} style={{
+                  color: scrolled ? WHITE : DARK,
+                  fontSize: 12.5,
+                  padding: "8px 11px",
+                  textDecoration: "none",
+                  fontFamily: "'Barlow', sans-serif",
+                  fontWeight: 600,
+                  letterSpacing: 0.3,
+                  display: "block",
+                  borderRadius: 4,
+                  transition: "all 0.2s",
+                  background: "transparent",
+                  whiteSpace: "nowrap",
+                  opacity: 0.85,
+                }}
+                  onMouseEnter={e => {
+                    e.currentTarget.style.opacity = "1";
+                    e.currentTarget.style.background = scrolled ? "rgba(255,255,255,0.15)" : "rgba(2,116,190,0.07)";
+                    e.currentTarget.style.color = scrolled ? WHITE : PRIMARY;
+                  }}
+                  onMouseLeave={e => {
+                    e.currentTarget.style.opacity = "0.85";
+                    e.currentTarget.style.background = "transparent";
+                    e.currentTarget.style.color = scrolled ? WHITE : DARK;
+                  }}
+                >
+                  {l.label}{l.sub ? " ▾" : ""}
+                </a>
+                {l.sub && activeDropdown === l.label && (
+                  <div style={{
+                    position: "absolute", top: "100%", left: 0,
+                    background: WHITE,
+                    borderRadius: 6,
+                    minWidth: 190,
+                    boxShadow: "0 12px 40px rgba(0,0,0,0.12)",
+                    border: `1px solid rgba(0,0,0,0.07)`,
+                    overflow: "hidden",
+                    borderTop: `3px solid ${PRIMARY}`,
+                  }}>
+                    {l.sub.map(s => (
+                      <a key={s} href="#" style={{
+                        display: "block", padding: "11px 18px",
+                        color: "#444", fontSize: 12.5,
+                        fontFamily: "'Barlow', sans-serif",
+                        textDecoration: "none", transition: "all 0.15s",
+                        borderBottom: "1px solid rgba(0,0,0,0.05)",
+                      }}
+                        onMouseEnter={e => { e.currentTarget.style.background = LIGHT_BG; e.currentTarget.style.color = PRIMARY; e.currentTarget.style.paddingLeft = "22px"; }}
+                        onMouseLeave={e => { e.currentTarget.style.background = "transparent"; e.currentTarget.style.color = "#444"; e.currentTarget.style.paddingLeft = "18px"; }}
+                      >{s}</a>
+                    ))}
+                  </div>
+                )}
+              </div>
+            ))}
+          </div>
+        )}
+
+        <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+          {/* Apply Now CTA */}
+          {!isMobile && (
+            <a href="#" style={{
+              background: RED,
+              color: WHITE,
+              padding: "9px 18px",
+              borderRadius: 4,
+              fontWeight: 800,
+              fontSize: 12,
+              fontFamily: "'Barlow Condensed', sans-serif",
+              letterSpacing: 1.5,
+              textDecoration: "none",
+              textTransform: "uppercase",
+              transition: "all 0.2s",
+              flexShrink: 0,
+              boxShadow: "0 2px 10px rgba(192,57,43,0.3)",
+            }}
+              onMouseEnter={e => { e.currentTarget.style.background = "#a93226"; }}
+              onMouseLeave={e => { e.currentTarget.style.background = RED; }}
+            >Apply Now</a>
+          )}
+
+          {/* Hamburger */}
+          {isMobileOrTablet && (
+            <button onClick={() => setMenuOpen(o => !o)} style={{
+              background: "transparent",
+              border: `2px solid ${scrolled ? "rgba(255,255,255,0.4)" : "rgba(0,0,0,0.15)"}`,
+              borderRadius: 6,
+              padding: "7px 10px",
+              cursor: "pointer",
+              display: "flex",
+              flexDirection: "column",
+              gap: 4,
+              alignItems: "center",
+              justifyContent: "center",
+            }}>
+              {[0, 1, 2].map(i => (
+                <span key={i} style={{
+                  display: "block",
+                  width: 20,
+                  height: 2,
+                  background: scrolled ? WHITE : DARK,
+                  borderRadius: 2,
+                  transition: "all 0.3s",
+                  transformOrigin: "center",
+                  transform: menuOpen
+                    ? i === 0 ? "rotate(45deg) translate(4px, 4px)"
+                    : i === 1 ? "scaleX(0)"
+                    : "rotate(-45deg) translate(4px, -4px)"
+                    : "none",
+                }} />
+              ))}
+            </button>
+          )}
+        </div>
+      </div>
+
+      {/* Mobile Menu */}
+      {isMobileOrTablet && menuOpen && (
+        <div style={{
+          background: WHITE,
+          borderTop: `3px solid ${PRIMARY}`,
+          boxShadow: "0 12px 40px rgba(0,0,0,0.15)",
+          maxHeight: "80vh",
+          overflowY: "auto",
+        }}>
           {mainLinks.map((l) => (
-            <div key={l.label} style={{ position: "relative" }}
-              onMouseEnter={() => l.sub && setActiveDropdown(l.label)}
-              onMouseLeave={() => setActiveDropdown(null)}
-            >
+            <div key={l.label}>
               <a href={l.href} style={{
-                color: scrolled ? WHITE : DARK,
-                fontSize: 12.5,
-                padding: "8px 13px",
-                textDecoration: "none",
+                display: "block",
+                padding: "14px 20px",
+                color: DARK,
                 fontFamily: "'Barlow', sans-serif",
                 fontWeight: 600,
-                letterSpacing: 0.3,
-                display: "block",
-                borderRadius: 4,
-                transition: "all 0.2s",
-                background: "transparent",
-                whiteSpace: "nowrap",
-                opacity: 0.85,
+                fontSize: 14,
+                textDecoration: "none",
+                borderBottom: "1px solid rgba(0,0,0,0.06)",
+                transition: "background 0.15s",
               }}
-                onMouseEnter={e => {
-                  e.currentTarget.style.opacity = "1";
-                  e.currentTarget.style.background = scrolled ? "rgba(255,255,255,0.15)" : "rgba(2,116,190,0.07)";
-                  e.currentTarget.style.color = scrolled ? WHITE : PRIMARY;
-                }}
-                onMouseLeave={e => {
-                  e.currentTarget.style.opacity = "0.85";
-                  e.currentTarget.style.background = "transparent";
-                  e.currentTarget.style.color = scrolled ? WHITE : DARK;
-                }}
+                onMouseEnter={e => { e.currentTarget.style.background = LIGHT_BG; e.currentTarget.style.color = PRIMARY; }}
+                onMouseLeave={e => { e.currentTarget.style.background = "transparent"; e.currentTarget.style.color = DARK; }}
               >
-                {l.label}{l.sub ? " ▾" : ""}
+                {l.label}
               </a>
-              {l.sub && activeDropdown === l.label && (
-                <div style={{
-                  position: "absolute", top: "100%", left: 0,
-                  background: WHITE,
-                  borderRadius: 6,
-                  minWidth: 190,
-                  boxShadow: "0 12px 40px rgba(0,0,0,0.12)",
-                  border: `1px solid rgba(0,0,0,0.07)`,
-                  overflow: "hidden",
-                  borderTop: `3px solid ${PRIMARY}`,
-                }}>
-                  {l.sub.map(s => (
-                    <a key={s} href="#" style={{
-                      display: "block", padding: "11px 18px",
-                      color: "#444", fontSize: 12.5,
-                      fontFamily: "'Barlow', sans-serif",
-                      textDecoration: "none", transition: "all 0.15s",
-                      borderBottom: "1px solid rgba(0,0,0,0.05)",
-                    }}
-                      onMouseEnter={e => { e.currentTarget.style.background = LIGHT_BG; e.currentTarget.style.color = PRIMARY; e.currentTarget.style.paddingLeft = "22px"; }}
-                      onMouseLeave={e => { e.currentTarget.style.background = "transparent"; e.currentTarget.style.color = "#444"; e.currentTarget.style.paddingLeft = "18px"; }}
-                    >{s}</a>
-                  ))}
-                </div>
-              )}
+              {l.sub && l.sub.map(s => (
+                <a key={s} href="#" style={{
+                  display: "block",
+                  padding: "10px 20px 10px 36px",
+                  color: "#666",
+                  fontFamily: "'Barlow', sans-serif",
+                  fontSize: 13,
+                  textDecoration: "none",
+                  borderBottom: "1px solid rgba(0,0,0,0.04)",
+                  background: "rgba(2,116,190,0.03)",
+                }}>› {s}</a>
+              ))}
             </div>
           ))}
+          {isMobile && (
+            <div style={{ padding: 16 }}>
+              <a href="#" style={{
+                display: "block",
+                background: RED,
+                color: WHITE,
+                padding: "12px",
+                borderRadius: 4,
+                fontWeight: 800,
+                fontSize: 13,
+                fontFamily: "'Barlow Condensed', sans-serif",
+                letterSpacing: 1.5,
+                textDecoration: "none",
+                textTransform: "uppercase",
+                textAlign: "center",
+              }}>Apply Now</a>
+            </div>
+          )}
+          <div style={{
+            padding: "12px 20px",
+            background: LIGHT_BG,
+            borderTop: "1px solid rgba(0,0,0,0.06)",
+            color: "#666",
+            fontSize: 12,
+            fontFamily: "'Barlow', sans-serif",
+          }}>
+            📞 020-2044965 | 0743 514 539
+          </div>
         </div>
-
-        {/* Apply Now CTA — Red */}
-        <a href="#" style={{
-          background: RED,
-          color: WHITE,
-          padding: "9px 22px",
-          borderRadius: 4,
-          fontWeight: 800,
-          fontSize: 12.5,
-          fontFamily: "'Barlow Condensed', sans-serif",
-          letterSpacing: 1.5,
-          textDecoration: "none",
-          textTransform: "uppercase",
-          transition: "all 0.2s",
-          flexShrink: 0,
-          boxShadow: "0 2px 10px rgba(192,57,43,0.3)",
-        }}
-          onMouseEnter={e => { e.currentTarget.style.background = "#a93226"; e.currentTarget.style.boxShadow = "0 4px 16px rgba(192,57,43,0.4)"; }}
-          onMouseLeave={e => { e.currentTarget.style.background = RED; e.currentTarget.style.boxShadow = "0 2px 10px rgba(192,57,43,0.3)"; }}
-        >Apply Now</a>
-      </div>
+      )}
     </nav>
   );
 }
@@ -456,6 +587,8 @@ function HeroCarousel() {
   const [current, setCurrent] = useState(0);
   const [animating, setAnimating] = useState(true);
   const [formData, setFormData] = useState({ name: "", phone: "", course: "" });
+  const [showForm, setShowForm] = useState(false);
+  const { isMobile, isTablet, isDesktop } = useBreakpoint();
 
   useEffect(() => {
     const timer = setInterval(() => {
@@ -471,7 +604,7 @@ function HeroCarousel() {
   const slide = heroSlides[current];
 
   return (
-    <div style={{ position: "relative", height: "88vh", minHeight: 520, overflow: "hidden", width: "100%" }}>
+    <div style={{ position: "relative", height: isMobile ? "100svh" : "88vh", minHeight: isMobile ? 500 : 520, overflow: "hidden", width: "100%" }}>
       {/* Background */}
       <div style={{
         position: "absolute", inset: 0,
@@ -480,10 +613,12 @@ function HeroCarousel() {
         transition: "opacity 0.5s ease",
         opacity: animating ? 1 : 0,
       }} />
-      {/* Overlay — cleaner gradient */}
+      {/* Overlay */}
       <div style={{
         position: "absolute", inset: 0,
-        background: "linear-gradient(110deg, rgba(13,27,42,0.93) 0%, rgba(13,27,42,0.75) 55%, rgba(2,116,190,0.25) 100%)",
+        background: isMobile
+          ? "linear-gradient(to bottom, rgba(13,27,42,0.88) 0%, rgba(13,27,42,0.82) 100%)"
+          : "linear-gradient(110deg, rgba(13,27,42,0.93) 0%, rgba(13,27,42,0.75) 55%, rgba(2,116,190,0.25) 100%)",
       }} />
       {/* Blue accent line left */}
       <div style={{
@@ -495,196 +630,61 @@ function HeroCarousel() {
       {/* Content */}
       <div style={{
         position: "relative", zIndex: 2,
-        maxWidth: 1280, margin: "0 auto", padding: "0 48px",
+        maxWidth: 1280, margin: "0 auto",
+        padding: isMobile ? "0 20px" : "0 48px",
         height: "100%", display: "flex", alignItems: "center",
         boxSizing: "border-box",
       }}>
-        <div style={{
-          display: "grid",
-          gridTemplateColumns: "1fr 380px",
-          gap: 60,
-          width: "100%",
-          alignItems: "center",
-        }}>
-          {/* Left - Original Content */}
+        {isDesktop ? (
+          /* Desktop: two-column */
           <div style={{
-            maxWidth: 680,
-            opacity: animating ? 1 : 0,
-            transform: animating ? "translateY(0)" : "translateY(20px)",
-            transition: "all 0.6s ease",
+            display: "grid",
+            gridTemplateColumns: "1fr 380px",
+            gap: 60,
+            width: "100%",
+            alignItems: "center",
           }}>
-            {/* Kenya flag stripe */}
-            <div style={{ display: "flex", gap: 5, marginBottom: 24 }}>
-              {["#000", RED, "#27ae60"].map((c, i) => (
-                <div key={i} style={{ width: 36, height: 4, background: c, borderRadius: 2 }} />
-              ))}
-            </div>
-
-            <div style={{
-              color: "rgba(255,255,255,0.65)", fontSize: 11.5, letterSpacing: 4,
-              fontFamily: "'Barlow', sans-serif", fontWeight: 600,
-              textTransform: "uppercase", marginBottom: 14,
-            }}>
-              Thika Technical Training Institute
-            </div>
-
-            <h1 style={{
-              color: WHITE, margin: 0, lineHeight: 1.05,
-              fontFamily: "'Barlow Condensed', sans-serif",
-              fontWeight: 800, fontSize: "clamp(40px, 6.5vw, 76px)",
-              textTransform: "uppercase",
-            }}>
-              {slide.title}<br />
-              <span style={{ color: PRIMARY }}>
-                {slide.highlight}
-              </span>
-            </h1>
-
-            <p style={{
-              color: "rgba(255,255,255,0.75)", fontSize: 17,
-              fontFamily: "'Barlow', sans-serif", margin: "20px 0 38px",
-              fontWeight: 400, maxWidth: 500, lineHeight: 1.6,
-            }}>{slide.sub}</p>
-
-            <div style={{ display: "flex", gap: 14, flexWrap: "wrap" }}>
-              <Link to="/courses" style={{
-                background: "red", 
-                color: WHITE, 
-                padding: "13px 30px",
-                borderRadius: 4, 
-                fontWeight: 700, 
-                fontSize: 13,
-                fontFamily: "'Barlow Condensed', sans-serif", 
-                letterSpacing: 2,
-                textDecoration: "none", 
-                textTransform: "uppercase",
-                border: "2px solid rgba(255,255,255,0.4)", 
-                transition: "all 0.2s",
-              }}
-                onMouseEnter={e => { e.currentTarget.style.background = "red"; e.currentTarget.style.borderColor = WHITE; }}
-                onMouseLeave={e => { e.currentTarget.style.background = "transparent"; e.currentTarget.style.borderColor = "rgba(255,255,255,0.4)"; }}
-              >COURSES</Link>
-              <a href="#" style={{
-                background: "transparent", color: WHITE, padding: "13px 30px",
-                borderRadius: 4, fontWeight: 700, fontSize: 13,
-                fontFamily: "'Barlow Condensed', sans-serif", letterSpacing: 2,
-                textDecoration: "none", textTransform: "uppercase",
-                border: `2px solid rgba(255,255,255,0.4)`, transition: "all 0.2s",
-              }}
-                onMouseEnter={e => { e.currentTarget.style.background = "rgba(255,255,255,0.1)"; e.currentTarget.style.borderColor = WHITE; }}
-                onMouseLeave={e => { e.currentTarget.style.background = "transparent"; e.currentTarget.style.borderColor = "rgba(255,255,255,0.4)"; }}
-              >Request Information</a>
-            </div>
+            <HeroText slide={slide} animating={animating} isMobile={false} />
+            <HeroForm formData={formData} setFormData={setFormData} />
           </div>
-
-          {/* Right - Career Guide Card */}
-          <div style={{
-            background: WHITE,
-            padding: 35,
-            borderRadius: 8,
-            boxShadow: "0 20px 60px rgba(0,0,0,0.4)",
-            opacity: animating ? 1 : 0,
-            transform: animating ? "translateY(0)" : "translateY(20px)",
-            transition: "all 0.6s ease 0.2s",
-          }}>
-            <h3 style={{
-              fontFamily: "'Barlow Condensed', sans-serif",
-              fontSize: 22,
-              color: DARK,
-              margin: "0 0 6px",
-              textTransform: "uppercase",
-              fontWeight: 800,
-            }}>Get Your Career Guide</h3>
-            <p style={{
-              color: "#666",
-              fontSize: 13,
-              margin: "0 0 20px",
-              lineHeight: 1.5,
-            }}>Download 2026 course catalog & fee structure instantly.</p>
-
-            <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
-              <input
-                type="text"
-                placeholder="Your Full Name"
-                value={formData.name}
-                onChange={e => setFormData({...formData, name: e.target.value})}
+        ) : (
+          /* Mobile/Tablet: stacked, form behind CTA button */
+          <div style={{ width: "100%", maxWidth: isTablet ? 600 : "100%" }}>
+            <HeroText slide={slide} animating={animating} isMobile={isMobile} />
+            {isMobile && (
+              <button
+                onClick={() => setShowForm(o => !o)}
                 style={{
-                  padding: "14px 16px",
-                  border: "1px solid #ddd",
+                  marginTop: 12,
+                  background: "rgba(255,255,255,0.12)",
+                  border: "1px solid rgba(255,255,255,0.3)",
+                  color: WHITE,
+                  padding: "10px 20px",
                   borderRadius: 4,
-                  fontSize: 14,
-                  fontFamily: "'Barlow', sans-serif",
-                  outline: "none",
-                }}
-              />
-              <input
-                type="tel"
-                placeholder="Phone Number"
-                value={formData.phone}
-                onChange={e => setFormData({...formData, phone: e.target.value})}
-                style={{
-                  padding: "14px 16px",
-                  border: "1px solid #ddd",
-                  borderRadius: 4,
-                  fontSize: 14,
-                  fontFamily: "'Barlow', sans-serif",
-                  outline: "none",
-                }}
-              />
-              <select 
-                value={formData.course}
-                onChange={e => setFormData({...formData, course: e.target.value})}
-                style={{
-                  padding: "14px 16px",
-                  border: "1px solid #ddd",
-                  borderRadius: 4,
-                  fontSize: 14,
-                  fontFamily: "'Barlow', sans-serif",
-                  color: formData.course ? DARK : "#888",
-                  outline: "none",
-                  background: WHITE,
+                  fontSize: 12,
+                  fontFamily: "'Barlow Condensed', sans-serif",
+                  fontWeight: 700,
+                  letterSpacing: 1.5,
+                  textTransform: "uppercase",
+                  cursor: "pointer",
+                  width: "100%",
                 }}
               >
-                <option value="">Select Course Interest</option>
-                {departments.map(d => (
-                  <option key={d.name} value={d.name}>{d.name}</option>
-                ))}
-              </select>
-              <button style={{
-                background: RED,
-                color: WHITE,
-                padding: "16px",
-                border: "none",
-                borderRadius: 4,
-                fontWeight: 800,
-                fontSize: 14,
-                textTransform: "uppercase",
-                letterSpacing: 1.5,
-                cursor: "pointer",
-                fontFamily: "'Barlow Condensed', sans-serif",
-                boxShadow: "0 4px 16px rgba(192,57,43,0.4)",
-                marginTop: 4,
-              }}>
-                Download Now →
+                {showForm ? "Hide Form ▲" : "Get Career Guide ▼"}
               </button>
-            </div>
-
-            <p style={{
-              color: "#999",
-              fontSize: 11,
-              textAlign: "center",
-              marginTop: 14,
-              marginBottom: 0,
-            }}>
-              Trusted by 10,000+ students. Your info is secure.
-            </p>
+            )}
+            {(!isMobile || showForm) && (
+              <div style={{ marginTop: 16 }}>
+                <HeroForm formData={formData} setFormData={setFormData} compact={isMobile} />
+              </div>
+            )}
           </div>
-        </div>
+        )}
       </div>
 
       {/* Slide indicators */}
       <div style={{
-        position: "absolute", bottom: 36, left: "50%", transform: "translateX(-50%)",
+        position: "absolute", bottom: 24, left: "50%", transform: "translateX(-50%)",
         display: "flex", gap: 8, zIndex: 3,
       }}>
         {heroSlides.map((_, i) => (
@@ -700,80 +700,222 @@ function HeroCarousel() {
   );
 }
 
+function HeroText({ slide, animating, isMobile }) {
+  return (
+    <div style={{
+      maxWidth: 680,
+      opacity: animating ? 1 : 0,
+      transform: animating ? "translateY(0)" : "translateY(20px)",
+      transition: "all 0.6s ease",
+    }}>
+      {/* Kenya flag stripe */}
+      <div style={{ display: "flex", gap: 5, marginBottom: 18 }}>
+        {["#000", RED, "#27ae60"].map((c, i) => (
+          <div key={i} style={{ width: 36, height: 4, background: c, borderRadius: 2 }} />
+        ))}
+      </div>
+
+      <div style={{
+        color: "rgba(255,255,255,0.65)", fontSize: 10, letterSpacing: 4,
+        fontFamily: "'Barlow', sans-serif", fontWeight: 600,
+        textTransform: "uppercase", marginBottom: 12,
+      }}>
+        Thika Technical Training Institute
+      </div>
+
+      <h1 style={{
+        color: WHITE, margin: 0, lineHeight: 1.05,
+        fontFamily: "'Barlow Condensed', sans-serif",
+        fontWeight: 800, fontSize: isMobile ? "clamp(32px, 10vw, 50px)" : "clamp(38px, 5.5vw, 70px)",
+        textTransform: "uppercase",
+      }}>
+        {slide.title}<br />
+        <span style={{ color: PRIMARY }}>{slide.highlight}</span>
+      </h1>
+
+      <p style={{
+        color: "rgba(255,255,255,0.75)", fontSize: isMobile ? 14 : 16,
+        fontFamily: "'Barlow', sans-serif", margin: "16px 0 28px",
+        fontWeight: 400, maxWidth: 500, lineHeight: 1.6,
+      }}>{slide.sub}</p>
+
+      <div style={{ display: "flex", gap: 12, flexWrap: "wrap" }}>
+        <Link to="/courses" style={{
+          background: RED,
+          color: WHITE,
+          padding: isMobile ? "11px 22px" : "13px 30px",
+          borderRadius: 4, fontWeight: 700, fontSize: isMobile ? 12 : 13,
+          fontFamily: "'Barlow Condensed', sans-serif", letterSpacing: 2,
+          textDecoration: "none", textTransform: "uppercase",
+          border: "2px solid rgba(255,255,255,0.4)", transition: "all 0.2s",
+        }}>COURSES</Link>
+        <a href="#" style={{
+          background: "transparent", color: WHITE,
+          padding: isMobile ? "11px 22px" : "13px 30px",
+          borderRadius: 4, fontWeight: 700, fontSize: isMobile ? 12 : 13,
+          fontFamily: "'Barlow Condensed', sans-serif", letterSpacing: 2,
+          textDecoration: "none", textTransform: "uppercase",
+          border: "2px solid rgba(255,255,255,0.4)", transition: "all 0.2s",
+        }}>Request Info</a>
+      </div>
+    </div>
+  );
+}
+
+function HeroForm({ formData, setFormData, compact = false }) {
+  return (
+    <div style={{
+      background: WHITE,
+      padding: compact ? 20 : 32,
+      borderRadius: 8,
+      boxShadow: "0 20px 60px rgba(0,0,0,0.4)",
+    }}>
+      <h3 style={{
+        fontFamily: "'Barlow Condensed', sans-serif",
+        fontSize: compact ? 18 : 22,
+        color: DARK, margin: "0 0 4px",
+        textTransform: "uppercase", fontWeight: 800,
+      }}>Get Your Career Guide</h3>
+      <p style={{
+        color: "#666", fontSize: 12, margin: "0 0 16px", lineHeight: 1.5,
+      }}>Download 2026 course catalog &amp; fee structure instantly.</p>
+
+      <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+        <input
+          type="text" placeholder="Your Full Name"
+          value={formData.name}
+          onChange={e => setFormData({ ...formData, name: e.target.value })}
+          style={{
+            padding: "12px 14px", border: "1px solid #ddd", borderRadius: 4,
+            fontSize: 13, fontFamily: "'Barlow', sans-serif", outline: "none", width: "100%", boxSizing: "border-box",
+          }}
+        />
+        <input
+          type="tel" placeholder="Phone Number"
+          value={formData.phone}
+          onChange={e => setFormData({ ...formData, phone: e.target.value })}
+          style={{
+            padding: "12px 14px", border: "1px solid #ddd", borderRadius: 4,
+            fontSize: 13, fontFamily: "'Barlow', sans-serif", outline: "none", width: "100%", boxSizing: "border-box",
+          }}
+        />
+        <select
+          value={formData.course}
+          onChange={e => setFormData({ ...formData, course: e.target.value })}
+          style={{
+            padding: "12px 14px", border: "1px solid #ddd", borderRadius: 4,
+            fontSize: 13, fontFamily: "'Barlow', sans-serif",
+            color: formData.course ? DARK : "#888", outline: "none",
+            background: WHITE, width: "100%", boxSizing: "border-box",
+          }}
+        >
+          <option value="">Select Course Interest</option>
+          {departments.map(d => (
+            <option key={d.name} value={d.name}>{d.name}</option>
+          ))}
+        </select>
+        <button style={{
+          background: RED, color: WHITE, padding: "14px",
+          border: "none", borderRadius: 4, fontWeight: 800, fontSize: 13,
+          textTransform: "uppercase", letterSpacing: 1.5, cursor: "pointer",
+          fontFamily: "'Barlow Condensed', sans-serif",
+          boxShadow: "0 4px 16px rgba(192,57,43,0.4)", marginTop: 2,
+          width: "100%",
+        }}>
+          Download Now →
+        </button>
+      </div>
+      <p style={{ color: "#999", fontSize: 11, textAlign: "center", marginTop: 10, marginBottom: 0 }}>
+        Trusted by 10,000+ students. Your info is secure.
+      </p>
+    </div>
+  );
+}
+
+function SectionHeader({ eyebrow, title }) {
+  return (
+    <div style={{ marginBottom: 36 }}>
+      <div style={{ display: "flex", alignItems: "center", gap: 14, marginBottom: 10 }}>
+        <div style={{ width: 4, height: 32, background: `linear-gradient(to bottom, ${PRIMARY}, ${RED})`, borderRadius: 2, flexShrink: 0 }} />
+        <div>
+          <div style={{ color: PRIMARY, fontSize: 11, letterSpacing: 4, fontFamily: "'Barlow', sans-serif", fontWeight: 700, textTransform: "uppercase" }}>{eyebrow}</div>
+          <div style={{ fontFamily: "'Barlow Condensed', sans-serif", fontSize: "clamp(22px, 4vw, 30px)", fontWeight: 800, color: DARK, letterSpacing: 1, lineHeight: 1 }}>{title}</div>
+        </div>
+      </div>
+      <div style={{ height: 1, background: "rgba(0,0,0,0.08)", marginTop: 4 }} />
+    </div>
+  );
+}
+
 function NewsSection() {
   const featured = news[0];
   const secondary = news.slice(1);
+  const { isMobile, isTablet } = useBreakpoint();
 
   return (
-    <section style={{ background: LIGHT_BG, padding: "70px 0", width: "100%", boxSizing: "border-box" }}>
-      <div style={{ maxWidth: 1280, margin: "0 auto", padding: "0 24px", boxSizing: "border-box" }}>
+    <section style={{ background: LIGHT_BG, padding: "60px 0", width: "100%", boxSizing: "border-box" }}>
+      <div style={{ maxWidth: 1280, margin: "0 auto", padding: "0 20px", boxSizing: "border-box" }}>
+        <SectionHeader eyebrow="Latest" title="NEWS & UPDATES" />
 
-        {/* Section header */}
-        <div style={{ marginBottom: 40 }}>
-          <div style={{ display: "flex", alignItems: "center", gap: 14, marginBottom: 10 }}>
-            <div style={{ width: 4, height: 32, background: `linear-gradient(to bottom, ${PRIMARY}, ${RED})`, borderRadius: 2 }} />
-            <div>
-              <div style={{ color: PRIMARY, fontSize: 11, letterSpacing: 4, fontFamily: "'Barlow', sans-serif", fontWeight: 700, textTransform: "uppercase" }}>Latest</div>
-              <div style={{ fontFamily: "'Barlow Condensed', sans-serif", fontSize: 30, fontWeight: 800, color: DARK, letterSpacing: 1, lineHeight: 1 }}>NEWS & UPDATES</div>
-            </div>
-          </div>
-          <div style={{ height: 1, background: "rgba(0,0,0,0.08)", marginTop: 4 }} />
-        </div>
-
-        <div style={{ display: "grid", gridTemplateColumns: "1fr 320px", gap: 32, boxSizing: "border-box" }}>
-
+        <div style={{
+          display: "grid",
+          gridTemplateColumns: isMobile || isTablet ? "1fr" : "1fr 320px",
+          gap: 28,
+          boxSizing: "border-box",
+        }}>
           {/* Left — News */}
           <div>
             {/* Featured story */}
             <div style={{
-              background: WHITE,
-              borderRadius: 8,
-              overflow: "hidden",
-              boxShadow: "0 2px 16px rgba(0,0,0,0.07)",
-              marginBottom: 24,
+              background: WHITE, borderRadius: 8, overflow: "hidden",
+              boxShadow: "0 2px 16px rgba(0,0,0,0.07)", marginBottom: 20,
               display: "grid",
-              gridTemplateColumns: "1fr 1fr",
+              gridTemplateColumns: isMobile ? "1fr" : "1fr 1fr",
               borderTop: `4px solid ${PRIMARY}`,
             }}>
-              <div style={{ padding: 28 }}>
+              <div style={{ padding: isMobile ? 20 : 28, order: isMobile ? 2 : 1 }}>
                 <div style={{
                   background: PRIMARY, color: WHITE, display: "inline-block",
                   padding: "3px 10px", fontSize: 10, fontWeight: 800,
-                  fontFamily: "'Barlow', sans-serif", letterSpacing: 2, marginBottom: 14,
+                  fontFamily: "'Barlow', sans-serif", letterSpacing: 2, marginBottom: 12,
                   borderRadius: 2,
                 }}>{featured.tag}</div>
                 <h2 style={{
                   fontFamily: "'Barlow Condensed', sans-serif",
-                  fontSize: 22, fontWeight: 800, color: DARK,
-                  lineHeight: 1.25, margin: "0 0 14px", letterSpacing: 0.5,
+                  fontSize: isMobile ? 18 : 22, fontWeight: 800, color: DARK,
+                  lineHeight: 1.25, margin: "0 0 12px", letterSpacing: 0.5,
                 }}>{featured.title}</h2>
-                <div style={{ width: 36, height: 3, background: RED, marginBottom: 14, borderRadius: 2 }} />
+                <div style={{ width: 36, height: 3, background: RED, marginBottom: 12, borderRadius: 2 }} />
                 <p style={{
-                  fontFamily: "'Barlow', sans-serif", fontSize: 13.5, color: "#555",
-                  lineHeight: 1.7, margin: "0 0 18px",
+                  fontFamily: "'Barlow', sans-serif", fontSize: 13, color: "#555",
+                  lineHeight: 1.7, margin: "0 0 14px",
                 }}>{featured.excerpt}</p>
                 <a href="#" style={{
                   color: RED, fontSize: 12, fontWeight: 700,
                   fontFamily: "'Barlow', sans-serif", textDecoration: "none",
                   letterSpacing: 1, textTransform: "uppercase",
                   borderBottom: `2px solid ${RED}`, paddingBottom: 2,
-                  transition: "opacity 0.2s",
                 }}>Continue Reading →</a>
               </div>
               <img src={featured.img} alt={featured.title} style={{
-                width: "100%", height: "100%", objectFit: "cover", minHeight: 220,
+                width: "100%", height: isMobile ? 200 : "100%",
+                objectFit: "cover", minHeight: isMobile ? 0 : 220,
+                order: isMobile ? 1 : 2,
               }} />
             </div>
 
             {/* Secondary cards */}
-            <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 16 }}>
+            <div style={{
+              display: "grid",
+              gridTemplateColumns: isMobile ? "1fr" : "repeat(3, 1fr)",
+              gap: 14,
+            }}>
               {secondary.map((item, i) => (
                 <div key={i} style={{
-                  background: WHITE, borderRadius: 8,
-                  overflow: "hidden",
+                  background: WHITE, borderRadius: 8, overflow: "hidden",
                   boxShadow: "0 2px 12px rgba(0,0,0,0.06)",
-                  transition: "transform 0.2s, box-shadow 0.2s",
                   borderTop: `3px solid rgba(2,116,190,0.3)`,
+                  transition: "transform 0.2s, box-shadow 0.2s",
                 }}
                   onMouseEnter={e => { e.currentTarget.style.transform = "translateY(-3px)"; e.currentTarget.style.boxShadow = "0 8px 24px rgba(0,0,0,0.1)"; }}
                   onMouseLeave={e => { e.currentTarget.style.transform = "translateY(0)"; e.currentTarget.style.boxShadow = "0 2px 12px rgba(0,0,0,0.06)"; }}
@@ -803,15 +945,13 @@ function NewsSection() {
               ))}
             </div>
 
-            <div style={{ textAlign: "center", paddingTop: 24 }}>
+            <div style={{ textAlign: "center", paddingTop: 20 }}>
               <a href="#" style={{
                 color: PRIMARY, fontSize: 12, fontWeight: 700,
                 fontFamily: "'Barlow Condensed', sans-serif", textDecoration: "none",
                 letterSpacing: 2, textTransform: "uppercase",
                 border: `2px solid ${PRIMARY}`, padding: "9px 26px",
-                borderRadius: 4,
-                transition: "all 0.2s",
-                display: "inline-block",
+                borderRadius: 4, transition: "all 0.2s", display: "inline-block",
               }}
                 onMouseEnter={e => { e.currentTarget.style.background = PRIMARY; e.currentTarget.style.color = WHITE; }}
                 onMouseLeave={e => { e.currentTarget.style.background = "transparent"; e.currentTarget.style.color = PRIMARY; }}
@@ -819,14 +959,13 @@ function NewsSection() {
             </div>
           </div>
 
-          {/* Right — Noticeboard */}
+          {/* Right — Noticeboard (always shown, stacks below on mobile) */}
           <div style={{ display: "flex", flexDirection: "column", gap: 20 }}>
             {/* Notice Board */}
             <div style={{
               background: WHITE, borderRadius: 8,
               boxShadow: "0 2px 12px rgba(0,0,0,0.07)",
-              overflow: "hidden",
-              border: "1px solid rgba(0,0,0,0.06)",
+              overflow: "hidden", border: "1px solid rgba(0,0,0,0.06)",
             }}>
               <div style={{
                 background: DARK, padding: "13px 18px",
@@ -844,11 +983,7 @@ function NewsSection() {
                     padding: "11px 18px",
                     borderBottom: i < notices.length - 1 ? "1px solid rgba(0,0,0,0.06)" : "none",
                     display: "flex", gap: 12, alignItems: "flex-start",
-                    transition: "background 0.15s",
-                  }}
-                    onMouseEnter={e => e.currentTarget.style.background = LIGHT_BG}
-                    onMouseLeave={e => e.currentTarget.style.background = "transparent"}
-                  >
+                  }}>
                     <div style={{
                       width: 6, height: 6, borderRadius: "50%",
                       background: PRIMARY, flexShrink: 0, marginTop: 5,
@@ -856,10 +991,7 @@ function NewsSection() {
                     <a href="#" style={{
                       fontFamily: "'Barlow', sans-serif", fontSize: 13, color: "#333",
                       textDecoration: "none", lineHeight: 1.45,
-                    }}
-                      onMouseEnter={e => e.currentTarget.style.color = PRIMARY}
-                      onMouseLeave={e => e.currentTarget.style.color = "#333"}
-                    >{n}</a>
+                    }}>{n}</a>
                   </div>
                 ))}
               </div>
@@ -869,8 +1001,7 @@ function NewsSection() {
             <div style={{
               background: WHITE, borderRadius: 8,
               boxShadow: "0 2px 12px rgba(0,0,0,0.07)",
-              overflow: "hidden",
-              border: "1px solid rgba(0,0,0,0.06)",
+              overflow: "hidden", border: "1px solid rgba(0,0,0,0.06)",
             }}>
               <div style={{
                 background: PRIMARY, padding: "13px 18px",
@@ -882,7 +1013,6 @@ function NewsSection() {
                   fontSize: 15, letterSpacing: 2.5, textTransform: "uppercase",
                 }}>Notices & Events</h3>
               </div>
-              {/* Calendar header */}
               <div style={{
                 background: `rgba(2,116,190,0.06)`, padding: "10px 14px",
                 color: PRIMARY, fontFamily: "'Barlow Condensed', sans-serif",
@@ -925,24 +1055,18 @@ function NewsSection() {
 }
 
 function CoursesSection() {
+  const { isMobile, isTablet } = useBreakpoint();
   return (
-    <section style={{ background: WHITE, padding: "70px 0", width: "100%", boxSizing: "border-box" }}>
-      <div style={{ maxWidth: 1280, margin: "0 auto", padding: "0 24px", boxSizing: "border-box" }}>
+    <section style={{ background: WHITE, padding: "60px 0", width: "100%", boxSizing: "border-box" }}>
+      <div style={{ maxWidth: 1280, margin: "0 auto", padding: "0 20px", boxSizing: "border-box" }}>
+        <SectionHeader eyebrow="Join Us" title="BECOME A PART OF THIKA TTI" />
 
-        {/* Header */}
-        <div style={{ marginBottom: 40 }}>
-          <div style={{ display: "flex", alignItems: "center", gap: 14, marginBottom: 10 }}>
-            <div style={{ width: 4, height: 32, background: `linear-gradient(to bottom, ${PRIMARY}, ${RED})`, borderRadius: 2 }} />
-            <div>
-              <div style={{ color: PRIMARY, fontSize: 11, letterSpacing: 4, fontFamily: "'Barlow', sans-serif", fontWeight: 700, textTransform: "uppercase" }}>Join Us</div>
-              <div style={{ fontFamily: "'Barlow Condensed', sans-serif", fontSize: 30, fontWeight: 800, color: DARK, letterSpacing: 1, lineHeight: 1 }}>BECOME A PART OF THIKA TTI</div>
-            </div>
-          </div>
-          <div style={{ height: 1, background: "rgba(0,0,0,0.08)", marginTop: 4 }} />
-        </div>
-
-        <div style={{ display: "grid", gridTemplateColumns: "1fr 320px", gap: 32, boxSizing: "border-box" }}>
-
+        <div style={{
+          display: "grid",
+          gridTemplateColumns: isMobile || isTablet ? "1fr" : "1fr 320px",
+          gap: 28,
+          boxSizing: "border-box",
+        }}>
           {/* Departments grid */}
           <div>
             <div style={{
@@ -956,7 +1080,8 @@ function CoursesSection() {
               }}>Academic Departments</h3>
             </div>
             <div style={{
-              display: "grid", gridTemplateColumns: "1fr 1fr",
+              display: "grid",
+              gridTemplateColumns: isMobile ? "1fr" : "1fr 1fr",
               border: "1px solid rgba(0,0,0,0.08)",
               borderRadius: "0 0 6px 6px",
               overflow: "hidden",
@@ -965,8 +1090,8 @@ function CoursesSection() {
                 <a key={i} href="#" style={{
                   display: "flex", alignItems: "center", gap: 13,
                   padding: "13px 18px", textDecoration: "none",
-                  borderBottom: i < departments.length - 2 ? "1px solid rgba(0,0,0,0.06)" : "none",
-                  borderRight: i % 2 === 0 ? "1px solid rgba(0,0,0,0.06)" : "none",
+                  borderBottom: "1px solid rgba(0,0,0,0.06)",
+                  borderRight: !isMobile && i % 2 === 0 ? "1px solid rgba(0,0,0,0.06)" : "none",
                   transition: "all 0.15s",
                   background: WHITE,
                 }}
@@ -1004,8 +1129,7 @@ function CoursesSection() {
             <div style={{
               border: "1px solid rgba(0,0,0,0.08)",
               borderRadius: "0 0 6px 6px",
-              overflow: "hidden",
-              background: WHITE,
+              overflow: "hidden", background: WHITE,
             }}>
               {tweets.map((t, i) => (
                 <div key={i} style={{
@@ -1023,7 +1147,7 @@ function CoursesSection() {
                       <div style={{
                         fontFamily: "'Barlow', sans-serif", fontWeight: 700,
                         fontSize: 11.5, color: DARK, marginBottom: 4,
-                      }}>Thika Technical Training Institute
+                      }}>Thika Technical
                         <span style={{ color: "#aaa", fontWeight: 400, marginLeft: 6 }}>· {t.date}</span>
                       </div>
                       <p style={{
@@ -1038,7 +1162,6 @@ function CoursesSection() {
                 <a href="https://twitter.com/Thika_Technical" target="_blank" rel="noreferrer" style={{
                   color: "#1da1f2", fontSize: 12, fontWeight: 700,
                   fontFamily: "'Barlow', sans-serif", textDecoration: "none",
-                  letterSpacing: 0.5,
                 }}>Follow @Thika_Technical →</a>
               </div>
             </div>
@@ -1050,22 +1173,27 @@ function CoursesSection() {
 }
 
 function MissionSection() {
+  const { isMobile, isTablet } = useBreakpoint();
   return (
-    <section style={{ background: DARK, padding: "80px 0", width: "100%", boxSizing: "border-box" }}>
-      <div style={{ maxWidth: 1280, margin: "0 auto", padding: "0 24px", boxSizing: "border-box" }}>
-        <div style={{ textAlign: "center", marginBottom: 52 }}>
+    <section style={{ background: DARK, padding: "70px 0", width: "100%", boxSizing: "border-box" }}>
+      <div style={{ maxWidth: 1280, margin: "0 auto", padding: "0 20px", boxSizing: "border-box" }}>
+        <div style={{ textAlign: "center", marginBottom: 44 }}>
           <div style={{ color: PRIMARY, fontSize: 11, letterSpacing: 4, fontFamily: "'Barlow', sans-serif", fontWeight: 700, marginBottom: 10, textTransform: "uppercase" }}>
             Who We Are
           </div>
           <h2 style={{
             color: WHITE, fontFamily: "'Barlow Condensed', sans-serif",
-            fontSize: "clamp(28px, 4vw, 44px)", margin: "0 0 16px", fontWeight: 800,
+            fontSize: "clamp(26px, 5vw, 44px)", margin: "0 0 16px", fontWeight: 800,
             letterSpacing: 1.5, textTransform: "uppercase",
           }}>Our Foundation</h2>
           <div style={{ width: 48, height: 3, background: RED, margin: "0 auto", borderRadius: 2 }} />
         </div>
 
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 20 }}>
+        <div style={{
+          display: "grid",
+          gridTemplateColumns: isMobile ? "1fr" : isTablet ? "1fr 1fr" : "repeat(3, 1fr)",
+          gap: 18,
+        }}>
           {[
             {
               icon: "🎯", title: "Our Mission",
@@ -1083,30 +1211,35 @@ function MissionSection() {
           ].map((item, i) => (
             <div key={i} style={{
               background: item.highlight ? PRIMARY : "rgba(255,255,255,0.04)",
-              padding: "36px 30px",
-              borderRadius: 8,
+              padding: "32px 28px", borderRadius: 8,
               borderTop: `4px solid ${item.highlight ? WHITE : PRIMARY}`,
               transition: "transform 0.2s, box-shadow 0.2s",
+              // On tablet, last card spans full width
+              gridColumn: isTablet && i === 2 ? "1 / -1" : "auto",
             }}
               onMouseEnter={e => { e.currentTarget.style.transform = "translateY(-4px)"; e.currentTarget.style.boxShadow = "0 16px 40px rgba(0,0,0,0.25)"; }}
               onMouseLeave={e => { e.currentTarget.style.transform = "translateY(0)"; e.currentTarget.style.boxShadow = "none"; }}
             >
-              <div style={{ fontSize: 30, marginBottom: 18 }}>{item.icon}</div>
+              <div style={{ fontSize: 28, marginBottom: 16 }}>{item.icon}</div>
               <h3 style={{
                 color: WHITE, fontFamily: "'Barlow Condensed', sans-serif",
-                fontSize: 21, fontWeight: 800, letterSpacing: 2,
-                textTransform: "uppercase", margin: "0 0 16px",
+                fontSize: 19, fontWeight: 800, letterSpacing: 2,
+                textTransform: "uppercase", margin: "0 0 14px",
               }}>{item.title}</h3>
-              <div style={{ width: 28, height: 2, background: item.highlight ? WHITE : RED, marginBottom: 16, borderRadius: 2 }} />
+              <div style={{ width: 28, height: 2, background: item.highlight ? WHITE : RED, marginBottom: 14, borderRadius: 2 }} />
               {item.text && (
                 <p style={{
                   color: item.highlight ? "rgba(255,255,255,0.9)" : "rgba(255,255,255,0.65)",
-                  fontFamily: "'Barlow', sans-serif",
-                  fontSize: 14, lineHeight: 1.75, margin: 0,
+                  fontFamily: "'Barlow', sans-serif", fontSize: 14, lineHeight: 1.75, margin: 0,
                 }}>{item.text}</p>
               )}
               {item.list && (
-                <ul style={{ margin: 0, padding: 0, listStyle: "none" }}>
+                <ul style={{
+                  margin: 0, padding: 0, listStyle: "none",
+                  display: isTablet && i === 2 ? "grid" : "block",
+                  gridTemplateColumns: isTablet && i === 2 ? "1fr 1fr 1fr" : "auto",
+                  gap: isTablet && i === 2 ? "0 24px" : 0,
+                }}>
                   {item.list.map((v, j) => (
                     <li key={j} style={{
                       color: "rgba(255,255,255,0.65)", fontFamily: "'Barlow', sans-serif",
@@ -1127,26 +1260,24 @@ function MissionSection() {
 }
 
 function StudentLifeSection() {
+  const { isMobile, isTablet } = useBreakpoint();
   return (
-    <section style={{ background: LIGHT_BG, padding: "80px 0", width: "100%", boxSizing: "border-box" }}>
-      <div style={{ maxWidth: 1280, margin: "0 auto", padding: "0 24px", boxSizing: "border-box" }}>
-        <div style={{ marginBottom: 48 }}>
-          <div style={{ display: "flex", alignItems: "center", gap: 14, marginBottom: 10 }}>
-            <div style={{ width: 4, height: 32, background: `linear-gradient(to bottom, ${PRIMARY}, ${RED})`, borderRadius: 2 }} />
-            <div>
-              <div style={{ color: PRIMARY, fontSize: 11, letterSpacing: 4, fontFamily: "'Barlow', sans-serif", fontWeight: 700, textTransform: "uppercase" }}>Experience</div>
-              <div style={{ fontFamily: "'Barlow Condensed', sans-serif", fontSize: 30, fontWeight: 800, color: DARK, letterSpacing: 1, lineHeight: 1 }}>STUDENT LIFE @ THIKA TTI</div>
-            </div>
-          </div>
-          <div style={{ height: 1, background: "rgba(0,0,0,0.08)", marginTop: 4 }} />
-        </div>
+    <section style={{ background: LIGHT_BG, padding: "70px 0", width: "100%", boxSizing: "border-box" }}>
+      <div style={{ maxWidth: 1280, margin: "0 auto", padding: "0 20px", boxSizing: "border-box" }}>
+        <SectionHeader eyebrow="Experience" title="STUDENT LIFE @ THIKA TTI" />
 
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 20 }}>
+        <div style={{
+          display: "grid",
+          gridTemplateColumns: isMobile ? "1fr" : isTablet ? "1fr 1fr" : "repeat(3, 1fr)",
+          gap: 18,
+        }}>
           {studentLife.map((item, i) => (
             <div key={i} style={{
               position: "relative", overflow: "hidden", cursor: "pointer",
-              height: 300, borderRadius: 8,
+              height: isMobile ? 240 : 280, borderRadius: 8,
               boxShadow: "0 4px 20px rgba(0,0,0,0.12)",
+              // On tablet, last card spans full width
+              gridColumn: isTablet && i === 2 ? "1 / -1" : "auto",
             }}
               onMouseEnter={e => {
                 e.currentTarget.querySelector(".overlay").style.background = `rgba(2,116,190,0.88)`;
@@ -1166,13 +1297,13 @@ function StudentLifeSection() {
                 background: "rgba(13,27,42,0.55)",
                 transition: "background 0.3s ease",
                 display: "flex", flexDirection: "column",
-                justifyContent: "flex-end", padding: 24,
+                justifyContent: "flex-end", padding: 22,
               }}>
                 <div style={{ width: 28, height: 3, background: RED, marginBottom: 10, borderRadius: 2 }} />
                 <h3 style={{
                   color: WHITE, margin: "0 0 8px",
                   fontFamily: "'Barlow Condensed', sans-serif",
-                  fontSize: 24, fontWeight: 800, letterSpacing: 1.5,
+                  fontSize: 22, fontWeight: 800, letterSpacing: 1.5,
                   textTransform: "uppercase",
                 }}>{item.title}</h3>
                 <p style={{
@@ -1186,24 +1317,24 @@ function StudentLifeSection() {
 
         {/* Stats */}
         <div style={{
-          display: "grid", gridTemplateColumns: "repeat(4, 1fr)",
-          gap: 0, marginTop: 40,
-          background: DARK,
-          borderRadius: 8,
-          overflow: "hidden",
+          display: "grid",
+          gridTemplateColumns: isMobile ? "1fr 1fr" : "repeat(4, 1fr)",
+          gap: 0, marginTop: 36,
+          background: DARK, borderRadius: 8, overflow: "hidden",
         }}>
           {stats.map((s, i) => (
             <div key={i} style={{
-              padding: "32px 24px", textAlign: "center",
-              borderRight: i < 3 ? "1px solid rgba(255,255,255,0.08)" : "none",
+              padding: isMobile ? "24px 16px" : "32px 24px", textAlign: "center",
+              borderRight: (isMobile ? i % 2 === 0 : i < 3) ? "1px solid rgba(255,255,255,0.08)" : "none",
+              borderBottom: isMobile && i < 2 ? "1px solid rgba(255,255,255,0.08)" : "none",
             }}>
               <div style={{
                 color: RED, fontFamily: "'Barlow Condensed', sans-serif",
-                fontSize: 42, fontWeight: 900, lineHeight: 1,
+                fontSize: isMobile ? 34 : 42, fontWeight: 900, lineHeight: 1,
               }}>{s.value}</div>
               <div style={{
                 color: "rgba(255,255,255,0.55)", fontFamily: "'Barlow', sans-serif",
-                fontSize: 12, letterSpacing: 2.5, textTransform: "uppercase", marginTop: 8,
+                fontSize: isMobile ? 10 : 12, letterSpacing: 2, textTransform: "uppercase", marginTop: 8,
               }}>{s.label}</div>
             </div>
           ))}
@@ -1214,17 +1345,22 @@ function StudentLifeSection() {
 }
 
 function ServiceCharterSection() {
+  const { isMobile, isTablet } = useBreakpoint();
   return (
-    <section style={{ background: WHITE, padding: "80px 0", width: "100%", boxSizing: "border-box" }}>
-      <div style={{ maxWidth: 1280, margin: "0 auto", padding: "0 24px", boxSizing: "border-box" }}>
-        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 60, alignItems: "center" }}>
+    <section style={{ background: WHITE, padding: "70px 0", width: "100%", boxSizing: "border-box" }}>
+      <div style={{ maxWidth: 1280, margin: "0 auto", padding: "0 20px", boxSizing: "border-box" }}>
+        <div style={{
+          display: "grid",
+          gridTemplateColumns: isMobile || isTablet ? "1fr" : "1fr 1fr",
+          gap: 48, alignItems: "center",
+        }}>
           <div>
             <div style={{ color: PRIMARY, fontSize: 11, letterSpacing: 4, fontFamily: "'Barlow', sans-serif", fontWeight: 700, marginBottom: 10, textTransform: "uppercase" }}>
               Our Commitment
             </div>
             <h2 style={{
               fontFamily: "'Barlow Condensed', sans-serif",
-              fontSize: "clamp(26px, 3.5vw, 40px)", margin: "0 0 18px",
+              fontSize: "clamp(24px, 4vw, 40px)", margin: "0 0 18px",
               fontWeight: 800, color: DARK, lineHeight: 1.15,
               letterSpacing: 0.5, textTransform: "uppercase",
             }}>Thika Technical<br />Service Charter</h2>
@@ -1240,25 +1376,19 @@ function ServiceCharterSection() {
               padding: "12px 28px", textDecoration: "none",
               fontFamily: "'Barlow Condensed', sans-serif", fontWeight: 800,
               fontSize: 13.5, letterSpacing: 2, textTransform: "uppercase",
-              transition: "background 0.2s",
-              borderRadius: 4,
-              boxShadow: "0 3px 12px rgba(192,57,43,0.3)",
-            }}
-              onMouseEnter={e => e.currentTarget.style.background = "#a93226"}
-              onMouseLeave={e => e.currentTarget.style.background = RED}
-            >Read More</a>
+              borderRadius: 4, boxShadow: "0 3px 12px rgba(192,57,43,0.3)",
+            }}>Read More</a>
           </div>
 
           {/* YouTube embed */}
           <div style={{
             position: "relative", paddingBottom: "56.25%", height: 0,
-            overflow: "hidden",
-            borderRadius: 8,
+            overflow: "hidden", borderRadius: 8,
             boxShadow: "0 12px 50px rgba(0,0,0,0.15)",
           }}>
             <iframe
               style={{ position: "absolute", top: 0, left: 0, width: "100%", height: "100%", border: "none" }}
-              src="https://youtu.be/3DlPQvYLjwI"
+              src="https://www.youtube.com/embed/3DlPQvYLjwI"
               title="Thika TTI"
               allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
               allowFullScreen
@@ -1273,22 +1403,21 @@ function ServiceCharterSection() {
 function PartnersSection() {
   return (
     <section style={{ background: LIGHT_BG, padding: "48px 0", overflow: "hidden", width: "100%", boxSizing: "border-box" }}>
-      <div style={{ maxWidth: 1280, margin: "0 auto", padding: "0 24px", marginBottom: 28, textAlign: "center", boxSizing: "border-box" }}>
+      <div style={{ maxWidth: 1280, margin: "0 auto", padding: "0 20px", marginBottom: 28, textAlign: "center", boxSizing: "border-box" }}>
         <div style={{ color: "#aaa", fontSize: 11, letterSpacing: 4, fontFamily: "'Barlow', sans-serif", fontWeight: 700, textTransform: "uppercase" }}>
           Our Partners & Affiliates
         </div>
       </div>
       <div style={{
-        display: "flex", gap: 20, animation: "marquee 18s linear infinite",
+        display: "flex", gap: 16, animation: "marquee 18s linear infinite",
         whiteSpace: "nowrap",
       }}>
         {[...partners, ...partners, ...partners].map((p, i) => (
           <div key={i} style={{
-            background: WHITE,
-            border: `1px solid rgba(0,0,0,0.08)`,
-            padding: "12px 32px", borderRadius: 6,
+            background: WHITE, border: `1px solid rgba(0,0,0,0.08)`,
+            padding: "12px 28px", borderRadius: 6,
             fontFamily: "'Barlow Condensed', sans-serif",
-            fontWeight: 800, fontSize: 16, color: DARK,
+            fontWeight: 800, fontSize: 15, color: DARK,
             letterSpacing: 2.5, flexShrink: 0,
             boxShadow: "0 1px 6px rgba(0,0,0,0.06)",
             borderTop: `3px solid ${PRIMARY}`,
@@ -1304,20 +1433,20 @@ function IssuesSection() {
   const [sent, setSent] = useState(false);
 
   return (
-    <section style={{ background: DARK, padding: "80px 0", width: "100%", boxSizing: "border-box" }}>
-      <div style={{ maxWidth: 660, margin: "0 auto", padding: "0 24px", textAlign: "center", boxSizing: "border-box" }}>
+    <section style={{ background: DARK, padding: "70px 0", width: "100%", boxSizing: "border-box" }}>
+      <div style={{ maxWidth: 660, margin: "0 auto", padding: "0 20px", textAlign: "center", boxSizing: "border-box" }}>
         <div style={{ color: PRIMARY, fontSize: 11, letterSpacing: 4, fontFamily: "'Barlow', sans-serif", fontWeight: 700, marginBottom: 12, textTransform: "uppercase" }}>
           Support
         </div>
         <h2 style={{
           color: WHITE, fontFamily: "'Barlow Condensed', sans-serif",
-          fontSize: "clamp(24px, 4vw, 38px)", margin: "0 0 10px", fontWeight: 800,
+          fontSize: "clamp(22px, 5vw, 38px)", margin: "0 0 10px", fontWeight: 800,
           textTransform: "uppercase", letterSpacing: 1,
         }}>Having Any Issues?</h2>
         <div style={{ width: 40, height: 3, background: RED, margin: "0 auto 16px", borderRadius: 2 }} />
         <p style={{
           color: "rgba(255,255,255,0.55)", fontFamily: "'Barlow', sans-serif",
-          fontSize: 15, marginBottom: 36, lineHeight: 1.6,
+          fontSize: 15, marginBottom: 32, lineHeight: 1.6,
         }}>Please complete the form below for any complaints or inquiries.</p>
 
         {sent ? (
@@ -1340,7 +1469,7 @@ function IssuesSection() {
                 border: "1px solid rgba(255,255,255,0.12)",
                 color: WHITE,
                 fontFamily: "'Barlow', sans-serif", fontSize: 14, borderRadius: 4,
-                outline: "none",
+                outline: "none", width: "100%", boxSizing: "border-box",
               }}
             />
             <textarea
@@ -1354,7 +1483,7 @@ function IssuesSection() {
                 border: "1px solid rgba(255,255,255,0.12)",
                 color: WHITE,
                 fontFamily: "'Barlow', sans-serif", fontSize: 14, borderRadius: 4,
-                outline: "none", resize: "vertical",
+                outline: "none", resize: "vertical", width: "100%", boxSizing: "border-box",
               }}
             />
             <button onClick={() => setSent(true)} style={{
@@ -1362,12 +1491,9 @@ function IssuesSection() {
               padding: "14px 32px", fontFamily: "'Barlow Condensed', sans-serif",
               fontWeight: 800, fontSize: 14.5, letterSpacing: 2,
               textTransform: "uppercase", cursor: "pointer",
-              transition: "background 0.2s", borderRadius: 4,
-              boxShadow: "0 3px 12px rgba(192,57,43,0.35)",
-            }}
-              onMouseEnter={e => e.currentTarget.style.background = "#a93226"}
-              onMouseLeave={e => e.currentTarget.style.background = RED}
-            >Submit Message</button>
+              borderRadius: 4, boxShadow: "0 3px 12px rgba(192,57,43,0.35)",
+              width: "100%",
+            }}>Submit Message</button>
           </div>
         )}
       </div>
@@ -1376,16 +1502,21 @@ function IssuesSection() {
 }
 
 function Footer() {
+  const { isMobile, isTablet } = useBreakpoint();
   return (
     <footer style={{ background: "#060f18", width: "100%", boxSizing: "border-box" }}>
-      <div style={{ maxWidth: 1280, margin: "0 auto", padding: "60px 24px 0", boxSizing: "border-box" }}>
-        <div style={{ display: "grid", gridTemplateColumns: "2fr 1.5fr 1.5fr 1.5fr", gap: 40, paddingBottom: 48 }}>
-
+      <div style={{ maxWidth: 1280, margin: "0 auto", padding: "52px 20px 0", boxSizing: "border-box" }}>
+        <div style={{
+          display: "grid",
+          gridTemplateColumns: isMobile ? "1fr" : isTablet ? "1fr 1fr" : "2fr 1.5fr 1.5fr 1.5fr",
+          gap: 36,
+          paddingBottom: 48,
+        }}>
           {/* Brand */}
           <div>
-            <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 20 }}>
+            <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 18 }}>
               <div style={{
-                width: 46, height: 46, background: PRIMARY, borderRadius: 8,
+                width: 44, height: 44, background: PRIMARY, borderRadius: 8,
                 display: "flex", alignItems: "center", justifyContent: "center",
                 fontWeight: 900, color: WHITE, fontSize: 13,
                 fontFamily: "'Barlow Condensed', sans-serif", letterSpacing: 0.5,
@@ -1401,14 +1532,14 @@ function Footer() {
             </div>
             <p style={{
               color: "rgba(255,255,255,0.45)", fontFamily: "'Barlow', sans-serif",
-              fontSize: 13, lineHeight: 1.8, marginBottom: 20,
+              fontSize: 13, lineHeight: 1.8, marginBottom: 18,
             }}>
               P.O BOX 91 – 01000, Thika<br />
               📧 info@thikatechnical.ac.ke<br />
               📞 020-2044965<br />
               📱 0743 514 539 / 0740 150 798
             </p>
-            <div style={{ display: "flex", gap: 8 }}>
+            <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
               {[
                 { icon: "f", href: "https://www.facebook.com/thikatechnical" },
                 { icon: "𝕏", href: "https://twitter.com/Thika_Technical" },
@@ -1477,16 +1608,19 @@ function Footer() {
               margin: "0 0 16px", paddingBottom: 12,
               borderBottom: `2px solid rgba(255,255,255,0.15)`,
             }}>Find Us</h4>
-            <iframe 
-              src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3989.1577933511653!2d37.07773657496532!3d-1.0425870989473822!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x182f4f8ce25a05df%3A0x30943508fed621a7!2sTHIKA%20TECHNICAL%20TRAINING%20INSTITUTE!5e0!3m2!1sen!2ske!4v1772484526882!5m2!1sen!2ske" 
-              width="600" 
-              height="450" 
-              style={{ border: 0 }}
-              allowFullScreen="" 
-              loading="lazy" 
-              referrerPolicy="no-referrer-when-downgrade"
-            >
-            </iframe>
+            <div style={{
+              position: "relative", paddingBottom: "70%", height: 0,
+              overflow: "hidden", borderRadius: 6,
+            }}>
+              <iframe
+                src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3989.1577933511653!2d37.07773657496532!3d-1.0425870989473822!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x182f4f8ce25a05df%3A0x30943508fed621a7!2sTHIKA%20TECHNICAL%20TRAINING%20INSTITUTE!5e0!3m2!1sen!2ske!4v1772484526882!5m2!1sen!2ske"
+                style={{ position: "absolute", top: 0, left: 0, width: "100%", height: "100%", border: 0 }}
+                allowFullScreen=""
+                loading="lazy"
+                referrerPolicy="no-referrer-when-downgrade"
+                title="Thika TTI Map"
+              />
+            </div>
           </div>
         </div>
 
@@ -1510,7 +1644,7 @@ function Footer() {
 // ─── STYLES ──────────────────────────────────────────────────────────────────
 
 const globalStyles = `
-  @import url('https://fonts.googleapis.com/css2?family=Barlow:wght@400;600;700;800&family=Barlow+Condensed:wght@600;700;800;900&family=Playfair+Display:wght@700;900&display=swap');
+  @import url('https://fonts.googleapis.com/css2?family=Barlow:wght@400;600;700;800&family=Barlow+Condensed:wght@600;700;800;900&display=swap');
 
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
   html { scroll-behavior: smooth; overflow-x: hidden; }
@@ -1526,22 +1660,6 @@ const globalStyles = `
     100% { transform: translateX(-33.33%); }
   }
 
-  .desktop-nav { display: flex !important; }
-
-  @media (max-width: 960px) {
-    .desktop-nav { display: none !important; }
-  }
-
-  @media (max-width: 900px) {
-    .news-grid { grid-template-columns: 1fr !important; }
-    .dept-grid { grid-template-columns: 1fr !important; }
-    .mission-grid { grid-template-columns: 1fr !important; }
-    .life-grid { grid-template-columns: 1fr 1fr !important; }
-    .stats-grid { grid-template-columns: 1fr 1fr !important; }
-    .footer-grid { grid-template-columns: 1fr 1fr !important; }
-    .service-grid { grid-template-columns: 1fr !important; }
-  }
-
   input::placeholder, textarea::placeholder {
     color: rgba(255,255,255,0.3);
   }
@@ -1549,6 +1667,8 @@ const globalStyles = `
   ::-webkit-scrollbar { width: 6px; }
   ::-webkit-scrollbar-track { background: #0d1b2a; }
   ::-webkit-scrollbar-thumb { background: #0274BE; border-radius: 3px; }
+
+  img { max-width: 100%; }
 `;
 
 // ─── MAIN ────────────────────────────────────────────────────────────────────
