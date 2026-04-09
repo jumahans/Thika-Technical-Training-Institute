@@ -2774,27 +2774,30 @@ function Footer() {
             >
               Student Resources
             </h4>
-            {studentResources.map((r, i) => (
-              r.href.startsWith('/') ? (
-                <Link
-                  key={i}
-                  to={r.href}
-                  style={{
-                    display: "block",
-                    color: "rgba(255,255,255,0.45)",
-                    fontFamily: "'Barlow', sans-serif",
-                    fontSize: 12,
-                    textDecoration: "none",
-                    padding: "4px 0",
-                    transition: "color 0.15s",
-                  }}
-                  onMouseEnter={(e) => (e.currentTarget.style.color = WHITE)}
-                  onMouseLeave={(e) => (e.currentTarget.style.color = "rgba(255,255,255,0.45)")}
-                >
-                  › {r.label}
-                </Link>
-              ) : (
-                
+            {studentResources.map((r, i) => {
+              if (r.href.startsWith('/')) {
+                return (
+                  <Link
+                    key={i}
+                    to={r.href}
+                    style={{
+                      display: "block",
+                      color: "rgba(255,255,255,0.45)",
+                      fontFamily: "'Barlow', sans-serif",
+                      fontSize: 12,
+                      textDecoration: "none",
+                      padding: "4px 0",
+                      transition: "color 0.15s",
+                    }}
+                    onMouseEnter={(e) => (e.currentTarget.style.color = WHITE)}
+                    onMouseLeave={(e) => (e.currentTarget.style.color = "rgba(255,255,255,0.45)")}
+                  >
+                    › {r.label}
+                  </Link>
+                );
+              }
+              return (
+                <a
                   key={i}
                   href={r.href}
                   style={{
@@ -2811,8 +2814,8 @@ function Footer() {
                 >
                   › {r.label}
                 </a>
-              )
-            ))}
+              );
+            })}
           </div>
 
           {/* Map */}
