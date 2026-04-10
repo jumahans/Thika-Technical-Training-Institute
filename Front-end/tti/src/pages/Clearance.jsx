@@ -10,13 +10,31 @@ const GREY4 = "#94a3b8";
 const DARK  = "#1e293b";
 
 const DEPT_META = {
-  finance:  { label: "Finance",        icon: "💳" },
-  library:  { label: "Library",        icon: "📚" },
-  hostel:   { label: "Hostel",         icon: "🏠" },
+  finance:  { label: "Finance",         icon: "💳" },
+  library:  { label: "Library",         icon: "📚" },
+  hostel:   { label: "Hostel",          icon: "🏠" },
   academic: { label: "Academic Office", icon: "🎓" },
 };
 
+function useScreenSize() {
+  const [size, setSize] = useState({
+    isMobile: window.innerWidth <= 640,
+    isTablet: window.innerWidth > 640 && window.innerWidth <= 1024,
+  });
+  useEffect(() => {
+    const fn = () => setSize({
+      isMobile: window.innerWidth <= 640,
+      isTablet: window.innerWidth > 640 && window.innerWidth <= 1024,
+    });
+    window.addEventListener("resize", fn);
+    return () => window.removeEventListener("resize", fn);
+  }, []);
+  return size;
+}
+
 export default function Clearance() {
+  const { isMobile, isTablet } = useScreenSize();
+
   const [records, setRecords] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error,   setError]   = useState(null);
@@ -61,21 +79,28 @@ export default function Clearance() {
 
       {/* HEADER */}
       <div style={{
-        background: P, borderRadius: 8, padding: "22px 28px",
-        display: "flex", justifyContent: "space-between", alignItems: "center",
-        marginBottom: 24, flexWrap: "wrap", gap: 12,
+        background: P, borderRadius: 8,
+        padding: isMobile ? "18px 16px" : "22px 28px",
+        display: "flex",
+        flexDirection: isMobile ? "column" : "row",
+        justifyContent: "space-between", alignItems: isMobile ? "flex-start" : "center",
+        marginBottom: 24, gap: 12,
       }}>
         <div>
           <p style={{ color: "rgba(255,255,255,0.65)", fontSize: 12, margin: "0 0 4px" }}>Services</p>
-          <h1 style={{ color: WHITE, fontSize: 20, fontWeight: 800, margin: 0 }}>Clearance ✅</h1>
+          <h1 style={{ color: WHITE, fontSize: isMobile ? 17 : 20, fontWeight: 800, margin: 0 }}>Clearance ✅</h1>
         </div>
-        <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
+        <div style={{ display: "flex", gap: 10, flexWrap: "wrap", width: isMobile ? "100%" : "auto" }}>
           {[
-            { label: "Cleared",     value: cleared,    bg: "rgba(255,255,255,0.15)" },
-            { label: "Not Cleared", value: notCleared, bg: "rgba(255,255,255,0.10)" },
+            { label: "Cleared",     value: cleared,        bg: "rgba(255,255,255,0.15)" },
+            { label: "Not Cleared", value: notCleared,     bg: "rgba(255,255,255,0.10)" },
             { label: "Total",       value: records.length, bg: "rgba(255,255,255,0.10)" },
           ].map(s => (
-            <div key={s.label} style={{ background: s.bg, borderRadius: 8, padding: "8px 18px", textAlign: "center" }}>
+            <div key={s.label} style={{
+              background: s.bg, borderRadius: 8,
+              padding: isMobile ? "8px 14px" : "8px 18px",
+              textAlign: "center", flex: isMobile ? 1 : "none",
+            }}>
               <p style={{ color: WHITE, fontWeight: 800, fontSize: 18, margin: 0, lineHeight: 1 }}>{s.value}</p>
               <p style={{ color: "rgba(255,255,255,0.65)", fontSize: 11, margin: "3px 0 0", textTransform: "uppercase", letterSpacing: 1 }}>{s.label}</p>
             </div>
@@ -88,10 +113,11 @@ export default function Clearance() {
         <div style={{
           background: allCleared ? "#f0fdf4" : "#fef9c3",
           border: `1px solid ${allCleared ? "#bbf7d0" : "#fde68a"}`,
-          borderRadius: 8, padding: "16px 22px", marginBottom: 20,
-          display: "flex", alignItems: "center", gap: 14,
+          borderRadius: 8, padding: isMobile ? "14px 16px" : "16px 22px",
+          marginBottom: 20, display: "flex", alignItems: "center", gap: 14,
+          flexWrap: "wrap",
         }}>
-          <span style={{ fontSize: 28 }}>{allCleared ? "🎉" : "⚠️"}</span>
+          <span style={{ fontSize: isMobile ? 22 : 28 }}>{allCleared ? "🎉" : "⚠️"}</span>
           <div>
             <p style={{ fontSize: 14, fontWeight: 700, color: allCleared ? "#15803d" : "#a16207", margin: "0 0 3px" }}>
               {allCleared ? "You are fully cleared!" : `${notCleared} department${notCleared !== 1 ? "s" : ""} pending clearance`}
@@ -105,7 +131,7 @@ export default function Clearance() {
         </div>
       )}
 
-      {/* TABLE */}
+      {/* TABLE / CARDS */}
       <div style={{ background: WHITE, border: `1px solid ${GREY3}`, borderRadius: 8, overflow: "hidden", marginBottom: 20 }}>
         <div style={{ padding: "16px 22px", borderBottom: `1px solid ${GREY3}`, background: GREY1 }}>
           <h3 style={{ fontSize: 14, fontWeight: 700, color: DARK, margin: 0 }}>Clearance Status by Department</h3>
@@ -117,7 +143,59 @@ export default function Clearance() {
             <p style={{ fontSize: 15, color: DARK, fontWeight: 700, marginBottom: 6 }}>No clearance records found</p>
             <p style={{ fontSize: 13, color: GREY4 }}>Clearance records will appear here once generated by the administration.</p>
           </div>
+        ) : isMobile ? (
+          /* ── MOBILE CARD LIST VIEW ── */
+          <div style={{ padding: "12px" }}>
+            {records.map((r, i) => {
+              const meta = DEPT_META[r.department] || { label: r.department || "—", icon: "🏢" };
+              return (
+                <div key={r.id || i} style={{
+                  background: GREY1,
+                  border: `1px solid ${GREY3}`,
+                  borderLeft: `4px solid ${r.cleared ? "#22c55e" : "#ef4444"}`,
+                  borderRadius: 8, padding: "14px 16px", marginBottom: 10,
+                }}>
+                  <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 10 }}>
+                    <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+                      <span style={{ fontSize: 22 }}>{meta.icon}</span>
+                      <div>
+                        <p style={{ fontSize: 14, fontWeight: 700, color: DARK, margin: "0 0 2px" }}>{meta.label}</p>
+                        <p style={{ fontSize: 12, color: GREY4, margin: 0 }}>
+                          {r.semester_name || r.semester || "—"}
+                        </p>
+                      </div>
+                    </div>
+                    <span style={{
+                      background: r.cleared ? "#dcfce7" : "#fee2e2",
+                      color: r.cleared ? "#15803d" : "#dc2626",
+                      fontSize: 11, fontWeight: 700,
+                      padding: "4px 10px", borderRadius: 99, whiteSpace: "nowrap", flexShrink: 0,
+                    }}>
+                      {r.cleared ? "✓ Cleared" : "✗ Pending"}
+                    </span>
+                  </div>
+                  <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8 }}>
+                    <div>
+                      <p style={{ fontSize: 10, color: GREY4, fontWeight: 700, letterSpacing: 0.8, textTransform: "uppercase", margin: "0 0 2px" }}>Cleared On</p>
+                      <p style={{ fontSize: 12.5, color: DARK, margin: 0 }}>
+                        {r.cleared_at
+                          ? new Date(r.cleared_at).toLocaleDateString("en-KE", { day: "numeric", month: "short", year: "numeric" })
+                          : <span style={{ color: GREY4 }}>—</span>}
+                      </p>
+                    </div>
+                    <div>
+                      <p style={{ fontSize: 10, color: GREY4, fontWeight: 700, letterSpacing: 0.8, textTransform: "uppercase", margin: "0 0 2px" }}>Remarks</p>
+                      <p style={{ fontSize: 12.5, color: r.remarks ? DARK : GREY4, margin: 0, fontStyle: r.remarks ? "normal" : "italic" }}>
+                        {r.remarks || "No remarks"}
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
         ) : (
+          /* ── DESKTOP TABLE VIEW ── */
           <div style={{ overflowX: "auto" }}>
             <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 13.5 }}>
               <thead>
@@ -179,9 +257,17 @@ export default function Clearance() {
         )}
       </div>
 
-      {/* DEPT CARDS */}
+      {/* DEPT CARDS — visible on all screen sizes, responsive grid */}
       {records.length > 0 && (
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(200px, 1fr))", gap: 14 }}>
+        <div style={{
+          display: "grid",
+          gridTemplateColumns: isMobile
+            ? "repeat(2, 1fr)"
+            : isTablet
+            ? "repeat(3, 1fr)"
+            : "repeat(auto-fill, minmax(200px, 1fr))",
+          gap: isMobile ? 10 : 14,
+        }}>
           {records.map((r, i) => {
             const meta = DEPT_META[r.department] || { label: r.department || "—", icon: "🏢" };
             return (
@@ -189,11 +275,12 @@ export default function Clearance() {
                 background: WHITE,
                 border: `2px solid ${r.cleared ? "#bbf7d0" : GREY3}`,
                 borderTop: `3px solid ${r.cleared ? "#22c55e" : "#ef4444"}`,
-                borderRadius: 8, padding: "18px 20px",
+                borderRadius: 8,
+                padding: isMobile ? "14px 12px" : "18px 20px",
                 textAlign: "center",
               }}>
-                <div style={{ fontSize: 32, marginBottom: 8 }}>{meta.icon}</div>
-                <p style={{ fontSize: 13, fontWeight: 700, color: DARK, margin: "0 0 8px" }}>{meta.label}</p>
+                <div style={{ fontSize: isMobile ? 26 : 32, marginBottom: 8 }}>{meta.icon}</div>
+                <p style={{ fontSize: isMobile ? 12 : 13, fontWeight: 700, color: DARK, margin: "0 0 8px" }}>{meta.label}</p>
                 <span style={{
                   background: r.cleared ? "#dcfce7" : "#fee2e2",
                   color: r.cleared ? "#15803d" : "#dc2626",

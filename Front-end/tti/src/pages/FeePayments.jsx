@@ -17,6 +17,27 @@ const METHOD_META = {
   cash:  { label: "Cash",          color: "#a16207", bg: "#fef9c3" },
 };
 
+const responsiveStyles = `
+  @media (max-width: 640px) {
+    .fp-header { padding: 16px 16px !important; }
+    .fp-header h1 { font-size: 17px !important; }
+    .fp-header-right { width: 100%; justify-content: space-between !important; }
+    .fp-stat-cards { grid-template-columns: 1fr !important; }
+    .fp-stat-card { padding: 14px 16px !important; }
+    .fp-toolbar { padding: 12px 12px !important; flex-direction: column !important; align-items: stretch !important; }
+    .fp-filter-tabs { width: 100%; justify-content: stretch !important; }
+    .fp-filter-tab { flex: 1; text-align: center; }
+    .fp-search-wrap { width: 100% !important; min-width: unset !important; }
+    .fp-table-header { padding: 12px 14px !important; }
+    .fp-table th, .fp-table td { padding: 10px 10px !important; font-size: 12px !important; }
+    .fp-download-btn { width: 100%; justify-content: center !important; }
+    .fp-header-stats { display: none !important; }
+  }
+  @media (max-width: 400px) {
+    .fp-filter-tabs button { padding: 6px 6px !important; font-size: 11px !important; }
+  }
+`;
+
 function fmt(dateStr) {
   if (!dateStr) return "—";
   return new Date(dateStr).toLocaleDateString("en-KE", {
@@ -29,7 +50,14 @@ export default function FeePayments() {
   const [loading,  setLoading]  = useState(true);
   const [error,    setError]    = useState(null);
   const [search,   setSearch]   = useState("");
-  const [filter,   setFilter]   = useState("all"); // "all" | "mpesa" | "bank" | "cash"
+  const [filter,   setFilter]   = useState("all");
+
+  useEffect(() => {
+    const style = document.createElement("style");
+    style.innerHTML = responsiveStyles;
+    document.head.appendChild(style);
+    return () => document.head.removeChild(style);
+  }, []);
 
   useEffect(() => {
     (async () => {
@@ -147,7 +175,7 @@ export default function FeePayments() {
     <div style={{ width: "100%" }}>
 
       {/* ── HEADER ── */}
-      <div style={{
+      <div className="fp-header" style={{
         background: P, borderRadius: 8, padding: "22px 28px",
         display: "flex", justifyContent: "space-between", alignItems: "center",
         marginBottom: 24, flexWrap: "wrap", gap: 12,
@@ -156,17 +184,20 @@ export default function FeePayments() {
           <p style={{ color: "rgba(255,255,255,0.65)", fontSize: 12, margin: "0 0 4px" }}>Finance</p>
           <h1 style={{ color: WHITE, fontSize: 20, fontWeight: 800, margin: 0 }}>My Payments 🧾</h1>
         </div>
-        <div style={{ display: "flex", gap: 10, alignItems: "center", flexWrap: "wrap" }}>
-          {[
-            { label: "Total Paid",  value: `KES ${totalPaid.toLocaleString()}` },
-            { label: "Payments",    value: payments.length },
-          ].map(s => (
-            <div key={s.label} style={{ background: "rgba(255,255,255,0.15)", borderRadius: 8, padding: "8px 16px", textAlign: "center" }}>
-              <p style={{ color: WHITE, fontWeight: 800, fontSize: 16, margin: 0, lineHeight: 1 }}>{s.value}</p>
-              <p style={{ color: "rgba(255,255,255,0.65)", fontSize: 11, margin: "3px 0 0", textTransform: "uppercase", letterSpacing: 1 }}>{s.label}</p>
-            </div>
-          ))}
+        <div className="fp-header-right" style={{ display: "flex", gap: 10, alignItems: "center", flexWrap: "wrap" }}>
+          <div className="fp-header-stats" style={{ display: "flex", gap: 10 }}>
+            {[
+              { label: "Total Paid",  value: `KES ${totalPaid.toLocaleString()}` },
+              { label: "Payments",    value: payments.length },
+            ].map(s => (
+              <div key={s.label} style={{ background: "rgba(255,255,255,0.15)", borderRadius: 8, padding: "8px 16px", textAlign: "center" }}>
+                <p style={{ color: WHITE, fontWeight: 800, fontSize: 16, margin: 0, lineHeight: 1 }}>{s.value}</p>
+                <p style={{ color: "rgba(255,255,255,0.65)", fontSize: 11, margin: "3px 0 0", textTransform: "uppercase", letterSpacing: 1 }}>{s.label}</p>
+              </div>
+            ))}
+          </div>
           <button
+            className="fp-download-btn"
             onClick={handleDownload}
             disabled={payments.length === 0}
             style={{
@@ -184,13 +215,13 @@ export default function FeePayments() {
       </div>
 
       {/* ── STAT CARDS ── */}
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 14, marginBottom: 20 }}>
+      <div className="fp-stat-cards" style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 14, marginBottom: 20 }}>
         {[
           { label: "Total Verified Paid", value: `KES ${totalPaid.toLocaleString()}`,    icon: "✅", color: "#15803d", bg: "#f0fdf4", border: "#bbf7d0" },
           { label: "Payments Verified",   value: `${verifiedCount} / ${payments.length}`, icon: "🧾", color: P,        bg: "#eff6ff", border: "#bfdbfe" },
           { label: "Pending Verification",value: `KES ${totalUnverif.toLocaleString()}`,  icon: "⏳", color: "#a16207", bg: "#fefce8", border: "#fde68a" },
         ].map(s => (
-          <div key={s.label} style={{
+          <div className="fp-stat-card" key={s.label} style={{
             background: s.bg, border: `1px solid ${s.border}`,
             borderRadius: 8, padding: "18px 20px",
             display: "flex", alignItems: "center", gap: 14,
@@ -200,26 +231,26 @@ export default function FeePayments() {
               background: WHITE, display: "flex", alignItems: "center", justifyContent: "center",
               fontSize: 20, boxShadow: "0 1px 4px rgba(0,0,0,0.06)",
             }}>{s.icon}</div>
-            <div>
+            <div style={{ minWidth: 0 }}>
               <p style={{ fontSize: 11, fontWeight: 700, color: s.color, letterSpacing: 1, textTransform: "uppercase", margin: "0 0 3px" }}>
                 {s.label}
               </p>
-              <p style={{ fontSize: 18, fontWeight: 800, color: s.color, margin: 0, lineHeight: 1 }}>{s.value}</p>
+              <p style={{ fontSize: 18, fontWeight: 800, color: s.color, margin: 0, lineHeight: 1, wordBreak: "break-word" }}>{s.value}</p>
             </div>
           </div>
         ))}
       </div>
 
       {/* ── SEARCH + FILTER ── */}
-      <div style={{
+      <div className="fp-toolbar" style={{
         background: WHITE, border: `1px solid ${GREY3}`, borderRadius: 8,
         padding: "14px 18px", marginBottom: 16,
         display: "flex", gap: 12, alignItems: "center", flexWrap: "wrap",
       }}>
         {/* Method filter tabs */}
-        <div style={{ display: "flex", background: GREY1, borderRadius: 6, padding: 3, gap: 2 }}>
+        <div className="fp-filter-tabs" style={{ display: "flex", background: GREY1, borderRadius: 6, padding: 3, gap: 2 }}>
           {["all", "mpesa", "bank", "cash"].map(f => (
-            <button key={f} onClick={() => setFilter(f)} style={{
+            <button className="fp-filter-tab" key={f} onClick={() => setFilter(f)} style={{
               background: filter === f ? WHITE : "transparent",
               border: filter === f ? `1px solid ${GREY3}` : "1px solid transparent",
               borderRadius: 5, padding: "6px 14px",
@@ -235,7 +266,7 @@ export default function FeePayments() {
         </div>
 
         {/* Search */}
-        <div style={{ flex: 1, minWidth: 200, position: "relative" }}>
+        <div className="fp-search-wrap" style={{ flex: 1, minWidth: 200, position: "relative" }}>
           <span style={{ position: "absolute", left: 12, top: "50%", transform: "translateY(-50%)", fontSize: 14, pointerEvents: "none" }}>🔍</span>
           <input
             placeholder="Search by transaction ref, semester, year…"
@@ -256,7 +287,7 @@ export default function FeePayments() {
 
       {/* ── TABLE ── */}
       <div style={{ background: WHITE, border: `1px solid ${GREY3}`, borderRadius: 8, overflow: "hidden", marginBottom: 16 }}>
-        <div style={{
+        <div className="fp-table-header" style={{
           padding: "14px 22px", borderBottom: `1px solid ${GREY3}`,
           background: GREY1, display: "flex", justifyContent: "space-between", alignItems: "center",
         }}>
@@ -279,8 +310,8 @@ export default function FeePayments() {
             <p style={{ fontSize: 13, color: GREY4 }}>Try adjusting your search or filter.</p>
           </div>
         ) : (
-          <div style={{ overflowX: "auto" }}>
-            <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 13.5 }}>
+          <div style={{ overflowX: "auto", WebkitOverflowScrolling: "touch" }}>
+            <table className="fp-table" style={{ width: "100%", borderCollapse: "collapse", fontSize: 13.5, minWidth: 680 }}>
               <thead>
                 <tr style={{ background: GREY2, borderBottom: `2px solid ${GREY3}` }}>
                   {["#", "Date", "Transaction Ref", "Method", "Semester", "Academic Year", "Amount (KES)", "Status"].map(h => (

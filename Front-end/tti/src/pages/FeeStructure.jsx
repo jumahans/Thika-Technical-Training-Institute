@@ -11,10 +11,30 @@ const GREY3 = "#e2e8f0";
 const GREY4 = "#94a3b8";
 const DARK  = "#1e293b";
 
+const responsiveStyles = `
+  @media (max-width: 640px) {
+    .fs-header { padding: 16px 16px !important; }
+    .fs-header h1 { font-size: 17px !important; }
+    .fs-header-right { width: 100%; justify-content: space-between !important; }
+    .fs-download-btn { flex: 1; justify-content: center !important; }
+    .fs-card-title { padding: 12px 14px !important; flex-direction: column !important; align-items: flex-start !important; gap: 4px !important; }
+    .fs-table th, .fs-table td { padding: 10px 10px !important; font-size: 12px !important; }
+    .fs-notice { padding: 12px 14px !important; }
+    .fs-notice p { font-size: 12.5px !important; }
+  }
+`;
+
 export default function FeeStructure() {
   const [structures, setStructures] = useState([]);
   const [loading,    setLoading]    = useState(true);
   const [error,      setError]      = useState(null);
+
+  useEffect(() => {
+    const style = document.createElement("style");
+    style.innerHTML = responsiveStyles;
+    document.head.appendChild(style);
+    return () => document.head.removeChild(style);
+  }, []);
 
   useEffect(() => {
     (async () => {
@@ -98,7 +118,7 @@ export default function FeeStructure() {
     <div style={{ width: "100%" }}>
 
       {/* ── HEADER ── */}
-      <div style={{
+      <div className="fs-header" style={{
         background: P, borderRadius: 8, padding: "22px 28px",
         display: "flex", justifyContent: "space-between", alignItems: "center",
         marginBottom: 24, flexWrap: "wrap", gap: 12,
@@ -107,12 +127,13 @@ export default function FeeStructure() {
           <p style={{ color: "rgba(255,255,255,0.65)", fontSize: 12, margin: "0 0 4px" }}>Finance</p>
           <h1 style={{ color: WHITE, fontSize: 20, fontWeight: 800, margin: 0 }}>Fee Structure 💰</h1>
         </div>
-        <div style={{ display: "flex", gap: 10, alignItems: "center", flexWrap: "wrap" }}>
+        <div className="fs-header-right" style={{ display: "flex", gap: 10, alignItems: "center", flexWrap: "wrap" }}>
           <div style={{ background: "rgba(255,255,255,0.15)", borderRadius: 8, padding: "8px 18px", textAlign: "center" }}>
             <p style={{ color: WHITE, fontWeight: 800, fontSize: 18, margin: 0, lineHeight: 1 }}>{structures.length}</p>
             <p style={{ color: "rgba(255,255,255,0.65)", fontSize: 11, margin: "3px 0 0", textTransform: "uppercase", letterSpacing: 1 }}>Records</p>
           </div>
           <button
+            className="fs-download-btn"
             onClick={handleDownload}
             disabled={structures.length === 0}
             style={{
@@ -132,7 +153,7 @@ export default function FeeStructure() {
       <div style={{ background: WHITE, border: `1px solid ${GREY3}`, borderRadius: 8, overflow: "hidden", marginBottom: 16 }}>
 
         {/* Card title bar */}
-        <div style={{
+        <div className="fs-card-title" style={{
           padding: "16px 22px", borderBottom: `1px solid ${GREY3}`,
           display: "flex", justifyContent: "space-between", alignItems: "center",
           background: GREY1,
@@ -143,7 +164,7 @@ export default function FeeStructure() {
               Fees applicable to your course and year of study
             </p>
           </div>
-          <span style={{ fontSize: 12.5, color: GREY4 }}>
+          <span style={{ fontSize: 12.5, color: GREY4, whiteSpace: "nowrap" }}>
             {structures.length} record{structures.length !== 1 ? "s" : ""}
           </span>
         </div>
@@ -157,8 +178,8 @@ export default function FeeStructure() {
             </p>
           </div>
         ) : (
-          <div style={{ overflowX: "auto" }}>
-            <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 13.5 }}>
+          <div style={{ overflowX: "auto", WebkitOverflowScrolling: "touch" }}>
+            <table className="fs-table" style={{ width: "100%", borderCollapse: "collapse", fontSize: 13.5, minWidth: 480 }}>
               <thead>
                 <tr style={{ background: GREY2, borderBottom: `2px solid ${GREY3}` }}>
                   {["#", "Course", "Academic Year", "Year of Study", "Total Fees (KES)"].map(h => (
@@ -227,7 +248,7 @@ export default function FeeStructure() {
       </div>
 
       {/* ── NOTICE ── */}
-      <div style={{
+      <div className="fs-notice" style={{
         background: `${P}08`, border: `1px solid ${P}25`,
         borderRadius: 8, padding: "14px 20px",
         display: "flex", alignItems: "flex-start", gap: 12,

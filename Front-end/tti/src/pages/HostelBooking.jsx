@@ -16,6 +16,22 @@ const STATUS_META = {
   rejected: { color: "#dc2626", bg: "#fee2e2", label: "Rejected" },
 };
 
+const responsiveStyles = `
+  @media (max-width: 640px) {
+    .hb-header { padding: 16px 16px !important; }
+    .hb-header h1 { font-size: 17px !important; }
+    .hb-header-right { width: 100%; justify-content: space-between !important; }
+    .hb-header-stats { display: none !important; }
+    .hb-new-btn { flex: 1; justify-content: center !important; text-align: center; }
+    .hb-form { padding: 18px 16px !important; }
+    .hb-form-grid { grid-template-columns: 1fr !important; }
+    .hb-form-actions { flex-direction: column !important; }
+    .hb-form-actions button { width: 100%; justify-content: center !important; }
+    .hb-section-title { padding: 12px 14px !important; }
+    .hb-table th, .hb-table td { padding: 10px 10px !important; font-size: 12px !important; }
+  }
+`;
+
 export default function HostelBooking() {
   const [bookings,   setBookings]   = useState([]);
   const [hostels,    setHostels]    = useState([]);
@@ -30,6 +46,13 @@ export default function HostelBooking() {
   const [selectedRoom,     setSelectedRoom]     = useState("");
   const [selectedSemester, setSelectedSemester] = useState("");
   const [selectedHostel,   setSelectedHostel]   = useState("");
+
+  useEffect(() => {
+    const style = document.createElement("style");
+    style.innerHTML = responsiveStyles;
+    document.head.appendChild(style);
+    return () => document.head.removeChild(style);
+  }, []);
 
   useEffect(() => {
     (async () => {
@@ -52,7 +75,6 @@ export default function HostelBooking() {
     })();
   }, []);
 
-  // Filter rooms by selected hostel
   const filteredRooms = selectedHostel
     ? rooms.filter(r => String(r.hostel) === selectedHostel || String(r.hostel_name) === selectedHostel)
     : rooms;
@@ -106,7 +128,7 @@ export default function HostelBooking() {
     <div style={{ width: "100%" }}>
 
       {/* HEADER */}
-      <div style={{
+      <div className="hb-header" style={{
         background: P, borderRadius: 8, padding: "22px 28px",
         display: "flex", justifyContent: "space-between", alignItems: "center",
         marginBottom: 24, flexWrap: "wrap", gap: 12,
@@ -115,17 +137,20 @@ export default function HostelBooking() {
           <p style={{ color: "rgba(255,255,255,0.65)", fontSize: 12, margin: "0 0 4px" }}>Services</p>
           <h1 style={{ color: WHITE, fontSize: 20, fontWeight: 800, margin: 0 }}>Hostel Booking 🏠</h1>
         </div>
-        <div style={{ display: "flex", gap: 10, alignItems: "center", flexWrap: "wrap" }}>
-          {[
-            { label: "My Bookings",     value: bookings.length },
-            { label: "Available Rooms", value: rooms.length    },
-          ].map(s => (
-            <div key={s.label} style={{ background: "rgba(255,255,255,0.15)", borderRadius: 8, padding: "8px 16px", textAlign: "center" }}>
-              <p style={{ color: WHITE, fontWeight: 800, fontSize: 18, margin: 0, lineHeight: 1 }}>{s.value}</p>
-              <p style={{ color: "rgba(255,255,255,0.65)", fontSize: 11, margin: "3px 0 0", textTransform: "uppercase", letterSpacing: 1 }}>{s.label}</p>
-            </div>
-          ))}
+        <div className="hb-header-right" style={{ display: "flex", gap: 10, alignItems: "center", flexWrap: "wrap" }}>
+          <div className="hb-header-stats" style={{ display: "flex", gap: 10 }}>
+            {[
+              { label: "My Bookings",     value: bookings.length },
+              { label: "Available Rooms", value: rooms.length    },
+            ].map(s => (
+              <div key={s.label} style={{ background: "rgba(255,255,255,0.15)", borderRadius: 8, padding: "8px 16px", textAlign: "center" }}>
+                <p style={{ color: WHITE, fontWeight: 800, fontSize: 18, margin: 0, lineHeight: 1 }}>{s.value}</p>
+                <p style={{ color: "rgba(255,255,255,0.65)", fontSize: 11, margin: "3px 0 0", textTransform: "uppercase", letterSpacing: 1 }}>{s.label}</p>
+              </div>
+            ))}
+          </div>
           <button
+            className="hb-new-btn"
             onClick={() => { setShowForm(!showForm); setError(null); }}
             style={{
               background: "rgba(255,255,255,0.2)", border: "1px solid rgba(255,255,255,0.35)",
@@ -152,7 +177,7 @@ export default function HostelBooking() {
 
       {/* BOOKING FORM */}
       {showForm && (
-        <div style={{
+        <div className="hb-form" style={{
           background: WHITE, border: `1px solid ${P}`,
           borderRadius: 8, padding: "24px 26px", marginBottom: 24,
           boxShadow: `0 0 0 3px ${P}15`,
@@ -161,7 +186,7 @@ export default function HostelBooking() {
             New Hostel Booking
           </h3>
 
-          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 16, marginBottom: 20 }}>
+          <div className="hb-form-grid" style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 16, marginBottom: 20 }}>
             {/* Hostel filter */}
             <div>
               <label style={{ fontSize: 11, fontWeight: 700, color: GREY4, letterSpacing: 1, textTransform: "uppercase", display: "block", marginBottom: 6 }}>
@@ -219,7 +244,7 @@ export default function HostelBooking() {
             </div>
           </div>
 
-          <div style={{ display: "flex", gap: 10, justifyContent: "flex-end" }}>
+          <div className="hb-form-actions" style={{ display: "flex", gap: 10, justifyContent: "flex-end" }}>
             <button onClick={() => { setShowForm(false); setError(null); }} style={{ padding: "10px 22px", background: GREY2, border: `1px solid ${GREY3}`, borderRadius: 6, color: DARK, fontWeight: 600, fontSize: 13.5, cursor: "pointer", fontFamily: "inherit" }}>Cancel</button>
             <button onClick={handleSubmit} disabled={submitting} style={{ padding: "10px 28px", background: submitting ? GREY4 : P, border: "none", borderRadius: 6, color: WHITE, fontWeight: 700, fontSize: 13.5, cursor: submitting ? "not-allowed" : "pointer", fontFamily: "inherit", transition: "background 0.15s" }}
               onMouseEnter={e => { if (!submitting) e.currentTarget.style.background = PDARK; }}
@@ -232,11 +257,11 @@ export default function HostelBooking() {
       {/* HOSTELS INFO TABLE */}
       {hostels.length > 0 && (
         <div style={{ background: WHITE, border: `1px solid ${GREY3}`, borderRadius: 8, overflow: "hidden", marginBottom: 20 }}>
-          <div style={{ padding: "16px 22px", borderBottom: `1px solid ${GREY3}`, background: GREY1 }}>
+          <div className="hb-section-title" style={{ padding: "16px 22px", borderBottom: `1px solid ${GREY3}`, background: GREY1 }}>
             <h3 style={{ fontSize: 14, fontWeight: 700, color: DARK, margin: 0 }}>Available Hostels</h3>
           </div>
-          <div style={{ overflowX: "auto" }}>
-            <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 13.5 }}>
+          <div style={{ overflowX: "auto", WebkitOverflowScrolling: "touch" }}>
+            <table className="hb-table" style={{ width: "100%", borderCollapse: "collapse", fontSize: 13.5, minWidth: 420 }}>
               <thead>
                 <tr style={{ background: GREY2, borderBottom: `2px solid ${GREY3}` }}>
                   {["#", "Hostel Name", "Gender", "Capacity", "Available Rooms"].map(h => (
@@ -276,7 +301,7 @@ export default function HostelBooking() {
 
       {/* MY BOOKINGS TABLE */}
       <div style={{ background: WHITE, border: `1px solid ${GREY3}`, borderRadius: 8, overflow: "hidden" }}>
-        <div style={{ padding: "16px 22px", borderBottom: `1px solid ${GREY3}`, background: GREY1, display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+        <div className="hb-section-title" style={{ padding: "16px 22px", borderBottom: `1px solid ${GREY3}`, background: GREY1, display: "flex", justifyContent: "space-between", alignItems: "center" }}>
           <h3 style={{ fontSize: 14, fontWeight: 700, color: DARK, margin: 0 }}>My Booking History</h3>
           <span style={{ fontSize: 12.5, color: GREY4 }}>{bookings.length} record{bookings.length !== 1 ? "s" : ""}</span>
         </div>
@@ -289,8 +314,8 @@ export default function HostelBooking() {
             <button onClick={() => setShowForm(true)} style={{ background: P, color: WHITE, fontWeight: 700, fontSize: 13.5, padding: "10px 24px", borderRadius: 6, cursor: "pointer", border: "none", fontFamily: "inherit" }}>+ New Booking</button>
           </div>
         ) : (
-          <div style={{ overflowX: "auto" }}>
-            <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 13.5 }}>
+          <div style={{ overflowX: "auto", WebkitOverflowScrolling: "touch" }}>
+            <table className="hb-table" style={{ width: "100%", borderCollapse: "collapse", fontSize: 13.5, minWidth: 480 }}>
               <thead>
                 <tr style={{ background: GREY2, borderBottom: `2px solid ${GREY3}` }}>
                   {["#", "Hostel", "Room", "Semester", "Booked On", "Status"].map(h => (

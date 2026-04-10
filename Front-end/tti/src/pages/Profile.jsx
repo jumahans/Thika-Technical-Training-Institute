@@ -10,9 +10,26 @@ const GREY3 = "#e2e8f0";
 const GREY4 = "#94a3b8";
 const DARK  = "#1e293b";
 
+const responsiveStyles = `
+  @media (max-width: 640px) {
+    .pf-header { padding: 16px 16px !important; }
+    .pf-header h1 { font-size: 17px !important; }
+    .pf-header-actions { width: 100%; display: flex; gap: 8px; }
+    .pf-header-actions button { flex: 1; justify-content: center !important; }
+    .pf-avatar-card { padding: 18px 16px !important; flex-direction: column !important; align-items: flex-start !important; gap: 16px !important; }
+    .pf-academic-chips { width: 100% !important; }
+    .pf-section { padding: 18px 16px !important; }
+    .pf-section-grid { grid-template-columns: 1fr !important; }
+    .pf-field input, .pf-field div, .pf-field textarea { font-size: 13px !important; }
+  }
+  @media (max-width: 400px) {
+    .pf-name-block h2 { font-size: 17px !important; }
+  }
+`;
+
 function Field({ label, value, name, type = "text", editing, onChange, readOnly = false }) {
   return (
-    <div style={{ display: "flex", flexDirection: "column", gap: 5 }}>
+    <div className="pf-field" style={{ display: "flex", flexDirection: "column", gap: 5 }}>
       <label style={{
         fontSize: 11, fontWeight: 700, color: GREY4,
         letterSpacing: 1, textTransform: "uppercase",
@@ -33,6 +50,8 @@ function Field({ label, value, name, type = "text", editing, onChange, readOnly 
             fontFamily: "inherit",
             background: WHITE,
             transition: "border 0.15s",
+            width: "100%",
+            boxSizing: "border-box",
           }}
           onFocus={e => e.target.style.border = `1px solid ${P}`}
           onBlur={e => e.target.style.border = `1px solid ${GREY3}`}
@@ -46,6 +65,7 @@ function Field({ label, value, name, type = "text", editing, onChange, readOnly 
           fontSize: 13.5,
           color: value ? DARK : GREY4,
           minHeight: 38,
+          wordBreak: "break-word",
         }}>
           {value || "—"}
         </div>
@@ -65,6 +85,13 @@ export default function Profile() {
   const [photoPreview, setPhotoPreview] = useState(null);
   const [photoFile,    setPhotoFile]    = useState(null);
   const fileRef = useRef();
+
+  useEffect(() => {
+    const style = document.createElement("style");
+    style.innerHTML = responsiveStyles;
+    document.head.appendChild(style);
+    return () => document.head.removeChild(style);
+  }, []);
 
   useEffect(() => {
     (async () => {
@@ -158,7 +185,7 @@ export default function Profile() {
     <div style={{ width: "100%", maxWidth: 860, margin: "0 auto" }}>
 
       {/* ── HEADER STRIP ── */}
-      <div style={{
+      <div className="pf-header" style={{
         background: P, borderRadius: 8,
         padding: "22px 28px",
         display: "flex", justifyContent: "space-between", alignItems: "center",
@@ -173,19 +200,21 @@ export default function Profile() {
           </h1>
         </div>
         {!editing ? (
-          <button
-            onClick={() => setEditing(true)}
-            style={{
-              background: "rgba(255,255,255,0.2)", border: "1px solid rgba(255,255,255,0.35)",
-              color: WHITE, fontWeight: 700, fontSize: 13.5,
-              padding: "9px 20px", borderRadius: 6, cursor: "pointer",
-              fontFamily: "inherit", transition: "background 0.15s",
-            }}
-            onMouseEnter={e => e.currentTarget.style.background = "rgba(255,255,255,0.3)"}
-            onMouseLeave={e => e.currentTarget.style.background = "rgba(255,255,255,0.2)"}
-          >✏️ Edit Profile</button>
+          <div className="pf-header-actions">
+            <button
+              onClick={() => setEditing(true)}
+              style={{
+                background: "rgba(255,255,255,0.2)", border: "1px solid rgba(255,255,255,0.35)",
+                color: WHITE, fontWeight: 700, fontSize: 13.5,
+                padding: "9px 20px", borderRadius: 6, cursor: "pointer",
+                fontFamily: "inherit", transition: "background 0.15s",
+              }}
+              onMouseEnter={e => e.currentTarget.style.background = "rgba(255,255,255,0.3)"}
+              onMouseLeave={e => e.currentTarget.style.background = "rgba(255,255,255,0.2)"}
+            >✏️ Edit Profile</button>
+          </div>
         ) : (
-          <div style={{ display: "flex", gap: 8 }}>
+          <div className="pf-header-actions" style={{ display: "flex", gap: 8 }}>
             <button
               onClick={handleCancel}
               style={{
@@ -233,7 +262,7 @@ export default function Profile() {
       )}
 
       {/* ── AVATAR CARD ── */}
-      <div style={{
+      <div className="pf-avatar-card" style={{
         background: WHITE, border: `1px solid ${GREY3}`, borderRadius: 8,
         padding: "24px 28px", marginBottom: 20,
         display: "flex", alignItems: "center", gap: 24, flexWrap: "wrap",
@@ -277,8 +306,8 @@ export default function Profile() {
         </div>
 
         {/* Name block */}
-        <div style={{ flex: 1, minWidth: 200 }}>
-          <h2 style={{ fontSize: 20, fontWeight: 800, color: DARK, margin: "0 0 4px" }}>
+        <div className="pf-name-block" style={{ flex: 1, minWidth: 180 }}>
+          <h2 style={{ fontSize: 20, fontWeight: 800, color: DARK, margin: "0 0 4px", wordBreak: "break-word" }}>
             {profile?.full_name || "—"}
           </h2>
           <p style={{ fontSize: 13, color: GREY4, margin: "0 0 8px" }}>
@@ -300,7 +329,7 @@ export default function Profile() {
         </div>
 
         {/* Read-only chips */}
-        <div style={{
+        <div className="pf-academic-chips" style={{
           background: GREY1, borderRadius: 6, padding: "12px 16px",
           display: "flex", flexDirection: "column", gap: 6,
         }}>
@@ -315,11 +344,11 @@ export default function Profile() {
       </div>
 
       {/* ── PERSONAL DETAILS ── */}
-      <div style={{ background: WHITE, border: `1px solid ${GREY3}`, borderRadius: 8, padding: "22px 24px", marginBottom: 20 }}>
+      <div className="pf-section" style={{ background: WHITE, border: `1px solid ${GREY3}`, borderRadius: 8, padding: "22px 24px", marginBottom: 20 }}>
         <h3 style={{ fontSize: 14, fontWeight: 700, color: DARK, margin: "0 0 18px", paddingBottom: 12, borderBottom: `1px solid ${GREY3}` }}>
           Personal Details
         </h3>
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))", gap: 16 }}>
+        <div className="pf-section-grid" style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))", gap: 16 }}>
           <Field label="Full Name"     name="full_name"     value={form.full_name}     editing={editing} onChange={handleChange} />
           <Field label="Email"         name="email"         value={form.email}         editing={editing} onChange={handleChange} type="email" />
           <Field label="Phone Number"  name="phone_number"  value={form.phone_number}  editing={editing} onChange={handleChange} type="tel" />
@@ -349,7 +378,7 @@ export default function Profile() {
                 border: `1px solid ${GREY3}`, borderRadius: 6,
                 fontSize: 13.5, color: DARK, outline: "none",
                 fontFamily: "inherit", resize: "vertical",
-                background: WHITE,
+                background: WHITE, boxSizing: "border-box",
               }}
               onFocus={e => e.target.style.border = `1px solid ${P}`}
               onBlur={e => e.target.style.border = `1px solid ${GREY3}`}
@@ -358,28 +387,29 @@ export default function Profile() {
             <div style={{
               padding: "9px 12px", background: GREY1, border: `1px solid ${GREY3}`,
               borderRadius: 6, fontSize: 13.5, color: form.address ? DARK : GREY4, minHeight: 38,
+              wordBreak: "break-word",
             }}>{form.address || "—"}</div>
           )}
         </div>
       </div>
 
       {/* ── NEXT OF KIN ── */}
-      <div style={{ background: WHITE, border: `1px solid ${GREY3}`, borderRadius: 8, padding: "22px 24px", marginBottom: 20 }}>
+      <div className="pf-section" style={{ background: WHITE, border: `1px solid ${GREY3}`, borderRadius: 8, padding: "22px 24px", marginBottom: 20 }}>
         <h3 style={{ fontSize: 14, fontWeight: 700, color: DARK, margin: "0 0 18px", paddingBottom: 12, borderBottom: `1px solid ${GREY3}` }}>
           Next of Kin
         </h3>
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))", gap: 16 }}>
+        <div className="pf-section-grid" style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))", gap: 16 }}>
           <Field label="Name"         name="next_of_kin_name"  value={form.next_of_kin_name}  editing={editing} onChange={handleChange} />
           <Field label="Phone Number" name="next_of_kin_phone" value={form.next_of_kin_phone} editing={editing} onChange={handleChange} type="tel" />
         </div>
       </div>
 
       {/* ── ACADEMIC INFO (read-only) ── */}
-      <div style={{ background: WHITE, border: `1px solid ${GREY3}`, borderRadius: 8, padding: "22px 24px", marginBottom: 24 }}>
+      <div className="pf-section" style={{ background: WHITE, border: `1px solid ${GREY3}`, borderRadius: 8, padding: "22px 24px", marginBottom: 24 }}>
         <h3 style={{ fontSize: 14, fontWeight: 700, color: DARK, margin: "0 0 18px", paddingBottom: 12, borderBottom: `1px solid ${GREY3}` }}>
           Academic Information <span style={{ fontSize: 11, color: GREY4, fontWeight: 500 }}>(read-only)</span>
         </h3>
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))", gap: 16 }}>
+        <div className="pf-section-grid" style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))", gap: 16 }}>
           <Field label="Admission Number" name="admission_number" value={form.admission_number} editing={false} />
           <Field label="Course"           name="course"           value={form.course}           editing={false} />
           <Field label="Department"       name="department"       value={form.department}       editing={false} />

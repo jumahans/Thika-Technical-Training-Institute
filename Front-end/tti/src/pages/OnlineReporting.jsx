@@ -15,6 +15,21 @@ const STATUS_META = {
   absent:   { color: "#dc2626", bg: "#fee2e2", label: "Absent"   },
 };
 
+const responsiveStyles = `
+  @media (max-width: 640px) {
+    .or-header { padding: 16px 16px !important; }
+    .or-header h1 { font-size: 17px !important; }
+    .or-header-right { width: 100%; justify-content: space-between !important; }
+    .or-report-btn { flex: 1; text-align: center; }
+    .or-form { padding: 18px 16px !important; }
+    .or-form-grid { grid-template-columns: 1fr !important; }
+    .or-form-actions { flex-direction: column !important; }
+    .or-form-actions button { width: 100%; }
+    .or-section-title { padding: 12px 14px !important; }
+    .or-table th, .or-table td { padding: 10px 10px !important; font-size: 12px !important; }
+  }
+`;
+
 export default function OnlineReporting() {
   const [reports,    setReports]    = useState([]);
   const [semesters,  setSemesters]  = useState([]);
@@ -26,6 +41,13 @@ export default function OnlineReporting() {
 
   const [selectedSemester, setSelectedSemester] = useState("");
   const [reportDate,       setReportDate]       = useState("");
+
+  useEffect(() => {
+    const style = document.createElement("style");
+    style.innerHTML = responsiveStyles;
+    document.head.appendChild(style);
+    return () => document.head.removeChild(style);
+  }, []);
 
   useEffect(() => {
     (async () => {
@@ -83,7 +105,7 @@ export default function OnlineReporting() {
     <div style={{ width: "100%" }}>
 
       {/* HEADER */}
-      <div style={{
+      <div className="or-header" style={{
         background: P, borderRadius: 8, padding: "22px 28px",
         display: "flex", justifyContent: "space-between", alignItems: "center",
         marginBottom: 24, flexWrap: "wrap", gap: 12,
@@ -92,16 +114,20 @@ export default function OnlineReporting() {
           <p style={{ color: "rgba(255,255,255,0.65)", fontSize: 12, margin: "0 0 4px" }}>Services</p>
           <h1 style={{ color: WHITE, fontSize: 20, fontWeight: 800, margin: 0 }}>Reporting 📝</h1>
         </div>
-        <div style={{ display: "flex", gap: 10, alignItems: "center", flexWrap: "wrap" }}>
+        <div className="or-header-right" style={{ display: "flex", gap: 10, alignItems: "center", flexWrap: "wrap" }}>
           <div style={{ background: "rgba(255,255,255,0.15)", borderRadius: 8, padding: "8px 18px", textAlign: "center" }}>
             <p style={{ color: WHITE, fontWeight: 800, fontSize: 18, margin: 0, lineHeight: 1 }}>{reports.length}</p>
             <p style={{ color: "rgba(255,255,255,0.65)", fontSize: 11, margin: "3px 0 0", textTransform: "uppercase", letterSpacing: 1 }}>Reports</p>
           </div>
-          <button onClick={() => { setShowForm(!showForm); setError(null); }} style={{
-            background: "rgba(255,255,255,0.2)", border: "1px solid rgba(255,255,255,0.35)",
-            color: WHITE, fontWeight: 700, fontSize: 13,
-            padding: "9px 18px", borderRadius: 6, cursor: "pointer", fontFamily: "inherit",
-          }}>{showForm ? "✕ Cancel" : "+ Report Attendance"}</button>
+          <button
+            className="or-report-btn"
+            onClick={() => { setShowForm(!showForm); setError(null); }}
+            style={{
+              background: "rgba(255,255,255,0.2)", border: "1px solid rgba(255,255,255,0.35)",
+              color: WHITE, fontWeight: 700, fontSize: 13,
+              padding: "9px 18px", borderRadius: 6, cursor: "pointer", fontFamily: "inherit",
+            }}
+          >{showForm ? "✕ Cancel" : "+ Report Attendance"}</button>
         </div>
       </div>
 
@@ -121,12 +147,12 @@ export default function OnlineReporting() {
 
       {/* FORM */}
       {showForm && (
-        <div style={{ background: WHITE, border: `1px solid ${P}`, borderRadius: 8, padding: "24px 26px", marginBottom: 24, boxShadow: `0 0 0 3px ${P}15` }}>
+        <div className="or-form" style={{ background: WHITE, border: `1px solid ${P}`, borderRadius: 8, padding: "24px 26px", marginBottom: 24, boxShadow: `0 0 0 3px ${P}15` }}>
           <h3 style={{ fontSize: 15, fontWeight: 700, color: DARK, margin: "0 0 20px", paddingBottom: 14, borderBottom: `1px solid ${GREY3}` }}>
             Submit Semester Report
           </h3>
 
-          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16, marginBottom: 20 }}>
+          <div className="or-form-grid" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16, marginBottom: 20 }}>
             <div>
               <label style={{ fontSize: 11, fontWeight: 700, color: GREY4, letterSpacing: 1, textTransform: "uppercase", display: "block", marginBottom: 6 }}>Semester *</label>
               <select
@@ -148,12 +174,12 @@ export default function OnlineReporting() {
                 type="date"
                 value={reportDate}
                 onChange={e => setReportDate(e.target.value)}
-                style={{ width: "100%", padding: "9px 12px", border: `1px solid ${GREY3}`, borderRadius: 6, fontSize: 13.5, color: DARK, outline: "none", background: WHITE, fontFamily: "inherit" }}
+                style={{ width: "100%", padding: "9px 12px", border: `1px solid ${GREY3}`, borderRadius: 6, fontSize: 13.5, color: DARK, outline: "none", background: WHITE, fontFamily: "inherit", boxSizing: "border-box" }}
               />
             </div>
           </div>
 
-          <div style={{ display: "flex", gap: 10, justifyContent: "flex-end" }}>
+          <div className="or-form-actions" style={{ display: "flex", gap: 10, justifyContent: "flex-end" }}>
             <button
               onClick={() => { setShowForm(false); setError(null); }}
               style={{ padding: "10px 22px", background: GREY2, border: `1px solid ${GREY3}`, borderRadius: 6, color: DARK, fontWeight: 600, fontSize: 13.5, cursor: "pointer", fontFamily: "inherit" }}
@@ -171,7 +197,7 @@ export default function OnlineReporting() {
 
       {/* TABLE */}
       <div style={{ background: WHITE, border: `1px solid ${GREY3}`, borderRadius: 8, overflow: "hidden" }}>
-        <div style={{ padding: "16px 22px", borderBottom: `1px solid ${GREY3}`, background: GREY1, display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+        <div className="or-section-title" style={{ padding: "16px 22px", borderBottom: `1px solid ${GREY3}`, background: GREY1, display: "flex", justifyContent: "space-between", alignItems: "center" }}>
           <h3 style={{ fontSize: 14, fontWeight: 700, color: DARK, margin: 0 }}>Reporting History</h3>
           <span style={{ fontSize: 12.5, color: GREY4 }}>{reports.length} record{reports.length !== 1 ? "s" : ""}</span>
         </div>
@@ -187,8 +213,8 @@ export default function OnlineReporting() {
             >+ Report Attendance</button>
           </div>
         ) : (
-          <div style={{ overflowX: "auto" }}>
-            <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 13.5 }}>
+          <div style={{ overflowX: "auto", WebkitOverflowScrolling: "touch" }}>
+            <table className="or-table" style={{ width: "100%", borderCollapse: "collapse", fontSize: 13.5, minWidth: 360 }}>
               <thead>
                 <tr style={{ background: GREY2, borderBottom: `2px solid ${GREY3}` }}>
                   {["#", "Semester", "Report Date", "Status"].map(h => (

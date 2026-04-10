@@ -11,11 +11,37 @@ const GREY3 = "#e2e8f0";
 const GREY4 = "#94a3b8";
 const DARK  = "#1e293b";
 
+const responsiveStyles = `
+  @media (max-width: 640px) {
+    .fsm-header { padding: 16px 16px !important; }
+    .fsm-header h1 { font-size: 17px !important; }
+    .fsm-header-right { width: 100%; }
+    .fsm-download-btn { width: 100%; justify-content: center !important; }
+    .fsm-stat-cards { grid-template-columns: 1fr !important; gap: 10px !important; }
+    .fsm-stat-card { padding: 16px 16px !important; }
+    .fsm-stat-value { font-size: 17px !important; }
+    .fsm-progress { padding: 16px 16px !important; }
+    .fsm-section-title { padding: 12px 14px !important; }
+    .fsm-table th, .fsm-table td { padding: 10px 10px !important; font-size: 12px !important; }
+    .fsm-balance-amount { font-size: 16px !important; }
+  }
+  @media (max-width: 400px) {
+    .fsm-stat-cards { grid-template-columns: 1fr !important; }
+  }
+`;
+
 export default function FeeSummary() {
   const [summary, setSummary] = useState(null);
   const [payments, setPayments] = useState([]);
   const [loading,  setLoading]  = useState(true);
   const [error,    setError]    = useState(null);
+
+  useEffect(() => {
+    const style = document.createElement("style");
+    style.innerHTML = responsiveStyles;
+    document.head.appendChild(style);
+    return () => document.head.removeChild(style);
+  }, []);
 
   useEffect(() => {
     (async () => {
@@ -42,10 +68,8 @@ export default function FeeSummary() {
 
   const barColor = paidPct >= 80 ? "#15803d" : paidPct >= 50 ? P : "#d97706";
 
-  // Recent 5 verified payments
   const recentPayments = payments.filter(p => p.verified).slice(0, 5);
 
-  // Per-semester breakdown from payments
   const bySemester = payments.filter(p => p.verified).reduce((acc, p) => {
     const key = p.semester_name || `Semester ${p.semester}` || "Other";
     if (!acc[key]) acc[key] = { semester: key, year: p.academic_year_label || p.academic_year || "—", total: 0, count: 0 };
@@ -190,7 +214,7 @@ export default function FeeSummary() {
     <div style={{ width: "100%" }}>
 
       {/* ── HEADER ── */}
-      <div style={{
+      <div className="fsm-header" style={{
         background: P, borderRadius: 8, padding: "22px 28px",
         display: "flex", justifyContent: "space-between", alignItems: "center",
         marginBottom: 24, flexWrap: "wrap", gap: 12,
@@ -199,21 +223,24 @@ export default function FeeSummary() {
           <p style={{ color: "rgba(255,255,255,0.65)", fontSize: 12, margin: "0 0 4px" }}>Finance</p>
           <h1 style={{ color: WHITE, fontSize: 20, fontWeight: 800, margin: 0 }}>Fee Summary 📊</h1>
         </div>
-        <button
-          onClick={handleDownload}
-          style={{
-            background: "rgba(255,255,255,0.2)", border: "1px solid rgba(255,255,255,0.35)",
-            color: WHITE, fontWeight: 700, fontSize: 13,
-            padding: "9px 18px", borderRadius: 6, cursor: "pointer",
-            fontFamily: "inherit", display: "flex", alignItems: "center", gap: 7,
-          }}
-        >
-          <span>⬇️</span> Download PDF
-        </button>
+        <div className="fsm-header-right">
+          <button
+            className="fsm-download-btn"
+            onClick={handleDownload}
+            style={{
+              background: "rgba(255,255,255,0.2)", border: "1px solid rgba(255,255,255,0.35)",
+              color: WHITE, fontWeight: 700, fontSize: 13,
+              padding: "9px 18px", borderRadius: 6, cursor: "pointer",
+              fontFamily: "inherit", display: "flex", alignItems: "center", gap: 7,
+            }}
+          >
+            <span>⬇️</span> Download PDF
+          </button>
+        </div>
       </div>
 
       {/* ── SUMMARY STAT CARDS ── */}
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 14, marginBottom: 20 }}>
+      <div className="fsm-stat-cards" style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 14, marginBottom: 20 }}>
         {[
           {
             label: "Total Fees Required",
@@ -235,7 +262,7 @@ export default function FeeSummary() {
             topBorder: balance > 0 ? "#f59e0b" : "#22c55e",
           },
         ].map(s => (
-          <div key={s.label} style={{
+          <div className="fsm-stat-card" key={s.label} style={{
             background: s.bg, border: `1px solid ${s.border}`,
             borderTop: `3px solid ${s.topBorder}`,
             borderRadius: 8, padding: "20px 22px",
@@ -246,18 +273,18 @@ export default function FeeSummary() {
               background: WHITE, display: "flex", alignItems: "center", justifyContent: "center",
               fontSize: 22, boxShadow: "0 1px 4px rgba(0,0,0,0.07)",
             }}>{s.icon}</div>
-            <div>
+            <div style={{ minWidth: 0 }}>
               <p style={{ fontSize: 11, fontWeight: 700, color: GREY4, letterSpacing: 1, textTransform: "uppercase", margin: "0 0 4px" }}>
                 {s.label}
               </p>
-              <p style={{ fontSize: 20, fontWeight: 800, color: s.color, margin: 0, lineHeight: 1 }}>{s.value}</p>
+              <p className="fsm-stat-value" style={{ fontSize: 20, fontWeight: 800, color: s.color, margin: 0, lineHeight: 1, wordBreak: "break-word" }}>{s.value}</p>
             </div>
           </div>
         ))}
       </div>
 
       {/* ── PROGRESS CARD ── */}
-      <div style={{ background: WHITE, border: `1px solid ${GREY3}`, borderRadius: 8, padding: "22px 26px", marginBottom: 20 }}>
+      <div className="fsm-progress" style={{ background: WHITE, border: `1px solid ${GREY3}`, borderRadius: 8, padding: "22px 26px", marginBottom: 20 }}>
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 14 }}>
           <h3 style={{ fontSize: 14, fontWeight: 700, color: DARK, margin: 0 }}>Payment Progress</h3>
           <span style={{ fontSize: 16, fontWeight: 800, color: barColor }}>{paidPct}%</span>
@@ -293,11 +320,11 @@ export default function FeeSummary() {
 
       {/* ── FEE BREAKDOWN TABLE ── */}
       <div style={{ background: WHITE, border: `1px solid ${GREY3}`, borderRadius: 8, overflow: "hidden", marginBottom: 20 }}>
-        <div style={{ padding: "16px 22px", borderBottom: `1px solid ${GREY3}`, background: GREY1 }}>
+        <div className="fsm-section-title" style={{ padding: "16px 22px", borderBottom: `1px solid ${GREY3}`, background: GREY1 }}>
           <h3 style={{ fontSize: 14, fontWeight: 700, color: DARK, margin: 0 }}>Fee Summary Table</h3>
         </div>
-        <div style={{ overflowX: "auto" }}>
-          <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 13.5 }}>
+        <div style={{ overflowX: "auto", WebkitOverflowScrolling: "touch" }}>
+          <table className="fsm-table" style={{ width: "100%", borderCollapse: "collapse", fontSize: 13.5, minWidth: 420 }}>
             <thead>
               <tr style={{ background: GREY2, borderBottom: `2px solid ${GREY3}` }}>
                 {["Description", "Amount (KES)", "Status"].map(h => (
@@ -349,7 +376,7 @@ export default function FeeSummary() {
                   Outstanding Balance
                 </td>
                 <td style={{ padding: "14px 18px" }}>
-                  <span style={{ fontSize: 20, fontWeight: 800, color: balance > 0 ? "#d97706" : "#15803d" }}>
+                  <span className="fsm-balance-amount" style={{ fontSize: 20, fontWeight: 800, color: balance > 0 ? "#d97706" : "#15803d" }}>
                     KES {balance.toLocaleString()}
                   </span>
                 </td>
@@ -372,11 +399,11 @@ export default function FeeSummary() {
       {/* ── PAYMENT BREAKDOWN BY SEMESTER ── */}
       {semRows.length > 0 && (
         <div style={{ background: WHITE, border: `1px solid ${GREY3}`, borderRadius: 8, overflow: "hidden", marginBottom: 20 }}>
-          <div style={{ padding: "16px 22px", borderBottom: `1px solid ${GREY3}`, background: GREY1 }}>
+          <div className="fsm-section-title" style={{ padding: "16px 22px", borderBottom: `1px solid ${GREY3}`, background: GREY1 }}>
             <h3 style={{ fontSize: 14, fontWeight: 700, color: DARK, margin: 0 }}>Payments by Semester</h3>
           </div>
-          <div style={{ overflowX: "auto" }}>
-            <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 13.5 }}>
+          <div style={{ overflowX: "auto", WebkitOverflowScrolling: "touch" }}>
+            <table className="fsm-table" style={{ width: "100%", borderCollapse: "collapse", fontSize: 13.5, minWidth: 480 }}>
               <thead>
                 <tr style={{ background: GREY2, borderBottom: `2px solid ${GREY3}` }}>
                   {["#", "Semester", "Academic Year", "Payments Made", "Total Paid (KES)"].map(h => (
@@ -425,15 +452,16 @@ export default function FeeSummary() {
       {/* ── RECENT PAYMENTS ── */}
       {recentPayments.length > 0 && (
         <div style={{ background: WHITE, border: `1px solid ${GREY3}`, borderRadius: 8, overflow: "hidden", marginBottom: 20 }}>
-          <div style={{
+          <div className="fsm-section-title" style={{
             padding: "16px 22px", borderBottom: `1px solid ${GREY3}`, background: GREY1,
             display: "flex", justifyContent: "space-between", alignItems: "center",
+            flexWrap: "wrap", gap: 6,
           }}>
             <h3 style={{ fontSize: 14, fontWeight: 700, color: DARK, margin: 0 }}>Recent Verified Payments</h3>
             <span style={{ fontSize: 12, color: GREY4 }}>Last {recentPayments.length} records</span>
           </div>
-          <div style={{ overflowX: "auto" }}>
-            <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 13.5 }}>
+          <div style={{ overflowX: "auto", WebkitOverflowScrolling: "touch" }}>
+            <table className="fsm-table" style={{ width: "100%", borderCollapse: "collapse", fontSize: 13.5, minWidth: 420 }}>
               <thead>
                 <tr style={{ background: GREY2, borderBottom: `2px solid ${GREY3}` }}>
                   {["#", "Date", "Transaction Ref", "Method", "Amount (KES)"].map(h => (

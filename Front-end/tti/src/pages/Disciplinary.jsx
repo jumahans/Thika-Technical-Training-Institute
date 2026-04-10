@@ -22,12 +22,76 @@ const STATUS_META = {
   closed:   { color: GREY4,     bg: GREY2,     label: "Closed"   },
 };
 
+const responsiveCSS = `
+  .disc-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 12px;
+  }
+  .disc-stats {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+  }
+  .disc-filter-bar {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+    flex-wrap: wrap;
+  }
+  .disc-table-wrap {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+  .disc-expand-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 16px;
+    padding-top: 4px;
+  }
+  /* Mobile: hide less-critical columns */
+  @media (max-width: 700px) {
+    .disc-col-hide-sm {
+      display: none;
+    }
+    .disc-header-pad {
+      padding: 18px 16px !important;
+    }
+    .disc-section-pad {
+      padding: 14px 12px !important;
+    }
+    .disc-expand-indent {
+      padding-left: 18px !important;
+    }
+  }
+  @media (max-width: 480px) {
+    .disc-stat-box {
+      padding: 6px 12px !important;
+    }
+    .disc-stat-val {
+      font-size: 16px !important;
+    }
+    .disc-filter-label {
+      display: none;
+    }
+  }
+`;
+
 export default function Disciplinary() {
-  const [cases,   setCases]   = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error,   setError]   = useState(null);
-  const [filter,  setFilter]  = useState("all");
-  const [expanded, setExpanded] = useState(null); // id of expanded row
+  const [cases,    setCases]    = useState([]);
+  const [loading,  setLoading]  = useState(true);
+  const [error,    setError]    = useState(null);
+  const [filter,   setFilter]   = useState("all");
+  const [expanded, setExpanded] = useState(null);
+
+  useEffect(() => {
+    const styleEl = document.createElement("style");
+    styleEl.innerHTML = responsiveCSS;
+    document.head.appendChild(styleEl);
+    return () => document.head.removeChild(styleEl);
+  }, []);
 
   useEffect(() => {
     (async () => {
@@ -69,23 +133,25 @@ export default function Disciplinary() {
     <div style={{ width: "100%" }}>
 
       {/* HEADER */}
-      <div style={{
-        background: P, borderRadius: 8, padding: "22px 28px",
-        display: "flex", justifyContent: "space-between", alignItems: "center",
-        marginBottom: 24, flexWrap: "wrap", gap: 12,
-      }}>
+      <div
+        className="disc-header disc-header-pad"
+        style={{
+          background: P, borderRadius: 8, padding: "22px 28px",
+          marginBottom: 24,
+        }}
+      >
         <div>
           <p style={{ color: "rgba(255,255,255,0.65)", fontSize: 12, margin: "0 0 4px" }}>Services</p>
           <h1 style={{ color: WHITE, fontSize: 20, fontWeight: 800, margin: 0 }}>Disciplinary Records ⚖️</h1>
         </div>
-        <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
+        <div className="disc-stats">
           {[
             { label: "Total Cases", value: cases.length },
             { label: "Open",        value: openCount     },
             { label: "Resolved",    value: resolvedCount },
           ].map(s => (
-            <div key={s.label} style={{ background: "rgba(255,255,255,0.15)", borderRadius: 8, padding: "8px 16px", textAlign: "center" }}>
-              <p style={{ color: WHITE, fontWeight: 800, fontSize: 18, margin: 0, lineHeight: 1 }}>{s.value}</p>
+            <div key={s.label} className="disc-stat-box" style={{ background: "rgba(255,255,255,0.15)", borderRadius: 8, padding: "8px 16px", textAlign: "center" }}>
+              <p className="disc-stat-val" style={{ color: WHITE, fontWeight: 800, fontSize: 18, margin: 0, lineHeight: 1 }}>{s.value}</p>
               <p style={{ color: "rgba(255,255,255,0.65)", fontSize: 11, margin: "3px 0 0", textTransform: "uppercase", letterSpacing: 1 }}>{s.label}</p>
             </div>
           ))}
@@ -97,9 +163,9 @@ export default function Disciplinary() {
         <div style={{
           background: "#fef2f2", border: "1px solid #fecaca",
           borderRadius: 8, padding: "14px 20px", marginBottom: 20,
-          display: "flex", alignItems: "center", gap: 14,
+          display: "flex", alignItems: "flex-start", gap: 14, flexWrap: "wrap",
         }}>
-          <span style={{ fontSize: 24 }}>⚠️</span>
+          <span style={{ fontSize: 24, flexShrink: 0 }}>⚠️</span>
           <div>
             <p style={{ fontSize: 14, fontWeight: 700, color: "#dc2626", margin: "0 0 3px" }}>
               You have {openCount} open disciplinary case{openCount !== 1 ? "s" : ""}
@@ -125,31 +191,38 @@ export default function Disciplinary() {
 
       {/* FILTER TABS */}
       {cases.length > 0 && (
-        <div style={{
-          background: WHITE, border: `1px solid ${GREY3}`, borderRadius: 8,
-          padding: "12px 16px", marginBottom: 16,
-          display: "flex", gap: 8, alignItems: "center", flexWrap: "wrap",
-        }}>
-          <span style={{ fontSize: 12.5, color: GREY4, fontWeight: 600, marginRight: 4 }}>Filter:</span>
-          {["all", "open", "pending", "resolved", "closed"].map(f => (
-            <button key={f} onClick={() => setFilter(f)} style={{
-              background: filter === f ? P : GREY1,
-              border: `1px solid ${filter === f ? P : GREY3}`,
-              color: filter === f ? WHITE : GREY4,
-              fontSize: 12.5, fontWeight: filter === f ? 700 : 500,
-              padding: "5px 14px", borderRadius: 99, cursor: "pointer",
-              textTransform: "capitalize", fontFamily: "inherit", transition: "all 0.15s",
-            }}>
-              {f === "all" ? `All (${cases.length})` : `${f.charAt(0).toUpperCase() + f.slice(1)} (${cases.filter(c => c.status === f).length})`}
-            </button>
-          ))}
+        <div
+          className="disc-section-pad"
+          style={{
+            background: WHITE, border: `1px solid ${GREY3}`, borderRadius: 8,
+            padding: "12px 16px", marginBottom: 16,
+          }}
+        >
+          <div className="disc-filter-bar">
+            <span className="disc-filter-label" style={{ fontSize: 12.5, color: GREY4, fontWeight: 600, marginRight: 4 }}>Filter:</span>
+            {["all", "open", "pending", "resolved", "closed"].map(f => (
+              <button key={f} onClick={() => setFilter(f)} style={{
+                background: filter === f ? P : GREY1,
+                border: `1px solid ${filter === f ? P : GREY3}`,
+                color: filter === f ? WHITE : GREY4,
+                fontSize: 12.5, fontWeight: filter === f ? 700 : 500,
+                padding: "5px 14px", borderRadius: 99, cursor: "pointer",
+                textTransform: "capitalize", fontFamily: "inherit", transition: "all 0.15s",
+              }}>
+                {f === "all"
+                  ? `All (${cases.length})`
+                  : `${f.charAt(0).toUpperCase() + f.slice(1)} (${cases.filter(c => c.status === f).length})`
+                }
+              </button>
+            ))}
+          </div>
         </div>
       )}
 
       {/* TABLE */}
       {cases.length > 0 && (
         <div style={{ background: WHITE, border: `1px solid ${GREY3}`, borderRadius: 8, overflow: "hidden" }}>
-          <div style={{ padding: "16px 22px", borderBottom: `1px solid ${GREY3}`, background: GREY1, display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+          <div className="disc-section-pad" style={{ padding: "16px 22px", borderBottom: `1px solid ${GREY3}`, background: GREY1, display: "flex", justifyContent: "space-between", alignItems: "center" }}>
             <h3 style={{ fontSize: 14, fontWeight: 700, color: DARK, margin: 0 }}>Case Records</h3>
             <span style={{ fontSize: 12.5, color: GREY4 }}>{filtered.length} of {cases.length} record{cases.length !== 1 ? "s" : ""}</span>
           </div>
@@ -159,13 +232,18 @@ export default function Disciplinary() {
               <p style={{ color: GREY4, fontSize: 13 }}>No cases match the selected filter.</p>
             </div>
           ) : (
-            <div style={{ overflowX: "auto" }}>
+            <div className="disc-table-wrap">
               <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 13.5 }}>
                 <thead>
                   <tr style={{ background: GREY2, borderBottom: `2px solid ${GREY3}` }}>
-                    {["#", "Case Reference", "Offence", "Severity", "Date", "Hearing Date", "Status", ""].map(h => (
-                      <th key={h} style={{ padding: "12px 18px", textAlign: "left", fontSize: 11, fontWeight: 700, color: GREY4, letterSpacing: 0.8, textTransform: "uppercase", whiteSpace: "nowrap" }}>{h}</th>
-                    ))}
+                    <th style={{ padding: "12px 18px", textAlign: "left", fontSize: 11, fontWeight: 700, color: GREY4, letterSpacing: 0.8, textTransform: "uppercase", whiteSpace: "nowrap" }}>#</th>
+                    <th style={{ padding: "12px 18px", textAlign: "left", fontSize: 11, fontWeight: 700, color: GREY4, letterSpacing: 0.8, textTransform: "uppercase", whiteSpace: "nowrap" }}>Case Reference</th>
+                    <th style={{ padding: "12px 18px", textAlign: "left", fontSize: 11, fontWeight: 700, color: GREY4, letterSpacing: 0.8, textTransform: "uppercase", whiteSpace: "nowrap" }}>Offence</th>
+                    <th style={{ padding: "12px 18px", textAlign: "left", fontSize: 11, fontWeight: 700, color: GREY4, letterSpacing: 0.8, textTransform: "uppercase", whiteSpace: "nowrap" }}>Severity</th>
+                    <th className="disc-col-hide-sm" style={{ padding: "12px 18px", textAlign: "left", fontSize: 11, fontWeight: 700, color: GREY4, letterSpacing: 0.8, textTransform: "uppercase", whiteSpace: "nowrap" }}>Date</th>
+                    <th className="disc-col-hide-sm" style={{ padding: "12px 18px", textAlign: "left", fontSize: 11, fontWeight: 700, color: GREY4, letterSpacing: 0.8, textTransform: "uppercase", whiteSpace: "nowrap" }}>Hearing Date</th>
+                    <th style={{ padding: "12px 18px", textAlign: "left", fontSize: 11, fontWeight: 700, color: GREY4, letterSpacing: 0.8, textTransform: "uppercase", whiteSpace: "nowrap" }}>Status</th>
+                    <th style={{ padding: "12px 18px", textAlign: "left", fontSize: 11, fontWeight: 700, color: GREY4, letterSpacing: 0.8, textTransform: "uppercase", whiteSpace: "nowrap" }}></th>
                   </tr>
                 </thead>
                 <tbody>
@@ -200,12 +278,12 @@ export default function Disciplinary() {
                           <td style={{ padding: "13px 18px" }}>
                             <span style={{ background: severityMeta.bg, color: severityMeta.color, fontSize: 12, fontWeight: 700, padding: "3px 10px", borderRadius: 99 }}>{severityMeta.label}</span>
                           </td>
-                          <td style={{ padding: "13px 18px", color: DARK, whiteSpace: "nowrap" }}>
+                          <td className="disc-col-hide-sm" style={{ padding: "13px 18px", color: DARK, whiteSpace: "nowrap" }}>
                             {c.date_of_offence || c.incident_date
                               ? new Date(c.date_of_offence || c.incident_date).toLocaleDateString("en-KE", { day: "numeric", month: "short", year: "numeric" })
                               : "—"}
                           </td>
-                          <td style={{ padding: "13px 18px", color: DARK, whiteSpace: "nowrap" }}>
+                          <td className="disc-col-hide-sm" style={{ padding: "13px 18px", color: DARK, whiteSpace: "nowrap" }}>
                             {c.hearing_date
                               ? new Date(c.hearing_date).toLocaleDateString("en-KE", { day: "numeric", month: "short", year: "numeric" })
                               : <span style={{ color: GREY4 }}>Not scheduled</span>}
@@ -223,8 +301,8 @@ export default function Disciplinary() {
                         {/* Expanded detail row */}
                         {isExpanded && (
                           <tr key={`${c.id || i}-detail`} style={{ borderBottom: `1px solid ${GREY3}` }}>
-                            <td colSpan={8} style={{ padding: "0 18px 18px 52px", background: `${P}05` }}>
-                              <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))", gap: 16, paddingTop: 4 }}>
+                            <td colSpan={8} className="disc-expand-indent" style={{ padding: "0 18px 18px 52px", background: `${P}05` }}>
+                              <div className="disc-expand-grid">
                                 {c.description && (
                                   <div>
                                     <p style={{ fontSize: 11, fontWeight: 700, color: GREY4, letterSpacing: 1, textTransform: "uppercase", margin: "0 0 5px" }}>Full Description</p>
@@ -243,6 +321,23 @@ export default function Disciplinary() {
                                     <p style={{ fontSize: 13, color: "#15803d", fontWeight: 600, lineHeight: 1.6, margin: 0 }}>{c.resolution}</p>
                                   </div>
                                 )}
+                                {/* Show hidden date fields in expanded row on mobile */}
+                                <div className="disc-col-show-sm" style={{ display: "none" }}>
+                                  <p style={{ fontSize: 11, fontWeight: 700, color: GREY4, letterSpacing: 1, textTransform: "uppercase", margin: "0 0 5px" }}>Incident Date</p>
+                                  <p style={{ fontSize: 13, color: DARK, margin: 0 }}>
+                                    {c.date_of_offence || c.incident_date
+                                      ? new Date(c.date_of_offence || c.incident_date).toLocaleDateString("en-KE", { day: "numeric", month: "short", year: "numeric" })
+                                      : "—"}
+                                  </p>
+                                </div>
+                                <div className="disc-col-show-sm" style={{ display: "none" }}>
+                                  <p style={{ fontSize: 11, fontWeight: 700, color: GREY4, letterSpacing: 1, textTransform: "uppercase", margin: "0 0 5px" }}>Hearing Date</p>
+                                  <p style={{ fontSize: 13, color: DARK, margin: 0 }}>
+                                    {c.hearing_date
+                                      ? new Date(c.hearing_date).toLocaleDateString("en-KE", { day: "numeric", month: "short", year: "numeric" })
+                                      : "Not scheduled"}
+                                  </p>
+                                </div>
                               </div>
                             </td>
                           </tr>

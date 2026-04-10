@@ -10,12 +10,44 @@ const GREY3 = "#e2e8f0";
 const GREY4 = "#94a3b8";
 const DARK  = "#1e293b";
 
+const responsiveStyles = `
+  @media (max-width: 640px) {
+    .ec-header { padding: 16px 16px !important; }
+    .ec-header h1 { font-size: 17px !important; }
+    .ec-banner { padding: 12px 14px !important; gap: 10px !important; }
+    .ec-banner-icon { width: 34px !important; height: 34px !important; font-size: 16px !important; flex-shrink: 0; }
+    .ec-card-header { padding: 16px 16px !important; gap: 12px !important; }
+    .ec-card-header-icon { width: 40px !important; height: 40px !important; font-size: 18px !important; }
+    .ec-card-header h2 { font-size: 15px !important; }
+    .ec-card-header-badge { display: none !important; }
+    .ec-info-grid { grid-template-columns: 1fr 1fr !important; }
+    .ec-info-cell { padding: 12px 14px !important; border-right: none !important; border-bottom: 1px solid #e2e8f0 !important; }
+    .ec-units-pad { padding: 14px 14px !important; }
+    .ec-table th, .ec-table td { padding: 10px 10px !important; font-size: 12px !important; }
+    .ec-footer { padding: 12px 14px !important; flex-direction: column !important; align-items: flex-start !important; gap: 10px !important; }
+    .ec-not-cleared { padding: 16px 16px !important; }
+    .ec-selector { display: flex; flex-wrap: wrap; }
+    .ec-print-btn { width: 100%; justify-content: center; }
+    .ec-header-actions { width: 100%; }
+  }
+  @media (max-width: 400px) {
+    .ec-info-grid { grid-template-columns: 1fr !important; }
+  }
+`;
+
 export default function ExamCard() {
   const [cards,   setCards]   = useState([]);
-  const [active,  setActive]  = useState(0); // index of currently viewed card
+  const [active,  setActive]  = useState(0);
   const [loading, setLoading] = useState(true);
   const [error,   setError]   = useState(null);
   const printRef = useRef();
+
+  useEffect(() => {
+    const style = document.createElement("style");
+    style.innerHTML = responsiveStyles;
+    document.head.appendChild(style);
+    return () => document.head.removeChild(style);
+  }, []);
 
   useEffect(() => {
     (async () => {
@@ -76,7 +108,7 @@ export default function ExamCard() {
 
   if (cards.length === 0) return (
     <div style={{ width: "100%" }}>
-      <div style={{
+      <div className="ec-header" style={{
         background: P, borderRadius: 8, padding: "22px 28px", marginBottom: 24,
       }}>
         <p style={{ color: "rgba(255,255,255,0.65)", fontSize: 12, margin: "0 0 4px" }}>Academic Progress</p>
@@ -105,7 +137,7 @@ export default function ExamCard() {
     <div style={{ width: "100%" }}>
 
       {/* ── HEADER ── */}
-      <div style={{
+      <div className="ec-header" style={{
         background: P, borderRadius: 8, padding: "22px 28px",
         display: "flex", justifyContent: "space-between", alignItems: "center",
         marginBottom: 24, flexWrap: "wrap", gap: 12,
@@ -114,10 +146,9 @@ export default function ExamCard() {
           <p style={{ color: "rgba(255,255,255,0.65)", fontSize: 12, margin: "0 0 4px" }}>Academic Progress</p>
           <h1 style={{ color: WHITE, fontSize: 20, fontWeight: 800, margin: 0 }}>Exam Card 🪪</h1>
         </div>
-        <div style={{ display: "flex", gap: 10, alignItems: "center", flexWrap: "wrap" }}>
-          {/* Card selector if multiple */}
+        <div className="ec-header-actions" style={{ display: "flex", gap: 10, alignItems: "center", flexWrap: "wrap" }}>
           {cards.length > 1 && (
-            <div style={{ display: "flex", background: "rgba(255,255,255,0.15)", borderRadius: 6, padding: 3, gap: 2 }}>
+            <div className="ec-selector" style={{ display: "flex", background: "rgba(255,255,255,0.15)", borderRadius: 6, padding: 3, gap: 2 }}>
               {cards.map((c, i) => (
                 <button key={c.id || i} onClick={() => setActive(i)} style={{
                   background: active === i ? WHITE : "transparent",
@@ -134,6 +165,7 @@ export default function ExamCard() {
           )}
           {isAvailable && (
             <button
+              className="ec-print-btn"
               onClick={handlePrint}
               style={{
                 background: "rgba(255,255,255,0.2)", border: "1px solid rgba(255,255,255,0.35)",
@@ -147,13 +179,13 @@ export default function ExamCard() {
       </div>
 
       {/* ── CLEARANCE STATUS BANNER ── */}
-      <div style={{
+      <div className="ec-banner" style={{
         background: isCleared ? "#f0fdf4" : "#fef9c3",
         border: `1px solid ${isCleared ? "#bbf7d0" : "#fde68a"}`,
         borderRadius: 8, padding: "14px 20px", marginBottom: 20,
         display: "flex", alignItems: "center", gap: 14,
       }}>
-        <div style={{
+        <div className="ec-banner-icon" style={{
           width: 40, height: 40, borderRadius: "50%", flexShrink: 0,
           background: isCleared ? "#dcfce7" : "#fef9c3",
           display: "flex", alignItems: "center", justifyContent: "center",
@@ -180,17 +212,18 @@ export default function ExamCard() {
           overflow: "hidden", marginBottom: 20,
         }}>
           {/* Card header */}
-          <div style={{
+          <div className="ec-card-header" style={{
             background: P, padding: "20px 28px",
             display: "flex", alignItems: "center", gap: 18,
+            flexWrap: "wrap",
           }}>
-            <div style={{
+            <div className="ec-card-header-icon" style={{
               width: 52, height: 52, borderRadius: "50%",
               background: "rgba(255,255,255,0.2)",
               display: "flex", alignItems: "center", justifyContent: "center",
               fontSize: 24, flexShrink: 0,
             }}>🏫</div>
-            <div>
+            <div style={{ flex: 1, minWidth: 0 }}>
               <p style={{ color: "rgba(255,255,255,0.7)", fontSize: 11, letterSpacing: 2, textTransform: "uppercase", margin: "0 0 3px" }}>
                 Thika Technical Training Institute
               </p>
@@ -201,7 +234,7 @@ export default function ExamCard() {
                 {card?.semester_name || "—"} · Academic Year: {card?.academic_year || "—"}
               </p>
             </div>
-            <div style={{ marginLeft: "auto", textAlign: "right" }}>
+            <div className="ec-card-header-badge" style={{ marginLeft: "auto", textAlign: "right" }}>
               <div style={{
                 background: isCleared ? "#dcfce7" : "#fef9c3",
                 color: isCleared ? "#15803d" : "#a16207",
@@ -220,7 +253,7 @@ export default function ExamCard() {
           </div>
 
           {/* Student info grid */}
-          <div style={{
+          <div className="ec-info-grid" style={{
             display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(180px, 1fr))",
             gap: 0, borderBottom: `2px solid ${GREY3}`,
           }}>
@@ -230,7 +263,7 @@ export default function ExamCard() {
               { label: "Course",            value: card?.course            || "—" },
               { label: "Department",        value: card?.department        || "—" },
             ].map((row, i, arr) => (
-              <div key={i} style={{
+              <div className="ec-info-cell" key={i} style={{
                 padding: "16px 22px",
                 borderRight: i < arr.length - 1 ? `1px solid ${GREY3}` : "none",
                 borderBottom: "none",
@@ -238,7 +271,7 @@ export default function ExamCard() {
                 <p style={{ fontSize: 10.5, fontWeight: 700, color: GREY4, letterSpacing: 1, textTransform: "uppercase", margin: "0 0 4px" }}>
                   {row.label}
                 </p>
-                <p style={{ fontSize: 14, fontWeight: 700, color: DARK, margin: 0 }}>
+                <p style={{ fontSize: 14, fontWeight: 700, color: DARK, margin: 0, wordBreak: "break-word" }}>
                   {row.value}
                 </p>
               </div>
@@ -246,7 +279,7 @@ export default function ExamCard() {
           </div>
 
           {/* Registered units table */}
-          <div style={{ padding: "20px 22px" }}>
+          <div className="ec-units-pad" style={{ padding: "20px 22px" }}>
             <p style={{ fontSize: 12, fontWeight: 700, color: GREY4, letterSpacing: 1, textTransform: "uppercase", margin: "0 0 14px" }}>
               Registered Units — {units.length} unit{units.length !== 1 ? "s" : ""}
             </p>
@@ -256,8 +289,8 @@ export default function ExamCard() {
                 <p style={{ fontSize: 13 }}>No units registered on this exam card.</p>
               </div>
             ) : (
-              <div style={{ overflowX: "auto" }}>
-                <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 13 }}>
+              <div style={{ overflowX: "auto", WebkitOverflowScrolling: "touch" }}>
+                <table className="ec-table" style={{ width: "100%", borderCollapse: "collapse", fontSize: 13, minWidth: 420 }}>
                   <thead>
                     <tr style={{ background: GREY1, borderBottom: `2px solid ${GREY3}` }}>
                       {["#", "Unit Code", "Unit Name", "Lecturer"].map(h => (
@@ -301,7 +334,7 @@ export default function ExamCard() {
           </div>
 
           {/* Card footer */}
-          <div style={{
+          <div className="ec-footer" style={{
             borderTop: `2px dashed ${GREY3}`,
             padding: "14px 22px",
             background: GREY1,
@@ -314,6 +347,7 @@ export default function ExamCard() {
             <div style={{
               background: WHITE, border: `1px solid ${GREY3}`,
               borderRadius: 5, padding: "8px 14px", textAlign: "center",
+              flexShrink: 0,
             }}>
               <p style={{ fontSize: 10, color: GREY4, margin: "0 0 2px", textTransform: "uppercase", letterSpacing: 1 }}>Card ID</p>
               <p style={{ fontSize: 13, fontWeight: 800, color: DARK, margin: 0, letterSpacing: 1 }}>
@@ -326,7 +360,7 @@ export default function ExamCard() {
 
       {/* ── NOT CLEARED NOTE ── */}
       {!isCleared && (
-        <div style={{
+        <div className="ec-not-cleared" style={{
           background: WHITE, border: `1px solid ${GREY3}`, borderRadius: 8,
           padding: "20px 24px",
         }}>

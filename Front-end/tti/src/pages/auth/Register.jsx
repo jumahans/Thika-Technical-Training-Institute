@@ -85,8 +85,9 @@ export default function Register() {
           align-items: flex-start;
           justify-content: center;
           font-family: 'Barlow', sans-serif;
-          padding: 60px;
+          padding: 150px;
           box-sizing: border-box;
+          margin-top: 20rem;
         }
 
         .reg-box {
@@ -153,7 +154,58 @@ export default function Register() {
 
         .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
         @media (max-width: 520px) { .two-col { grid-template-columns: 1fr; } }
-      `}</style>
+      
+
+        /* ===== SCROLLING FIX - Form Overflow ===== */
+        .reg-page {
+          overflow-y: auto;
+          -webkit-overflow-scrolling: touch;
+        }
+
+        /* ===== MOBILE RESPONSIVE - Phone Screens ===== */
+        @media (max-width: 768px) {
+          .reg-page {
+            padding: 16px;
+            align-items: flex-start;
+            height: auto;
+            min-height: 100vh;
+            overflow-y: auto;
+          }
+          .reg-box {
+            max-width: 100%;
+            width: 100%;
+            margin: 0 auto;
+            border-radius: 8px;
+            box-shadow: 0 4px 40px rgba(0,0,0,0.10);
+            padding: 24px 20px;
+            height: auto;
+          }
+        }
+
+        @media (max-width: 480px) {
+          .reg-page {
+            padding: 12px;
+          }
+          .reg-box {
+            padding: 20px 16px;
+            border-radius: 6px;
+          }
+        }
+
+        @media (max-width: 480px) {
+          .reg-box {
+            padding: 20px 12px;
+          }
+          .two-col {
+            grid-template-columns: 1fr;
+            gap: 16px;
+          }
+          .f-input {
+            font-size: 16px;
+            padding: 14px 12px;
+          }
+        }
+`}</style>
 
       <div className="reg-page">
         <div className="reg-box">

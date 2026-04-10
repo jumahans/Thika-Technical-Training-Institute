@@ -33,6 +33,68 @@ function SectionTitle({ title, action, actionPath }) {
   );
 }
 
+/* ── Inline responsive styles injected once ── */
+const responsiveCSS = `
+  .dash-stats-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 16px;
+    margin-bottom: 24px;
+  }
+  .dash-two-col {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+    margin-bottom: 20px;
+  }
+  .dash-welcome {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 12px;
+  }
+  .dash-table-wrap {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+  @media (max-width: 900px) {
+    .dash-stats-grid {
+      grid-template-columns: repeat(2, 1fr);
+    }
+    .dash-two-col {
+      grid-template-columns: 1fr;
+    }
+  }
+  @media (max-width: 540px) {
+    .dash-stats-grid {
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+    }
+    .dash-welcome {
+      flex-direction: column;
+      align-items: flex-start;
+    }
+    .dash-welcome-card {
+      width: 100%;
+      text-align: left !important;
+    }
+    .dash-stat-card {
+      padding: 14px 14px !important;
+    }
+    .dash-stat-value {
+      font-size: 18px !important;
+    }
+    .dash-section-pad {
+      padding: 16px 14px !important;
+    }
+    .dash-results-avg {
+      flex-direction: column;
+      gap: 4px;
+    }
+  }
+`;
+
 export default function Dashboard() {
   const [units,    setUnits]    = useState([]);
   const [results,  setResults]  = useState([]);
@@ -40,6 +102,13 @@ export default function Dashboard() {
   const [fees,     setFees]     = useState(null);
   const [loading,  setLoading]  = useState(true);
   const [error,    setError]    = useState(null);
+
+  useEffect(() => {
+    const styleEl = document.createElement("style");
+    styleEl.innerHTML = responsiveCSS;
+    document.head.appendChild(styleEl);
+    return () => document.head.removeChild(styleEl);
+  }, []);
 
   useEffect(() => {
     const load = async () => {
@@ -101,13 +170,8 @@ export default function Dashboard() {
         background: P,
         borderRadius: 8,
         padding: "22px 28px",
-        display: "flex",
-        justifyContent: "space-between",
-        alignItems: "center",
         marginBottom: 24,
-        flexWrap: "wrap",
-        gap: 12,
-      }}>
+      }} className="dash-welcome">
         <div>
           <p style={{ color: "rgba(255,255,255,0.65)", fontSize: 12, marginBottom: 4 }}>
             Student Portal Dashboard
@@ -116,7 +180,7 @@ export default function Dashboard() {
             Welcome back 👋
           </h1>
         </div>
-        <div style={{
+        <div className="dash-welcome-card" style={{
           background: "rgba(255,255,255,0.15)",
           borderRadius: 8,
           padding: "10px 20px",
@@ -132,19 +196,14 @@ export default function Dashboard() {
       </div>
 
       {/* ── STATS ROW ── */}
-      <div style={{
-        display: "grid",
-        gridTemplateColumns: "repeat(4, 1fr)",
-        gap: 16,
-        marginBottom: 24,
-      }}>
+      <div className="dash-stats-grid">
         {[
           { label: "Fee Balance",      value: balanceFee > 0 ? `KES ${balanceFee.toLocaleString()}` : "Cleared", icon: "💳" },
           { label: "Total Fee",        value: totalFee > 0 ? `KES ${totalFee.toLocaleString()}` : "—",           icon: "📊" },
           { label: "Registered Units", value: units.length || "—",                                               icon: "📚" },
           { label: "Average Score",    value: avg > 0 ? `${avg}%` : "—",                                        icon: "🎓" },
         ].map((s, i) => (
-          <div key={i} style={{
+          <div key={i} className="dash-stat-card" style={{
             background: WHITE,
             border: `1px solid ${GREY3}`,
             borderTop: `3px solid ${P}`,
@@ -154,13 +213,13 @@ export default function Dashboard() {
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start" }}>
               <div>
                 <p style={{ fontSize: 11, fontWeight: 700, color: GREY4, letterSpacing: 1, textTransform: "uppercase", marginBottom: 8, margin: "0 0 8px" }}>{s.label}</p>
-                <p style={{ fontSize: 22, fontWeight: 800, color: DARK, margin: 0, lineHeight: 1 }}>{s.value}</p>
+                <p className="dash-stat-value" style={{ fontSize: 22, fontWeight: 800, color: DARK, margin: 0, lineHeight: 1 }}>{s.value}</p>
               </div>
               <div style={{
                 width: 38, height: 38, borderRadius: 8,
                 background: `${P}15`,
                 display: "flex", alignItems: "center", justifyContent: "center",
-                fontSize: 18,
+                fontSize: 18, flexShrink: 0,
               }}>{s.icon}</div>
             </div>
           </div>
@@ -168,10 +227,10 @@ export default function Dashboard() {
       </div>
 
       {/* ── FEE + EXAM CARD ROW ── */}
-      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 20, marginBottom: 20 }}>
+      <div className="dash-two-col">
 
         {/* Fee Summary */}
-        <div style={{ background: WHITE, border: `1px solid ${GREY3}`, borderRadius: 8, padding: "22px 24px" }}>
+        <div className="dash-section-pad" style={{ background: WHITE, border: `1px solid ${GREY3}`, borderRadius: 8, padding: "22px 24px" }}>
           <SectionTitle title="Fee Summary" action="View Payments" actionPath="/fees/payments" />
 
           {/* Progress bar */}
@@ -200,6 +259,8 @@ export default function Dashboard() {
               display: "flex", justifyContent: "space-between",
               padding: "10px 0",
               borderBottom: i < 2 ? `1px solid ${GREY3}` : "none",
+              flexWrap: "wrap",
+              gap: 4,
             }}>
               <span style={{ fontSize: 13.5, color: GREY4 }}>{row.label}</span>
               <span style={{ fontSize: 13.5, fontWeight: row.bold ? 700 : 600, color: row.color }}>{row.value}</span>
@@ -211,6 +272,7 @@ export default function Dashboard() {
               marginTop: 16, background: GREY1, borderRadius: 6,
               padding: "10px 14px",
               display: "flex", justifyContent: "space-between", alignItems: "center",
+              flexWrap: "wrap", gap: 8,
             }}>
               <div>
                 <p style={{ fontSize: 11, color: GREY4, letterSpacing: 1, textTransform: "uppercase", margin: "0 0 2px" }}>Last Payment</p>
@@ -233,7 +295,7 @@ export default function Dashboard() {
         </div>
 
         {/* Exam Card */}
-        <div style={{ background: WHITE, border: `1px solid ${GREY3}`, borderRadius: 8, padding: "22px 24px" }}>
+        <div className="dash-section-pad" style={{ background: WHITE, border: `1px solid ${GREY3}`, borderRadius: 8, padding: "22px 24px" }}>
           <SectionTitle title="Exam Card" action="View Full Card" actionPath="/exam-card" />
 
           {examCard ? (
@@ -260,6 +322,7 @@ export default function Dashboard() {
                   display: "flex", justifyContent: "space-between",
                   padding: "10px 0",
                   borderBottom: i < 1 ? `1px solid ${GREY3}` : "none",
+                  flexWrap: "wrap", gap: 4,
                 }}>
                   <span style={{ fontSize: 13, color: GREY4 }}>{row.label}</span>
                   <span style={{ fontSize: 13, fontWeight: 600, color: DARK }}>{row.value}</span>
@@ -286,11 +349,11 @@ export default function Dashboard() {
       </div>
 
       {/* ── REGISTERED UNITS ── */}
-      <div style={{ background: WHITE, border: `1px solid ${GREY3}`, borderRadius: 8, padding: "22px 24px", marginBottom: 20 }}>
+      <div className="dash-section-pad" style={{ background: WHITE, border: `1px solid ${GREY3}`, borderRadius: 8, padding: "22px 24px", marginBottom: 20 }}>
         <SectionTitle title="Registered Units — Current Semester" action="Register Units" actionPath="/unit-registration" />
 
         {units.length > 0 ? (
-          <div style={{ overflowX: "auto" }}>
+          <div className="dash-table-wrap">
             <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 13.5 }}>
               <thead>
                 <tr style={{ background: GREY1, borderBottom: `2px solid ${GREY3}` }}>
@@ -341,12 +404,12 @@ export default function Dashboard() {
       </div>
 
       {/* ── RESULTS ── */}
-      <div style={{ background: WHITE, border: `1px solid ${GREY3}`, borderRadius: 8, padding: "22px 24px" }}>
+      <div className="dash-section-pad" style={{ background: WHITE, border: `1px solid ${GREY3}`, borderRadius: 8, padding: "22px 24px" }}>
         <SectionTitle title="Previous Semester Results" action="View All Results" actionPath="/results" />
 
         {results.length > 0 ? (
           <>
-            <div style={{ overflowX: "auto" }}>
+            <div className="dash-table-wrap">
               <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 13.5 }}>
                 <thead>
                   <tr style={{ background: GREY1, borderBottom: `2px solid ${GREY3}` }}>
@@ -381,7 +444,7 @@ export default function Dashboard() {
                         </td>
                         <td style={{ padding: "12px 14px" }}>
                           <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-                            <div style={{ flex: 1, height: 6, background: GREY2, borderRadius: 99, overflow: "hidden", minWidth: 80 }}>
+                            <div style={{ flex: 1, height: 6, background: GREY2, borderRadius: 99, overflow: "hidden", minWidth: 60 }}>
                               <div style={{
                                 height: "100%", width: `${marks}%`,
                                 background: gradeColor(grade), borderRadius: 99,
@@ -413,7 +476,7 @@ export default function Dashboard() {
               </table>
             </div>
 
-            <div style={{
+            <div className="dash-results-avg" style={{
               marginTop: 16, padding: "12px 14px",
               background: GREY1, borderRadius: 6,
               display: "flex", justifyContent: "space-between", alignItems: "center",
