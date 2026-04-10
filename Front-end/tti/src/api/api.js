@@ -2,8 +2,8 @@
 
 import axios from "axios";
 
-const BASE_URL = "http://127.0.0.1:8000/"
-// const BASE_URL = "https://thika-technical-training-institute.onrender.com/"
+// const BASE_URL = "http://127.0.0.1:8000/"
+const BASE_URL = "https://thika-technical-training-institute.onrender.com/"
 
 // ── AXIOS INSTANCE ────────────────────────────────────────────────────────────
 const api = axios.create({
